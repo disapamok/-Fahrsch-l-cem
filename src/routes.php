@@ -6,13 +6,27 @@ use Simcify\Middleware\Authenticate;
 use Pecee\Http\Middleware\BaseCsrfVerifier;
 use Simcify\Middleware\RedirectIfAuthenticated;
 
+
+    $exceptCSRF = array(
+        '/api/fetch-user'
+    );
+
+    if(!in_array($_SERVER["REQUEST_URI"], $exceptCSRF)){
+        Router::csrfVerifier(new BaseCsrfVerifier());
+    }
+
+    /*
+    * API Routes
+    */
+    Router::group(['prefix' => '/api'], function() {
+        Router::post('/fetch-user', 'API@fetchUser');
+    });
 /**
  * ,------,
  * | NOTE | CSRF Tokens are checked on all PUT, POST and GET requests. It
  * '------' should be passed in a hidden field named "csrf-token" or a header
  *          (in the case of AJAX without credentials) called "X-CSRF-TOKEN"
  *  */
-Router::csrfVerifier(new BaseCsrfVerifier());
 
 Router::group(array(
     //'prefix' => env("APP_ROUTE_DIRECTORY")
@@ -290,11 +304,3 @@ Router::group(array(
     // error pages
     Router::get('/404', 'Schleier@error404');
     Router::get('/405', 'Schleier@error405');
-
-
-    /*
-    * API Routes
-    */
-    Router::group(['prefix' => '/api'], function() {
-        Router::get('/fetch-user', 'API@fetchUser');
-    });

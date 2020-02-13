@@ -33,4 +33,8 @@ class API{
 
 		var_dump($signin);
 	}
+
+	function test(){
+		echo 'test';
+	}
 }
