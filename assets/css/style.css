@@ -2998,3 +2998,14 @@ p.help {
     .slider.round:before {
     border-radius: 50%;
     }
+
+    /*
+        Adjustment by Sahan.
+        Alignment of user profile right side bar.
+    */
+
+    
+@supports (-moz-appearance:none) {
+    .profile-sb-right{ display: block ruby; }
+    .profile-sb-right .col-md-6{ margin-top: 10px; }
+}
