@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('update_center')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/dropify/css/dropify.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+    <style>
+        .update-card h1 {
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="auth-page">
+        <div class="auth-card card update-card">
+            <div class="auth-logo text-center mb-40 mt-40">
+                <img src="{{ url('') }}uploads/app/{{ env('APP_LOGO'); }}" class="img-responsive">
+            </div>
+            <div class="login">
+                <div class="text-center">
+                    @if(!is_null($latest))
+                    <p class="">{{sch_translate('current_version')}}</p>
+                    @else
+                    <p class="">{{sch_translate('you_are_running_latest_version')}}</p>
+                    @endif
+                    <h1 class="text-center text-primary mb-40"><strong>Ver {{ env("APP_VERSION") }}</strong></h1>
+                    <div class="mt-40">
+                        <a class="btn btn-default" href="{{ url('') }}">{{sch_translate('go_home')}}</a>
+                        @if(!is_null($latest))
+                        <button class="btn btn-primary send-to-server-click" data="csrf-token:{{csrf_token() }}" url="{{ url('Update@scan') }}" loader="true" href="">{{sch_translate('update_now')}}</button>
+                        @endif
+                    </div>
+        
+                </div>
+
+            </div>
+
+    </div>
+    <p class="copyright"> &copy; {{ date("Y") }}  {{ env("APP_NAME") }}. {{sch_translate('all_rights')}}</p>
+</div>
+
+
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/libs/dropify/js/dropify.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   @include("schleier/bottomscript")
+</body>
+</html>

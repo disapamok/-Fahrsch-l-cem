@@ -1,0 +1,541 @@
+Searching 39 files for "json(responder("
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Branch.php:
+   47          );
+   48          Database::table("branches")->insert($branchData);
+   49:         return response()->json(responder("success", sch_translate('branch_created'), sch_translate('branch_successfully_created'), "reload()"));
+   50      }
+   51      
+   ..
+   64          }
+   65          Database::table("branches")->where("id", input("branchid"))->delete();
+   66:         
+   67      }
+   68      
+   ..
+   90          );
+   91          Database::table("branches")->where("id", input("branchid"))->update($data);
+   92:         
+   93      }
+   94      responder([\("a-zA-Z]+)([\, ]+)([\("a-zA-Z \!\.]+)([\, ]+)([\(\"a-zA-Z \.\']+)
+   ..
+  124          
+  125          if ($send) {
+  126:             return response()->json(responder("success", sch_translate('alright'), sch_translate('email_successfully_sent'), "reload()"));
+  127          } else {
+  128:             return response()->json(responder("error", sch_translate('hmm'),$send->ErrorInfo));
+  129          }
+  130      }
+  ...
+  139          $branch = Database::table("branches")->where("id", input("branchid"))->first();
+  140          if (empty($branch->phone)) {
+  141:             return response()->json(responder("error", sch_translate('hmm'), sch_translate('this_branch_has_not_set_it's_phone_number')));
+  142          }
+  143          
+  144          if (env("DEFAULT_SMS_GATEWAY") == "africastalking") {
+  145              if (empty(env("AFRICASTALKING_USERNAME"))) {
+  146:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_africa's_talking_username_is_not_set')));
+  147              }
+  148              if (empty(env("AFRICASTALKING_KEY"))) {
+  149:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_africa's_talking_api_key_is_not_set')));
+  150              }
+  151              
+  ...
+  169              
+  170              if ($send) {
+  171:                 return response()->json(responder("success", sch_translate('alright'), sch_translate('sms_successfully_sent'), "reload()"));
+  172              } else {
+  173:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('failed_to_send_sms_please_try_again')));
+  174              }
+  175              
+  176          } elseif (env("DEFAULT_SMS_GATEWAY") == "twilio") {
+  177              if (empty(env("TWILIO_SID"))) {
+  178:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_sid_is_not_set')));
+  179              }
+  180              if (empty(env("TWILIO_AUTHTOKEN"))) {
+  181:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_auth_token_is_not_set')));
+  182              }
+  183              if (empty(env("TWILIO_PHONENUMBER"))) {
+  184:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_phone_number_is_not_set')));
+  185              }
+  186              
+  ...
+  204              
+  205              if ($send) {
+  206:                 return response()->json(responder("success", sch_translate('alright'), sch_translate('sms_successfully_sent'), "reload()"));
+  207              } else {
+  208:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('failed_to_send_sms_please_try_again')));
+  209              }
+  210          }
+  ...
+  222              'branch' => input("branchid")
+  223          ));
+  224:         return response()->json(responder("success", sch_translate('alright'), sch_translate('branch_switch_successfull'), "reload()"));
+  225      }
+  226      
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Communication.php:
+   82          }
+   83          if (empty($receivers)) {
+   84:             return response()->json(responder("error", sch_translate('hmm'), sch_translate('selected_recipients_have_not_set_numbers')));
+   85          }
+   86          
+   87          if (env("DEFAULT_SMS_GATEWAY") == "africastalking") {
+   88              if (empty(env("AFRICASTALKING_USERNAME"))) {
+   89:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_africa's_talking_username_is_not_set')));
+   90              }
+   91              if (empty(env("AFRICASTALKING_KEY"))) {
+   92:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_africa's_talking_api_key_is_not_set')));
+   93              }
+   94              foreach ($receivers as $receiver) {
+   ..
+  110              }
+  111              
+  112:             return response()->json(responder("success", sch_translate('alright'), sch_translate("Message queued to be sent. ")}}, "reload()"));
+  113              
+  114          } elseif (env("DEFAULT_SMS_GATEWAY") == "twilio") {
+  115              if (empty(env("TWILIO_SID"))) {
+  116:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_sid_is_not_set')));
+  117              }
+  118              if (empty(env("TWILIO_AUTHTOKEN"))) {
+  119:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_auth_token_is_not_set')));
+  120              }
+  121              if (empty(env("TWILIO_PHONENUMBER"))) {
+  122:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_phone_number_is_not_set')));
+  123              }
+  124              
+  ...
+  141              }
+  142              
+  143:             return response()->json(responder("success", sch_translate('alright'), sch_translate("Message queued to be sent. ")}}, "reload()"));
+  144              
+  145          }
+  ...
+  196          }
+  197          if (empty($receivers)) {
+  198:             return response()->json(responder("error", sch_translate('hmm'), sch_translate('selected_recipients_have_not_set_emails')));
+  199          }
+  200          
+  ...
+  220          }
+  221          
+  222:         return response()->json(responder("success", sch_translate('alright'), sch_translate("Messages queued to be sent. ")}}, "reload()"));
+  223          
+  224      }
+  ...
+  256              Database::table("schoolmessages")->where("id", input("messageid"))->delete();
+  257          }
+  258:         return response()->json(responder("success", sch_translate('message_deleted'), sch_translate('message_successfully_deleted'), "reload()"));
+  259      }
+  260      
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Course.php:
+   77              }
+   78          }
+   79:         return response()->json(responder("success", sch_translate('course_added'), sch_translate('course_successfully_added'), "redirect('".url('Course@preview',['courseid'=>$courseId])."', true)"));
+   80      }
+   81      
+   ..
+   97          Database::table('onlineclasses')->insert($data);
+   98          $curriculumid = Database::table('onlineclasses')->insertId();
+   99:         return response()->json(responder("success", sch_translate(''), sch_translate(''), "redirect('".url('Course@curriculum',['curriculumid'=>$curriculumid])."', true)", false));
+  100      }
+  101      
+  ...
+  111          }
+  112          Database::table("courses")->where("id", input("courseid"))->delete();
+  113:         return response()->json(responder("success", sch_translate('course_deleted'), sch_translate('course_successfully_deleted'), "redirect('" . url("Course@get") . "')"));
+  114      }
+  115      
+  ...
+  172          }
+  173          Database::table("onlineclasses")->where("id", input("curriculumid"))->delete();
+  174:         return response()->json(responder("success", sch_translate(''), sch_translate(''), "redirect('".url('Course@preview',['courseid'=>$class->course])."', true)", false));
+  175      }
+  176      
+  ...
+  244              }
+  245          }
+  246:         return response()->json(responder("success", sch_translate('alright'), sch_translate('course_successfully_updated'), "reload()"));
+  247      }
+  248      
+  ...
+  259          );
+  260          Database::table("onlineclasses")->where("id", input("curriculumid"))->update($data);
+  261:         return response()->json(responder("success", sch_translate('alright'), sch_translate('course_successfully_updated')));
+  262      }
+  263      
+  ...
+  278          );
+  279          Database::table("onlineclasses")->where("id", input("curriculumid"))->update($data);
+  280:         return response()->json(responder("success", sch_translate('alright'), sch_translate('course_successfully_updated')));
+  281      }
+  282      
+  ...
+  483  
+  484          }
+  485:         return response()->json(responder("success", sch_translate('content_updated'), sch_translate('content_successfully_updated'), "reload()"));
+  486      }
+  487      
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Exam.php:
+   27          Database::table('exams')->insert($data);
+   28          $examid = Database::table('exams')->insertId();
+   29:         return response()->json(responder("success", sch_translate(''), sch_translate(''), "redirect('".url('Exam@builder',['examid'=>$examid])."', true)", false));
+   30      }
+   31      
+   ..
+   43          );
+   44          Database::table("exams")->where("id", input("examid"))->update($data);
+   45:         return response()->json(responder("success", sch_translate('alright'), sch_translate('exam_successfully_updated')));
+   46      }
+   47      
+   ..
+   54          $exam = Database::table("exams")->where("id", input("examid"))->first();
+   55          Database::table("exams")->where("id", input("examid"))->delete();
+   56:         return response()->json(responder("success", sch_translate(''), sch_translate(''), "redirect('".url('Course@preview',['courseid'=>$exam->course])."', true)", false));
+   57      }
+   58      
+   ..
+   86          );
+   87          Database::table("exams")->where("id", input("examid"))->update($data);
+   88:         return response()->json(responder("success", sch_translate('alright'), sch_translate('exam_successfully_updated')));
+   89      }
+   90      
+   ..
+  208          );
+  209          Database::table('examsreports')->insert($report);
+  210:         return response()->json(responder("success", sch_translate('you_scored___1__'), sch_translate('your_exam_was_marked_and_you_answered___1___out_of___2___questions_correctly')", "reload()"));
+  211      }
+  212  
+  ...
+  244  
+  245          }
+  246:         return response()->json(responder("success", sch_translate('questions_updated'), sch_translate('questions_successfully_updated'), "reload()"));
+  247      }
+  248  
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Fleet.php:
+   53          );
+   54          Database::table('fleet')->insert($data);
+   55:         return response()->json(responder("success", sch_translate('car_added'), sch_translate('car_successfully_added_to_fleet'), "reload()"));
+   56      }
+   57      
+   ..
+   64      public function delete() {
+   65          Database::table("fleet")->where("id", input("carid"))->delete();
+   66:         return response()->json(responder("success", sch_translate('car_deleted'), sch_translate('car_successfully_deleted_flom_fleet'), "reload()"));
+   67      }
+   68      
+   ..
+   97          );
+   98          Database::table("fleet")->where("id", input("carid"))->update($data);
+   99:         return response()->json(responder("success", sch_translate('alright'), sch_translate('car_successfully_updated'), "reload()"));
+  100      }
+  101      
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Instructor.php:
+  104                  "message" => "These are your login Credentials:<br><br><strong>Email:</strong>" . input('email') . "<br><strong>Password:</strong>" . $password . "<br><br>Cheers!<br>" . env("APP_NAME") . " Team."
+  105              ), "withbutton");
+  106:             return response()->json(responder("success", sch_translate('account_created'), sch_translate('instructor_account_successfully_created'), "reload()"));
+  107          }
+  108          
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Invoice.php:
+   47          Landa::notify($notification, $user->id, "payment");
+   48  
+   49:         return response()->json(responder("success", sch_translate('alright'), sch_translate('payment_successfully_added'), "reload()"));
+   50      }
+   51      
+   ..
+   68          $notification = 'A payment record of <strong>'.money($payment->amount).'</strong> has been deleted by <strong>'.$user->fname.' '.$user->lname.'</strong>.';
+   69          Landa::notify($notification, $user->id, "delete");
+   70:         return response()->json(responder("success", sch_translate('payment_deleted'), sch_translate('payment_successfully_deleted'), "reload()"));
+   71      }
+   72      
+   ..
+   92          );
+   93          Database::table("invoices")->where("id", input("invoiceid"))->update($data);
+   94:         return response()->json(responder("success", sch_translate('alright'), sch_translate('invoice_successfully_updated'), "reload()"));
+   95      }
+   96      
+   ..
+  118          $notification = 'Invoice #'.$invoice->reference.' of <strong>'.money($invoice->amount).'</strong>  has been deleted by <strong>'.$user->fname.' '.$user->lname.'</strong>.';
+  119          Landa::notify($notification, $user->id, "delete");
+  120:         return response()->json(responder("success", sch_translate('invoice_deleted'), sch_translate('invoice_successfully_deleted'), "reload()"));
+  121      }
+  122  
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Profile.php:
+   62          }
+   63          Database::table("users")->where("id", input("userid"))->update($data);
+   64:         return response()->json(responder("success", sch_translate('alright'), sch_translate('profile_successfully_updated'), "reload()"));
+   65      }
+   66      
+   ..
+   76          }
+   77          Database::table("users")->where("id", input("userid"))->delete();
+   78:         return response()->json(responder("success", sch_translate('user_deleted'), sch_translate('user_account_successfully_deleted'), "redirect('".url('')."', true)"));
+   79      }
+   80      
+   ..
+   92          
+   93          if ($send) {
+   94:             return response()->json(responder("success", sch_translate('alright'), sch_translate('email_successfully_sent'), "reload()"));
+   95          } else {
+   96:             return response()->json(responder("error", sch_translate('hmm'),$send->ErrorInfo));
+   97          }
+   98      }
+   ..
+  106          $user = Database::table("users")->where("id", input("userid"))->first();
+  107          if (empty($user->phone)) {
+  108:             return response()->json(responder("error", sch_translate('hmm'), sch_translate('this_user_has_not_set_it's_phone_number')));
+  109          }
+  110          
+  111          if (env("DEFAULT_SMS_GATEWAY") == "africastalking") {
+  112              if (empty(env("AFRICASTALKING_USERNAME"))) {
+  113:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_africa's_talking_username_is_not_set')));
+  114              }
+  115              if (empty(env("AFRICASTALKING_KEY"))) {
+  116:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_africa's_talking_api_key_is_not_set')));
+  117              }
+  118              
+  ...
+  120              
+  121              if ($send) {
+  122:                 return response()->json(responder("success", sch_translate('alright'), sch_translate('sms_successfully_sent'), "reload()"));
+  123              } else {
+  124:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('failed_to_send_sms_please_try_again')));
+  125              }
+  126              
+  127          } elseif (env("DEFAULT_SMS_GATEWAY") == "twilio") {
+  128              if (empty(env("TWILIO_SID"))) {
+  129:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_sid_is_not_set')));
+  130              }
+  131              if (empty(env("TWILIO_AUTHTOKEN"))) {
+  132:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_auth_token_is_not_set')));
+  133              }
+  134              if (empty(env("TWILIO_PHONENUMBER"))) {
+  135:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_phone_number_is_not_set')));
+  136              }
+  137              
+  ...
+  139              
+  140              if ($send) {
+  141:                 return response()->json(responder("success", sch_translate('alright'), sch_translate('sms_successfully_sent'), "reload()"));
+  142              } else {
+  143:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('failed_to_send_sms_please_try_again')));
+  144              }
+  145          }
+  ...
+  161                  );
+  162          Database::table('notes')->insert($data);
+  163:         return response()->json(responder("success", sch_translate('alright'), sch_translate('note_successfully_published'), "reload()"));
+  164      }
+  165      
+  ...
+  171      public function deletenote() {
+  172          Database::table("notes")->where("id", input("noteid"))->delete();
+  173:         return response()->json(responder("success", sch_translate('note_deleted'), sch_translate('note_successfully_deleted'), "reload()"));
+  174      }
+  175      
+  ...
+  204          );
+  205          Database::table("notes")->where("id", input("noteid"))->update($data);
+  206:         return response()->json(responder("success", sch_translate('alright'), sch_translate('note_successfully_updated'), "reload()"));
+  207      }
+  208  
+  ...
+  231              );
+  232              Database::table('attachments')->insert($data);
+  233:             return response()->json(responder("success", sch_translate('alright'), sch_translate('attachment_successfully_uploaded'), "reload()"));
+  234          }else{
+  235:             return response()->json(responder("error", sch_translate('hmm'), sch_translate("Something went wrong, please try again.")}}   ));
+  236          }
+  237      }
+  ...
+  246          File::delete($attachment->attachment, "attachments");
+  247          Database::table("attachments")->where("id", input("attachmentid"))->delete();
+  248:         return response()->json(responder("success", sch_translate('attachment_deleted'), sch_translate('attachment_successfully_deleted'), "reload()"));
+  249      }
+  250      
+  ...
+  256      public function disconnectgoogle() {
+  257          Database::table("users")->where("id", input("userid"))->update(array("google_access_token" => ""));
+  258:         return response()->json(responder("success", sch_translate('disconnected'), sch_translate('your_google_calendar_has_been_disconnected'), "reload()"));
+  259      }
+  260  
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Schedule.php:
+   58       $endTime = self::landaDate(input('end'));
+   59       if ($endTime <= $startTime) {
+   60:        return response()->json(responder("warning", sch_translate('time_overlap'), sch_translate('class_end_time_must_be_greater_than_start_time')));
+   61       }
+   62       if (input("class_type") == "Practical" && $school->multibooking == "Disabled") {
+   ..
+   69                             ->first();
+   70         if (!empty($overlap)) {
+   71:          return response()->json(responder("warning", sch_translate('schedule_overlap'), sch_translate('another_class_is_scheduled_to_start_at___1____and_end_at___2__'))));
+   72         }
+   73       }
+   ..
+  141           self::smsnotification($data, $scheduleId);
+  142          }
+  143:         return response()->json(responder("success", sch_translate('schedule_set'), sch_translate('class_schedule_successfully_saved'),"reload()"));
+  144  
+  145    }
+  ...
+  341       }
+  342          Database::table("schedules")->where("id", input("scheduleid"))->delete();
+  343:         return response()->json(responder("success", sch_translate('class_deleted'), sch_translate('class_successfully_removed_from_schedule'), "reload()"));
+  344      }
+  345      
+  ...
+  371       $endTime = self::landaDate(input('end'));
+  372       if ($endTime <= $startTime) {
+  373:        return response()->json(responder("warning", sch_translate('time_overlap'), sch_translate('class_end_time_must_be_greater_than_start_time')));
+  374       }
+  375       if (input("class_type") == "Practical" && $school->multibooking == "Disabled") {
+  ...
+  382                             ->first();
+  383         if (!empty($overlap)) {
+   71:          return response()->json(responder("warning", sch_translate('schedule_overlap'), sch_translate('another_class_is_scheduled_to_start_at___1____and_end_at___2__'))));
+  385         }
+  386       }
+  ...
+  473           self::smsnotification($data, input("scheduleid"));
+  474          }
+  475:         return response()->json(responder("success", sch_translate('schedule_updated'), sch_translate('class_schedule_successfully_updated'),"reload()"));
+  476      }
+  477      
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\School.php:
+   93                  "message" => "These are your login Credentials:<br><br><strong>Email:</strong>" . input('email') . "<br><strong>Password:</strong>" . $password . "<br><br>Cheers!<br>" . env("APP_NAME") . " Team."
+   94              ), "withbutton");
+   95:             return response()->json(responder("success", sch_translate('school_created'), sch_translate('school_account_successfully_created'), "reload()"));
+   96          }
+   97          
+   ..
+  112          }
+  113          Database::table("schools")->where("id", input("schoolid"))->delete();
+  114:         return response()->json(responder("success", sch_translate('school_deleted'), sch_translate('school_account_successfully_deleted'), "reload()"));
+  115      }
+  116      
+  ...
+  139          );
+  140          Database::table("schools")->where("id", input("schoolid"))->update($data);
+  141:         return response()->json(responder("success", sch_translate('alright'), sch_translate('school_successfully_updated'), "reload()"));
+  142      }
+  143      
+  ...
+  173          
+  174          if ($send) {
+  175:             return response()->json(responder("success", sch_translate('alright'), sch_translate('email_successfully_sent'), "reload()"));
+  176          } else {
+  177:             return response()->json(responder("error", sch_translate('hmm'),$send->ErrorInfo));
+  178          }
+  179      }
+  ...
+  188          $school = Database::table("schools")->where("id", input("schoolid"))->first();
+  189          if (empty($school->phone)) {
+  190:             return response()->json(responder("error", sch_translate('hmm'), sch_translate('this_school_has_not_set_it's_phone_number')));
+  191          }
+  192          
+  193          if (env("DEFAULT_SMS_GATEWAY") == "africastalking") {
+  194              if (empty(env("AFRICASTALKING_USERNAME"))) {
+  195:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_africa's_talking_username_is_not_set')));
+  196              }
+  197              if (empty(env("AFRICASTALKING_KEY"))) {
+  198:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_africa's_talking_api_key_is_not_set')));
+  199              }
+  200              
+  ...
+  217              
+  218              if ($send) {
+  219:                 return response()->json(responder("success", sch_translate('alright'), sch_translate('sms_successfully_sent'), "reload()"));
+  220              } else {
+  221:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('failed_to_send_sms_please_try_again')));
+  222              }
+  223              
+  224          } elseif (env("DEFAULT_SMS_GATEWAY") == "twilio") {
+  225              if (empty(env("TWILIO_SID"))) {
+  226:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_sid_is_not_set')));
+  227              }
+  228              if (empty(env("TWILIO_AUTHTOKEN"))) {
+  229:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_auth_token_is_not_set')));
+  230              }
+  231              if (empty(env("TWILIO_PHONENUMBER"))) {
+  232:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('your_twilio_phone_number_is_not_set')));
+  233              }
+  234              
+  ...
+  252              
+  253              if ($send) {
+  254:                 return response()->json(responder("success", sch_translate('alright'), sch_translate('sms_successfully_sent'), "reload()"));
+  255              } else {
+  256:                 return response()->json(responder("error", sch_translate('hmm'), sch_translate('failed_to_send_sms_please_try_again')));
+  257              }
+  258          }
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Settings.php:
+   71              ));
+   72          }
+   73:         return response()->json(responder("success", sch_translate('alright'), sch_translate('profile_successfully_updated')));
+   74      }
+   75  
+   ..
+   88              ));
+   89          }
+   90:         return response()->json(responder("success", sch_translate('alright'), sch_translate('school_info_successfully_updated')));
+   91      }
+   92  
+   ..
+  129              Database::table("reminders")->insert($reminder);
+  130          }
+  131:         return response()->json(responder("success", sch_translate('alright'), sch_translate('reminders_successfully_updated')));
+  132      }
+  133  
+  ...
+  143                  "password" => Auth::password(input("password"))
+  144              ));
+  145:             return response()->json(responder("success", sch_translate('alright'), sch_translate('password_successfully_updated'), "reload()"));
+  146          } else {
+  147:             return response()->json(responder("error", sch_translate("Oops")}}, sch_translate('you_have_entered_an_incorrect_password')));
+  148          }
+  149      }
+  ...
+  206              $env->save();
+  207          }
+  208:         return response()->json(responder("success", sch_translate('alright'), sch_translate('system_settings_successfully_updated'), "reload()"));
+  209      }
+  210  }
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Staff.php:
+   98                  "message" => "These are your login Credentials:<br><br><strong>Email:</strong>" . input('email') . "<br><strong>Password:</strong>" . $password . "<br><br>Cheers!<br>" . env("APP_NAME") . " Team."
+   99              ), "withbutton");
+  100:             return response()->json(responder("success", sch_translate('account_created'), sch_translate('instructor_account_successfully_created'), "reload()"));
+  101          }
+  102          
+
+C:\xampp\htdocs\micheal\maikwen\src\Controllers\Student.php:
+  115  
+  116  
+  117:             return response()->json(responder("success", sch_translate('account_created'), sch_translate('student_account_successfully_created'), "reload()"));
+  118          }else{
+  119:           return response()->json(responder("error", sch_translate('hmm'), sch_translate('something_went_wrong_please_try_again')));
+  120          }
+  121          
+  ...
+  130            self::enroll(input("studentid"), input("newcourse"));
+  131            self::createinvoice(input("studentid"), input("newcourse"), input("amountpaid"), input("method"));
+  132:           return response()->json(responder("success", sch_translate('alright'), sch_translate('student_successfully_enrolled_to_the_course'), "reload()"));
+  133      }
+  134  
+  ...
+  170      public function deleteenrollment(){
+  171          Database::table('coursesenrolled')->where("id", input("enrollmentid"))->delete();
+  172:         return response()->json(responder("success", sch_translate('alright'), sch_translate('student_enrollment_successfully_deleted'), "reload()"));
+  173      }
+  174  
+
+103 matches across 13 files

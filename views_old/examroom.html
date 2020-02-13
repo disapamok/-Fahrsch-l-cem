@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+    @include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{ $exam->name }} | {{sch_translate('app_name_long')}}</title>
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/calendar.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h3>{{ $exam->name }}</h3>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+                
+                <!-- Curriculum Details -->
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                                <h5>{{sch_translate('exam_center')}}</h5>
+                        </div>
+                        <div class="card-body p-0" style="padding-top: 15px !important">
+                          @if ( $takes > 0 )
+                          <div class="exam-complete">
+                            <i class="mdi mdi-checkbox-multiple-marked-circle complete-icon"></i>
+                            <h3>{{sch_translate('you_sat_this_exam_and_scored_', [$lastTake->score])}}</h3>
+                            @if ( $takes <= $exam->retakes || $user->role != "student" )
+                            <button type="submit" class="btn btn-primary btn-icon retake-exam"><i class="mdi mdi-restart"></i> {{sch_translate('retake_exam')}}</button>
+                            @endif
+                          </div>
+                          @endif
+                          @if ( $takes > 0 )
+                          <div class="exam-question-section" style="display: none;">
+                            @else
+                          <div class="exam-question-section">
+                          @endif
+                              <span class="text-muted text-xs">{{sch_translate('questions_with_star_are_required')}}
+                                <p>{{ $exam->description }}</p>
+                            <form class="simcy-form" action="{{ url('Exam@save') }}" data-parsley-validate="" method="POST" loader="true">
+                              <input type="hidden" name="csrf-token" value="{{ csrf_token() }}">
+                              <input type="hidden" name="examid" value="{{ $exam->id }}">
+                              @if (!empty($questions))
+                                @foreach ($questions as $index => $question)
+                                <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label>{{ $index + 1 }}.) {{ $question->question }}
+                                                  @if( $question->required == "yes" )
+                                                  <span class="text-danger">*</span>
+                                                  @endif
+                                                </label>
+                                                <input type="hidden" name="question[]" value="{{ $question->id }}">
+                                                @foreach ($question->choices as $key => $choice)
+                                                <div class="exam-answer">
+                                                  @if( $question->type == "single" )
+                                                  @if( $key == 0 )
+                                                  <input type="checkbox" class="hidden" name="answer{{ $question->id }}[]" value="0">
+                                                  <input type="radio" id="choice{{ $index.$key }}" class="answer-option" value="1" name="answer{{ $question->id }}[]" checked=""  value="1">
+                                                  @else
+                                                  <input type="checkbox" class="hidden" name="answer{{ $question->id }}[]" value="0" checked="">
+                                                  <input type="radio" id="choice{{ $index.$key }}" class="answer-option" value="1" name="answer{{ $question->id }}[]" value="1">
+                                                  @endif
+                                                  @else
+                                                  <input type="checkbox" class="hidden" name="answer{{ $question->id }}[]" value="0" checked="">
+                                                  <input type="checkbox" id="choice{{ $index.$key }}" class="answer-option" value="1" name="answer{{ $question->id }}[]" value="1">
+                                                  @endif
+                                                  <label for="choice{{ $index.$key }}">{{ $choice->answer }}</label>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                </div>
+                                        @endforeach
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-primary btn-icon"><i class="mdi mdi-check-all"></i> {{sch_translate('submit_for_marking')}} </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                      @else
+                                      <div class="empty-section">
+                                        <i class="mdi mdi-clipboard-text"></i>
+                                        <h5>{{sch_translate('no_question_this_exam')}}</h5>
+                                      </div>
+                                      @endif
+                            </form>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+
+        </div>
+    </div>
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/libs/datetimepicker/js/bootstrap-datetimepicker.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/examroom.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   @include("schleier/bottomscript")
+</body>
+</html>

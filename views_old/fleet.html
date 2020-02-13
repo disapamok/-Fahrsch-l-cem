@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('fleet')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+       <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <button type="button" class="btn btn-primary btn-icon pull-right ml-5" data-toggle="modal" data-target="#create"><i class=" mdi mdi-plus-circle-outline"></i> {{sch_translate('add_vehicle')}} </button>
+            <h3>{{sch_translate('fleet')}}</h3>
+            <p>{{sch_translate('vehicles_for_your_branch')}}</p>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                            <table class="table table-striped mb-0 mw-1000">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{sch_translate('car_type')}}</th>
+                                            <th>{{sch_translate('car_no')}}</th>
+                                            <th>{{sch_translate('license_plate')}}</th>
+                                            <th>{{sch_translate('m_year')}}</th>
+                                            <th>{{sch_translate('instructor')}}</th>
+                                            <th class="text-center">{{sch_translate('action')}}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if(!empty($fleet))
+                                                @foreach($fleet as $key => $car)
+                                                <tr>
+                                                    <th scope="row">{{$key+1}}</th>
+                                                    <td><strong>{{$car->make}} {{$car->model}}</strong></td>
+                                                    <td>#{{$car->carno_}}</td>
+                                                    <td>{{$car->carplate}}</td>
+                                                    <td>{{$car->modelyear}}</td>
+                                                    <td><strong>{{$car->instructor}}</strong></td>
+                                                    <td class="text-center">
+                                                        <a class="btn btn-primary btn-sm btn-icon" href="{{url('Schedule@get')}}?filter=car&filterid={{ $car->id }}"><i class="mdi mdi-calendar-text"></i> {{sch_translate('schedule')}}</a>
+
+                                                        <div class="dropdown inline-block">
+                                                                <button class="btn btn-default btn-sm btn-icofn dropdown-toggle" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></button>
+                                                                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                                                <li role="presentation"><a role="menuitem" class="fetch-display-click" data="carid:{{ $car->id }}|csrf-token:{{ csrf_token() }}" url="<?=url('Fleet@updateview');?>" holder=".update-holder" modal="#update" href=""> <i class="mdi mdi-pencil"></i> {{sch_translate('edit')}}</a></li>
+                                                                <li role="presentation"><a role="menuitem" class="send-to-server-click" data="carid:{{ $car->id }}|csrf-token:{{csrf_token()}}" href="" url="{{ url('Fleet@delete') }}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('this_car_and_all_its_record_will_be_deleted')}}" warning-button="{{sch_translate('delete')}}" loader="true" data-cancel-button="{{sch_translate('cancel')}}"> <i class="mdi mdi-delete"></i> {{sch_translate('delete')}}</a></li>
+                                                                </ul>
+                                                        </div>
+                                                        
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            @else
+                                            <tr><th colspan="7" class="text-center">{{sch_translate('empty_here')}}</th></tr>
+                                            @endif
+                                        </tbody>
+                            </table>
+                        </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- footer -->
+    @include("includes/footer")
+<!-- modals -->
+<div class="modal right fade" id="create" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('add_vehicle')}}</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form class="simcy-form" data-parsley-validate="" action="{{ url('Fleet@add') }}" method="POST" loader="true">
+                        <p>{{sch_translate('a_welcome_email_will_be_set_and_recepient_will_complete_setup')}}</p>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>{{sch_translate('car_no')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('car_no')}}" name="carno" required>
+                                <input type="hidden" value="{{csrf_token()}}" name="csrf-token">
+                            </div>
+                            <div class="col-md-6">
+                                <label>{{sch_translate('number_plate')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('number_plate')}}" name="carplate" required>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>{{sch_translate('make')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('make')}}" name="make" required>
+                              </div>
+                            <div class="col-md-6">
+                                <label>{{sch_translate('model')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('model')}}" name="model" required>
+                              </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('model_year')}}</label>
+                                <input type="number" class="form-control" placeholder="{{sch_translate('model_year')}}" name="modelyear" required>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="email">{{sch_translate('assigned_instructor')}}</label>
+                                <select class="form-control select2" name="instructor">
+                                    @if(!empty($instructors))
+                                    <option value="0" class="disabled">{{sch_translate('select_instructor')}}</option>
+                                    @foreach($instructors as $instructor)
+                                     <option class="item" value="{{$instructor->id}}">{{$instructor->fname}} {{$instructor->lname}}</option>
+                                    @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="btn btn-primary btn-block" type="submit">{{sch_translate('add_vehicle')}}</button>
+                            </div>
+                        </div>
+                      </div>
+                      
+                    </form>
+                </div>
+
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div><!-- modal -->
+
+    <!-- update -->
+    <div class="modal right fade" id="update" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('edit_car')}}</h4>
+                </div>
+                <div class="update-holder"></div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end update -->
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   <script>
+    //Edit Vehicle
+    $('.editcar').on('click',function(){
+        var data = JSON.parse($(this).attr('data-scope'));
+        $('#create .modal-title').text('Edit Branch');
+        $('.submitbtn').text('Save changes');
+        $('.simcy-form').attr('action',`{{url('Fleet@edit')}}${data.id}`);
+        $('.carno').val(data.carno);
+        $('.carplate').val(data.carplate);
+        $('.carmake').val(data.carmake);
+        $('.carmodel').val(data.carmodel);
+        $('.modelyear').val(data.modelyear);
+        for(var i =0;i<=data.names.length;i++){
+            console.log(data.names[i]);
+        }
+        $('.instructors').val(data.instructors);
+        $('.carimg').attr('data-default-file',`{{asset("uploads/fleet/")}}${data.carimg}`); 
+    });
+    //Add Vehicle
+    $('.addcar').on('click',function(){
+        $('#create .modal-title').text("{{sch_translate('add_fleet')}}");
+        $('.submitbtn').text("{{sch_translate('add_branch')}}");
+        $('.simcy-form').attr('action',"{{url('Branch@store')}}");
+        $('.carno').val('');
+        $('.carplate').val('');
+        $('.carmake').val('');
+        $('.carmodel').val('');
+        $('.modelyear').val('');
+        $('.instructors').val('');
+        $('.carimg').attr('data-default-file',' '); 
+
+    });
+    //Select instructor
+    $('.instructor').on('change', function(){
+      var instructors = $('.instructors');
+      var insdata = $('.insdata');
+      var value = $(this).val();
+      if(instructors.val().length < 1){
+          instructors.val(value);
+          insdata.html('<span class="badge badge-pill badge-primary col-md-5 mt-2 ml-1">'+$('.instructor option:selected').text()+'</span>');
+      } else {
+          if(instructors.val().indexOf(value) < 0){
+            insdata.append('<span class="badge badge-pill badge-primary col-md-5 mt-2 ml-1">'+$('.instructor option:selected').text()+'</span>');
+            instructors.val(instructors.val()+','+value);
+          } else {
+              notify("{{sch_translate('oops')}}","{{sch_translate('this_item_already_exists')}}",'warning',"{{sch_translate('ok')}}");//"{{sch_translate()}}"
+          }
+      }
+    });
+    //On submit
+    $('.simcy-form').on('submit',function(){
+      $('.instructors').attr('disabled',false);
+    });
+   </script>
+   @include("schleier/bottomscript")
+</body>
+</html>

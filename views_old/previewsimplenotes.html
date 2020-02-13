@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+  @include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('Vorschau Ansehen')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+          <a href="{{url('')}}notes/{{$notetype}}">
+            <button class="btn btn-sm btn-secondary pull-right text-white ml-5">&lt; {{sch_translate('back')}}</button>            
+          </a>
+          <h3>{{$title}}</h3>
+          <p>{{sch_translate('Vorschau Ansehen')}}</p>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">            
+          <!-- deleted -->
+          @if(isset($_GET["deleted"]))
+          <div class="col-12"> 
+            <div class="card">    
+              <h5 class="text-success">
+                {{sch_translate('Hinweis wurde erfolgreich geloescht')}}
+              </h5>
+            </div>
+          </div>
+          @endif
+          <!-- deleted -->
+          <!-- saved -->
+          @if(isset($_GET["saved"]))
+          <div class="col-12"> 
+            <div class="card">    
+              <h5 class="text-success">
+                {{sch_translate('Hinweis gespeichert')}}
+              </h5>
+            </div>
+          </div>
+          @endif
+          <!-- saved -->
+          <div class="col-md-8 offset-md-2 col-sm-12"> <!-- familycol12 -->
+            <div class="card preview-card"> 
+            @if(!empty($notes_collections))
+            @foreach($notes_collections as $index => $notes_collection)
+              <div class="col-12 mt-2"> 
+                <div class="note_title border border-muted py-2 text-center">
+                 <h5 class="@if(strtolower(trim($notes_collection_notes->name)) == 'hinweise') text-danger @endif"><b>{{$notes_collection->name}}</b></h5>
+                </div>
+              @if(!empty($notes_collection->notes))
+              @foreach($notes_collection->notes as $notes_collection_notes)
+                <div class="row mt-1 px-1">
+                @if($notes_collection_notes->listtype == "checkbox")
+                  <div class="col-12 preview-words">{{$notes_collection_notes->hinweis}}
+                    <div class="pull-right checkbox-like checkbox-uncheck mr-1"></div>
+                  </div>
+                  <hr class="dark-hr-btw-checkbox my-0"/>
+                @else
+                  <div class="col-12 preview-words"><span class="preview-words m-1"><i class="fas fa-car"></i></span>{{$notes_collection_notes->hinweis}}</div>
+                @endif                  
+                </div>
+              @endforeach
+              @endif 
+                <hr class="dark-hr"/>
+              </div>
+            @endforeach
+            @endif 
+            </div> <!-- card -->
+          </div> <!-- family-col12 -->
+        </div> <!-- row -->
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   <script type="text/javascript">
+    function doShowOnSelect(){
+      //hide all
+     $(".show_at_select_click").hide();
+     //show only active
+     $(".show_at_select_click.active").show();      
+    }
+    $(function(){
+      doShowOnSelect();
+      $(document).on("change", "#show_at_select_selector", function(){
+        $(".show_at_select_click").removeClass("active");
+
+        var id_of_selector_to_show= "#"+($("#show_at_select_selector").val());
+        $(id_of_selector_to_show).addClass("active");
+
+        doShowOnSelect();
+      });
+      $(".checkbox-like").click(function(){
+        if($(this).hasClass("checkbox-uncheck")){
+          $(this).removeClass("checkbox-uncheck");
+          $(this).addClass("checkbox-check");          
+        }else{
+          $(this).removeClass("checkbox-check");
+          $(this).addClass("checkbox-uncheck");          
+        }
+      })
+    })
+   </script>
+   @include("schleier/bottomscript")
+</body>
+</html>

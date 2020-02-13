@@ -1,0 +1,11 @@
+
+<script src="{{ url('') }}assets/js/parsley.2.9.2.min.js"></script>
+
+@if(sch_translate('translate') == 'de')
+<script src="{{ url('') }}assets/js/extras/de.js"></script>
+<script type="text/javascript">window.ParsleyValidator.setLocale('de');</script>
+@else
+<script src="{{ url('') }}assets/js/extras/en.js"></script>
+<script type="text/javascript">window.ParsleyValidator.setLocale('en');</script>
+@endif
+<script>$(".translateValidation").parsley();</script>

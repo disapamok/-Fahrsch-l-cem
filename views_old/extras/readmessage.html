@@ -1,0 +1,8 @@
+
+                <div class="modal-body">
+                    <div class="message-header">
+                        <h6>{{ $message->contact }}</h6>
+                        <p>{{ date('F j, Y H:i:s', strtotime($message->sent_at)) }}</p>
+                    </div>
+                    <p>{{ $message->message }}</p>
+                </div>

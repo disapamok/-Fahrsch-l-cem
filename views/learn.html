@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{ $curriculum->name }} | {{sch_translate('app_name_long')}}</title>
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h3>{{ $curriculum->name }}</h3>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+
+            <div class="page-rightbar profile-right-bar p-0">
+                <div class="slimscroll-profile-menu">
+                <div class="table-of-content">
+                    <h5>{{sch_translate('table_of_contents')}}</h5>
+                </div>
+                <div class="toc-list">
+                    
+                    @if (!empty($chapters))
+                      @foreach ($chapters as $chapterindex => $chapter)
+                    <!-- single chapter -->
+                      <div class="chapters-list">
+                        <span class="text-xs text-thin">{{sch_translate('chapter')}} {{ $chapterindex + 1 }}:</span>
+                          <h6> <strong class="">{{ $chapter->title }}</strong></h6>
+                          <ul>
+                          @if (!empty($chapter->lectures))
+                            @foreach ($chapter->lectures as $key => $lecture)
+                              @if( in_array($lecture->id , $completedLectures) )
+                              <li class="lecture-item complete" data-id="{{ $lecture->id }}">
+                              @else
+                              <li class="lecture-item" data-id="{{ $lecture->id }}">
+                              @endif
+                                <div class="lecture-complete"><i class=" mdi mdi-checkbox-multiple-marked-circle"></i> </div>
+                                  @if ( $lecture->type == "link" )
+                                <div class="chapter-class-type"><i class=" mdi mdi-link-variant"></i> </div>
+                                   @elseif ( $lecture->type == "text" )
+                                <div class="chapter-class-type"><i class=" mdi mdi-clipboard-text"></i> </div>
+                                   @elseif ( $lecture->type == "downloads" )
+                                <div class="chapter-class-type"><i class=" mdi mdi-cloud-download"></i> </div>
+                                   @elseif ( $lecture->type == "pdf" )
+                                <div class="chapter-class-type"><i class=" mdi mdi-file-pdf-box"></i> </div>
+                                   @elseif ( $lecture->type == "video" )
+                                <div class="chapter-class-type"><i class=" mdi mdi-play-circle"></i> </div>
+                                   @endif
+                                {{ $lecture->title }}
+                            </li>
+                            @endforeach
+                          @else
+                              <li>
+                                <div class="chapter-class-type"><i class=" mdi mdi-clipboard-outline"></i></div> 
+                                {{sch_translate('this_has_no_lectures')}}
+                            </li>
+                          @endif
+                          </ul>
+                      </div>
+                      @endforeach
+                    @else
+                    <div class="empty-section empty-chapter"><i class="mdi mdi-clipboard-text"></i><h5>{{sch_translate('no_chapter_yet')}}</h5></div>
+                    @endif
+                </div>
+                </div>
+            </div>
+
+            <div class="halfpage-content">
+                
+                <!-- Curriculum player -->
+                <div class="col-md-12">
+                    <div class="card player">
+                        <div class="card-header">
+                            <button class="btn btn-black pull-right ml-5 next-lecture" style="display: none;">{{sch_translate('next')}} <i class=" mdi mdi-arrow-right"></i> </button>
+                            <button class="btn btn-black pull-right previous-lecture" style="display: none;"><i class=" mdi mdi-arrow-left"></i> {{sch_translate('previous')}}</button>
+                                <h5>{{sch_translate('online_class')}}</h5>
+                        </div>
+                        <div class="card-body p-0 player-canvas">
+                            <h1>{{ $curriculum->name }}</h1>
+                            <p>{{ $curriculum->description }}</p>
+                            <button type="button" class="btn btn-icon btn-primary mt-40 start-class"><i class=" mdi mdi-play-circle-outline"></i> {{sch_translate('start_class')}}</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- update -->
+    <div class="modal right fade" id="update" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('edit')}} </h4>
+                </div>
+                <div class="update-holder"></div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end update -->
+
+
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   <script src="{{ url('') }}assets/js/player.js"></script>
+   <script type="text/javascript">
+    var lectureUrl = "{{ url('Course@loadlecture') }}";
+       // Jquery start
+    $(document).ready(function() {
+        $('.slimscroll-profile-menu').slimscroll({
+            height: 'auto',
+            position: 'right',
+            size: "3px",
+            color: '#9ea5ab',
+            wheelStep: 5,
+            touchScrollStep: 50
+        });
+    });
+
+</script>
+   @include("schleier/bottomscript")
+</body>
+</html>

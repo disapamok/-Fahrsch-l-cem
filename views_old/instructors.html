@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('instructors')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <button type="button" class="btn btn-red pull-right ml-5" data-toggle="modal" data-target="#create">{{sch_translate('add_instructor')}} </button>
+            <button type="button" class="btn btn-grey pull-right toggle-search d-block d-sm-block d-md-none">{{sch_translate('filter_8nd_search')}} </button>
+            <h3>{{sch_translate('instructors_gender')}}</h3>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+
+            <!-- search & Filter -->
+            <div class="col-md-12 search-filter d-none d-md-block">
+               <div class="card">
+                <form class="form" action="{{ url('Instructor@get') }}" method="POST">
+                    <input type="hidden" value="{{ csrf_token() }}" name="csrf-token">
+
+                    <div class="row">
+                        <div class="col-md-8">
+                          <div class="form-group">
+                            <label>{{sch_translate('search_name')}}</label>
+                            <input type="text" class="form-control" value="{{$search}}" placeholder="{{sch_translate('search_name')}}" name="search">
+                          </div>
+                        </div>
+                        <div class="col-md-2">
+                              <div class="form-group">
+                                <label for="email">{{sch_translate('Gender')}}</label>
+                                <select class="form-control" name="gender">
+                                    <option value="all" @if( $gender == "all" ) selected @endif>
+                                        {{sch_translate('all')}}</option>
+                                    <option value="Male" @if( $gender == "Male" ) selected @endif>
+                                        {{sch_translate('male')}}</option>
+                                    <option value="Female" @if( $gender == "Female" ) selected @endif>
+                                        {{sch_translate('female')}}</option>
+                                </select>
+                              </div>
+                        </div>
+                        <div class="col-md-2">
+                              <button class="btn btn-grey btn-block"><i class="fas fa-search mr-2"></i> {{sch_translate('search')}}</button>
+                        </div>
+                    </div>
+                </form>
+              </div>
+            </div>
+            @if(!empty($instructors))
+                @foreach($instructors as $instructor)
+                <!-- user grid -->
+                <div class="col-md-4 col-lg-3">
+                  <div class="w-100 bg-grey p-1 rounded-top"></div>
+                    <div class="user-grid card p-0 shadow-sm">
+                      <div class="p-0 p-3">                        
+                        <div class="user-grid-pic">
+                            @if( !empty($instructor->avatar) )
+                            <img src="{{ url('') }}uploads/avatar/{{ $instructor->avatar }}" class="student-image mb-2">
+                            @else
+                            <img src="{{ url('') }}assets/images/avatar.png" class="student-image mb-2">
+                            @endif
+                        </div>
+                        <div class="user-grid-info">
+                            <h5 class="text-gray text-uppercase font-14 mb-0">{{ $instructor->fname }} {{ $instructor->lname }}</h5>
+                            <p>{{sch_translate('instructor_of_course', [$instructor->courses])}}</p>
+                        </div>
+                      </div>
+                      <div class="p-3 px-4">                    
+                        <div class="row user-grid-buttons">
+                            <div class="col-md-12 px-0 ml-1 mr-2 mb-2">
+                                <span class="bg-dark p-2 text-white float-left w-25 rounded-left"><img src="{{url('')}}assets/images/icons/telephone.png"></span>
+                                <div class="pr-2 d-inline w-75 float-right">
+                                    <div class="text-center p-2 bg-grey rounded-right letter_spacing_phone">{{ $instructor->phone }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 p-5">
+                                <a class="btn btn-red btn-block" href="{{url('Profile@get',['userid'=>$instructor->id])}}">
+                                    <i class="fa fa-user mr-2"></i>{{sch_translate('profile')}}</a>
+                            </div>
+                            <div class="col-md-6 p-5">
+                                <a class="btn btn-default btn-block" href="{{url('Schedule@get')}}?filter=instructor&filterid={{ $instructor->id }}"><img src="{{url('')}}assets/images/icons/calendar-alt-solid.png" class="img-icon mr-2">{{sch_translate('Kalender')}}</a>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                @endforeach
+            @else
+            <div class="col-md-12">
+                <div class="empty">
+                    <i class="mdi mdi-alert-circle-outline"></i>
+                    <h3>{{sch_translate('empty_here')}}</h3>
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+  <!-- modals -->
+  <div class="modal right fade" id="create" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                  <h4 class="modal-title">{{sch_translate('add_instructor')}}</h4>
+              </div>
+
+              <div class="modal-body">
+                  <form class="simcy-form translateValidation" data-parsley-validate="" action="{{ url('Instructor@create') }}" method="POST" loader="true">
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          
+                        </div>
+                      </div>
+                      <label>{{sch_translate('first_name')}}</label>
+                      <input type="text" class="form-control" placeholder="{{sch_translate('first_name')}}" name="fname" required>
+                      <input type="hidden" value="{{csrf_token()}}" name="csrf-token">
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('last_name')}}</label>
+                          <input type="text" class="form-control" placeholder="{{sch_translate('last_name')}}" name="lname" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('email_address')}}</label>
+                          <input type="email" class="form-control" placeholder="{{sch_translate('email_address')}}" name="email" required>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="form-group">
+                      <div class="row hide-parsley">
+                        <div class="col-12">
+                          <label>{{sch_translate('phone_number')}}</label>
+                        </div>
+                        <div class="col-md-12">
+                          <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text" id="basic-addon1"><i class="fa fa-plus"></i></span>
+                            </div>
+                          <input type="number" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" required="">
+                          </div>
+                        </div>
+                      </div>
+                    </div> -->
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('phone_number')}}</label>
+                          <input type="number" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label for="email">{{sch_translate('gender')}}</label>
+                          <select class="form-control" name="gender" required>
+                              <option value="Male">{{sch_translate('male')}}</option>
+                              <option value="Female">{{sch_translate('female')}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group mt-md-5">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <button class="btn btn-red btn-block">{{sch_translate('create_account')}}</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                  </form>
+              </div>
+
+          </div><!-- modal-content -->
+      </div><!-- modal-dialog -->
+  </div><!-- modal -->
+
+  
+  <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+  <script src="{{ url('') }}assets/js/popper.min.js"></script>
+  <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+  <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+  <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+  <script src="{{ url('') }}assets/js/app.js"></script>
+  
+  @include("translate/validation")
+
+  @include("schleier/bottomscript")
+</body>
+</html>

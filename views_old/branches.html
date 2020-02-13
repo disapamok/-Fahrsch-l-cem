@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('branches')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <button type="button" class="btn btn-red btn-icon pull-right ml-5 addbranch" data-toggle="modal" data-target="#create"><i class=" mdi mdi-plus-circle-outline"></i> {{sch_translate('add_branch')}} </button>
+            <h3>{{sch_translate('branches')}}</h3>
+            <p>{{sch_translate('these_are_branches_of_your_school')}} </p>
+        </div>
+
+        <!-- page content -->
+        <div class="row">
+            @if(!empty($branches))
+             @foreach($branches as $branch)
+                <!-- branch -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="card p-0">
+                        <div class="school">
+                            <div class="school-heading bg-grey p-4 border-red mb-0">
+                                <div class="school-icon text-grey bg-grey"><i class="mdi mdi-map-marker-multiple"></i></div>
+                                <div class="school-details">
+                                    <h6>{{$branch->name}}</h6>
+                                    <!-- <span>{{$branch->email}}</span> -->
+                                    <span class="letter_spacing_phone text-black">
+                                        @if ( !empty($branch->phone) ) {{ $branch->phone }} @else 
+                                            {{sch_translate('phone_not_set')}} 
+                                        @endif
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="school-info px-4 py-2 border-bottom-0 mb-0">
+                                <p>
+                                    <span><i class="mdi mdi-account-convert"></i></span>
+                                    {{$branch->students}} {{sch_translate('active_students')}}
+                                </p>
+                                <p>
+                                    <span><i class="mdi mdi-account-multiple-outline"></i></span>
+                                    {{$branch->instructors}} {{sch_translate('instructors')}}
+                                </p>
+                               <!--  <p>
+                                   <span><i class="mdi mdi-car"></i></span>
+                                   {{$branch->vehicles}} {{sch_translate('vehicles')}}
+                               </p> -->
+                                <p>
+                                    <span><i class="mdi mdi-map"></i></span>
+                                    @if ( !empty($branch->address) ) {{ $branch->address }} @else 
+                                    {{sch_translate('address_not_set')}} 
+                                    @endif
+                                </p>
+                            </div>
+                            <div class="school-footer px-3 pl-4">
+                                <div class="dropdown pull-right">
+                                        <span class="dropdown-toggle" data-toggle="dropdown">
+                                            <i class="mdi mdi-dots-horizontal"></i> </span>
+                                        <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                          <li role="presentation"><a role="menuitem" class="fetch-display-click" data="branchid:{{ $branch->id }}|csrf-token:{{ csrf_token() }}" url="<?=url('Branch@updateview');?>" holder=".update-holder" modal="#update" href=""> <i class="mdi mdi-pencil"></i> {{sch_translate('edit')}}</a></li>
+                                          <li role="presentation"><a role="menuitem" href="" input="branchid" modal="#sendemail" class="pass-data" value="{{ $branch->id }}"> <i class="mdi mdi-email-outline"></i>{{sch_translate('send_email')}}</a></li>
+                                          <li role="presentation"><a role="menuitem" href="" input="branchid" modal="#sendsms" class="pass-data" value="{{ $branch->id }}"> <i class="mdi mdi-message-text-outline"></i> {{sch_translate('send_sms')}} </a></li>
+                                          @if($branch->name != 'Headquarters' && $user->branch != $branch->id)
+                                          <li role="presentation"><a role="menuitem" href="" class="send-to-server-click" data="branchid:{{ $branch->id }}|csrf-token:{{ csrf_token() }}" url="{{ url('Branch@delete') }}"  warning-message="{{sch_translate('delete_branch_and_staff')}}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('delete_and_inform_schedule')}}" data-cancel-button="{{sch_translate('cancel')}}" warning-button="{{sch_translate('yes_delete')}}" loader="true"> <i class="mdi mdi-delete"></i>{{sch_translate('delete')}}</a></li>
+                                          @endif
+                                        
+                                        </ul>
+                                </div>
+                                @if($user->branch == $branch->id)
+                                    <span class="badge badge-success bg-red">{{sch_translate('current_branch')}}</span>
+                                @else
+                                    <a href="" class="send-to-server-click" data="branchid:{{ $branch->id }}|csrf-token:{{ csrf_token() }}" url="{{ url('Branch@switch') }}" loader="true"><span class="badge badge-primary pointer">{{sch_translate('switch_to_branch')}}</span></a>
+                                @endif
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             @endforeach
+            @else 
+            <div class="col-md-12">
+                <div class="empty">
+                    <i class="mdi mdi-alert-circle-outline"></i>
+                    <h3>{{sch_translate('empty_here')}}</h3>
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+
+    <!-- modals -->
+    <div class="modal right fade" id="create" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('add_branch')}}</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form class="simcy-form translateValidation" action="{{ url('Branch@create') }}" method="POST" loader="true" data-parsley-validate="">
+                        <p>{{sch_translate('enter_info_to_branch')}}</p>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('branch_name')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('branch_name')}}" name="name" required="">
+                                <input type="hidden" value="{{ csrf_token() }}" name="csrf-token" />
+                            </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('email_address')}}</label>
+                                <input type="email" class="form-control" placeholder="{{sch_translate('email_address')}}" name="email" required="">
+                            </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('phone_number')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" required="" data-parsley-type="digits">
+                            </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('address')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('address')}}" name="address" required="">
+                            </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="btn btn-red btn-block" type="submit">{{sch_translate('add_branch')}}</button>
+                            </div>
+                        </div>
+                      </div>
+                    </form>
+                </div>
+
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div><!-- modal -->
+
+    <!-- update -->
+    <div class="modal right fade" id="update" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('edit_school')}}</h4>
+                </div>
+                <div class="update-holder"></div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end update -->
+    <!-- Send Email-->
+    <div class="modal right fade" id="sendemail" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('send_email')}}</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url('Branch@sendemail') }}" class="simcy-form translateValidation" data-parsley-validate=""  loader="true" method="post">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('subject')}}</label> 
+                                    <input class="form-control" name="subject" placeholder="{{sch_translate('subject')}}" type="text" required="">
+                                    <input name="csrf-token" type="hidden" value="{{csrf_token()}}">
+                                    <input name="branchid" type="hidden">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('message')}}</label> 
+                                    <textarea class="form-control" name="message" placeholder="{{sch_translate('message')}}" rows="6" required=""></textarea>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-red btn-block">{{sch_translate('send_email')}}</button>
+                                </div>
+                            </div>
+                        </div> 
+                    </form>
+                </div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end Send Email-->
+    <!-- Send SMS-->
+    <div class="modal right fade" id="sendsms" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('send_sms')}}</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url('Branch@sendsms') }}" class="simcy-form translateValidation" data-parsley-validate=""  loader="true" method="post">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('message')}}</label> 
+                                    <textarea class="form-control" placeholder="{{sch_translate('message')}}" name="message" rows="6" required=""></textarea>
+                                    <input name="csrf-token" type="hidden" value="{{ csrf_token() }}">
+                                    <input name="branchid" type="hidden">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-red btn-block">{{sch_translate('send_sms')}}</button>
+                                </div>
+                            </div>
+                        </div> 
+                    </form>
+                </div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div><!-- end SMS-->
+
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   @include("translate/validation")
+   <script>
+    //Send Email
+    $('.sendemail').on('click',function(){
+      var email = $(this).attr('data-value');
+      $('.schoolemail').val(email);
+    });
+    //Send SMS
+    $('.sendsms').on('click',function(){
+      var phone = $(this).attr('data-value');
+      $('.schoolphone').val(phone);
+    });
+    //Edit Branch
+    $('.editbranch').on('click',function(){
+        var data = JSON.parse($(this).attr('data-scope'));
+        $('#create .modal-title').text("{{sch_translate('edit_branch')}}");
+        $('.submitbtn').text("{{sch_translate('save_changes')}}");
+        $('.branchform').attr('action', `{{url('Branch@edit')}}${data.id}/`);
+        $('.branchname').val(data.bname);
+        $('.branchemail').val(data.bemail);
+        $('.branchphone').val(data.bphone);
+        $('.branchaddress').val(data.baddress);
+        $('.branchcode').val(data.bcode);
+    });
+    //Add Branch
+    $('.addbranch').on('click',function(){
+        $('#create .modal-title').text("{{sch_translate('add_branch')}}");
+        $('.submitbtn').text("{{sch_translate('add_branch')}}");
+        $('.branchform').attr('action',"{{url('Branch@store')}}");
+        $('.branchname').val('');
+        $('.branchemail').val('');
+        $('.branchphone').val('');
+        $('.branchaddress').val('');
+        $('.branchcode').val('');
+    });
+   </script>
+   @include("schleier/bottomscript")
+</body>
+</html>

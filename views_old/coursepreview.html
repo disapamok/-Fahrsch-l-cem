@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{ $course->name }} | {{sch_translate('app_name_long')}}</title>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css" />
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/fullcalendar/fullcalendar.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/calendar.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- Used for select2 indicator validation -->
+    <input type="hidden" name="select2HasError" class="select2HasError" value="0" />
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h3>{{$course->name}}</h3>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+
+            <div class="page-rightbar profile-right-bar p-0">
+                <div class="slimscroll-profile-menu">
+                  @if ( $user->role != "student" )
+                    <div class="user-profile-options course-options">
+                        <div class="dropdown">
+                                <div class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class=" mdi mdi-account-edit"></i> 
+                                </div>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                      <li role="presentation"><a role="menuitem" class="fetch-display-click" data="courseid:{{ $course->id }}|csrf-token:{{ csrf_token() }}" url="<?=url('Course@updateview');?>" holder=".update-holder" modal="#update" href=""> <i class="mdi mdi-pencil"></i> {{sch_translate('edit')}}</a></li>
+                                      <li role="presentation"><a class="send-to-server-click" data="courseid:{{ $course->id }}|csrf-token:{{ csrf_token() }}" url="{{ url('Course@delete') }}" warning-title="Are you sure?" warning-message="This course and all it's data will be deleted." warning-button="Continue" loader="true" data-cancel-button="{{sch_translate('cancel')}}"><i class="mdi mdi-delete"></i>{{sch_translate('delete')}}</a></li>
+                                </ul>
+                        </div>
+                    </div>
+                    @endif
+                    <div class="course-image">
+                            <img src="<?=url('');?>uploads/courses/{{$course->image }}">
+                    </div>
+                    <div class="user-profile-info">
+                        <h5>{{$course->name}}</h5>
+                    </div>
+                    <div class="profile-more-section">
+                        <ul class="nav nav-tabs">
+                          <li><a data-toggle="tab" href="#account" class="active">{{sch_translate('course_info')}}</a></li>
+                          <li><a data-toggle="tab" href="#activity">{{sch_translate('instructor')}}</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div id="account" class="tab-pane fade in show active">
+                            <table>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('duration')}}</td>
+                                    <td class="profile-item-value">{{ $course->duration }} {{ $course->period }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('cost')}} </td>
+                                    <td class="profile-item-value">{{ money($course->price) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('practical')}}</td>
+                                    <td class="profile-item-value">{{ $course->practical_classes }} {{sch_translate('classes')}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('theory')}} </td>
+                                    <td class="profile-item-value">{{ $course->theory_classes }} {{sch_translate('classes')}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('online_classes')}}</td>
+                                    <td class="profile-item-value">{{ count($curriculums) }} {{sch_translate('classes')}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('exams')}}</td>
+                                    <td class="profile-item-value">{{ count($exams) }} </td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('students')}}</td>
+                                    <td class="profile-item-value">{{ $total }}</td>
+                                </tr>
+                            </table>
+                          </div>
+                          <div id="activity" class="tab-pane fade">
+                                <div class="instructors-list">
+
+                                    @if (!empty($courseinstructors))
+                                    @foreach ($courseinstructors as $instructor)
+                                    <!-- instructor -->
+                                    <div class="instructor-item">
+                                        <div class="instructor-item-img">
+                                            @if( !empty($instructor->avatar) )
+                                            <img src="{{ url('') }}uploads/avatar/{{ $instructor->avatar }}">
+                                            @else
+                                            <img src="{{ url('') }}assets/images/avatar.png">
+                                            @endif
+                                        </div>
+                                        <div class="instructor-item-info">
+                                            <h6><a href="{{ url('') }}profile/{{$instructor->id}}">{{$instructor->fname }} {{$instructor->lname }}</a></h6>
+                                            <p>{{$instructor->email }}</p>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                    @else
+                                    <p class="text-muted">{{sch_translate('no_instructor')}}</p>
+                                    @endif
+
+                                </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="halfpage-content">
+                
+                <!-- Online classes -->
+                <!-- <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                          @if ( $user->role != "student" )
+                            <button class="btn btn-red btn-icon pull-right"  data-toggle="modal" data-target="#newcurriculum"><i class=" mdi mdi-plus-circle-outline"></i> {{sch_translate('create_new_class')}}</button>
+                          @endif
+                                <h5>{{sch_translate('online_classes_or_lessons')}}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <p>{{sch_translate('these_clases_access')}}</p>
+                            <div class="online-classes-list">
+                                <div class="panel-group" id="accordion">
+
+                                  @if (!empty($curriculums))
+                                    @foreach ($curriculums as $index => $curriculum)
+                                      <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                          @if ( $user->role == "student" )
+                                            <a href="{{ url('Course@learn',['curriculumid'=>$curriculum->id]) }} " class="btn btn-success btn-sm btn-icon pull-right manage-class"><i class=" mdi mdi-airplay"></i> {{sch_translate('go_to_class')}} </a>
+                                          @else
+                                            <a href="{{ url('Course@curriculum',['curriculumid'=>$curriculum->id]) }}" class="btn btn-success btn-sm btn-icon pull-right manage-class"><i class=" mdi mdi-settings"></i> {{sch_translate('manage')}}</a>
+                                            <a href="{{ url('Course@classstudents',['curriculumid'=>$curriculum->id]) }}" class="btn btn-black btn-sm btn-icon pull-right manage-class"><i class=" mdi mdi-account-multiple"></i> {{sch_translate('students_list')}}</a>
+                                          @endif
+                                          <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ $curriculum->id }}">
+                                            {{ $index + 1 }}.) {{ $curriculum->name }}</a>
+                                          </h4>
+                                        </div>
+                                        @if ( $index == 0 )
+                                        <div id="collapse{{ $curriculum->id }}" class="panel-collapse collapse in show">
+                                        @else
+                                        <div id="collapse{{ $curriculum->id }}" class="panel-collapse collapse in">
+                                        @endif
+                                          <div class="panel-body">
+                                          <p>{{sch_translate('class_curriculum')}}</p>
+                                          <div class="class-curriculum-list">
+
+                                            @if (!empty($curriculum->chapters))
+                                              @foreach ($curriculum->chapters as $chapterindex => $chapter)
+                                            <!- - single chapter - - >
+                                              <div class="chapters-list">
+                                                  <h6>Chapter {{ $chapterindex + 1 }}: <strong class="text-primary">{{ $chapter->title }}</strong></h6>
+                                                  <ul>
+                                                  @if (!empty($chapter->lectures))
+                                                    @foreach ($chapter->lectures as $key => $lecture)
+                                                      <li>
+                                                          @if ( $lecture->type == "link" )
+                                                        <div class="chapter-class-type"><i class=" mdi mdi-link-variant"></i> </div>
+                                                           @elseif ( $lecture->type == "text" )
+                                                        <div class="chapter-class-type"><i class=" mdi mdi-clipboard-text"></i> </div>
+                                                           @elseif ( $lecture->type == "downloads" )
+                                                        <div class="chapter-class-type"><i class=" mdi mdi-cloud-download"></i> </div>
+                                                           @elseif ( $lecture->type == "pdf" )
+                                                        <div class="chapter-class-type"><i class=" mdi mdi-file-pdf-box"></i> </div>
+                                                           @elseif ( $lecture->type == "video" )
+                                                        <div class="chapter-class-type"><i class=" mdi mdi-play-circle"></i> </div>
+                                                           @endif
+                                                        {{ $lecture->title }}
+                                                    </li>
+                                                    @endforeach
+                                                  @else
+                                                      <li>
+                                                        <div class="chapter-class-type"><i class=" mdi mdi-clipboard-outline"></i></div> 
+                                                        {{sch_translate('this_has_no_lectures')}}
+                                                    </li>
+                                                  @endif
+                                                  </ul>
+                                              </div>
+                                              @endforeach
+                                            @else
+                                            <div class="empty-section empty-chapter"><i class="mdi mdi-clipboard-text"></i><h5>{{sch_translate('no_chapter_yet')}}</h5></div>
+                                            @endif
+                                          </div>
+                                        </div>
+                                        </div>
+                                      </div>
+                                    @endforeach
+                                  @else
+                                  <div class="empty-section">
+                                    <i class="mdi mdi-clipboard-text"></i>
+                                    <h5>{{sch_translate('no_online_classes')}}</h5>
+                                  </div>
+                                  @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                
+                <!-- courses -->
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                          @if ( $user->role != "student" )
+                            <button class="btn btn-red btn-icon pull-right"  data-toggle="modal" data-target="#newexam"><i class=" mdi mdi-plus-circle-outline"></i> {{sch_translate('create_new_exam')}}</button>
+                          @endif
+                                <h5>{{sch_translate('exams')}}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive mt-15 longer">
+                                <table class="table table-striped mb-0" id="data-table">
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>{{sch_translate('name')}}</th>
+                                                <th>{{sch_translate('questions')}}</th>
+                                                <th>{{sch_translate('status')}}</th>
+                                                <th>{{sch_translate('completed_by')}}</th>
+                                                <th>{{sch_translate('action')}}</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                             @if(!empty($exams))
+                                                 @foreach($exams as $index => $exam)
+                                                    <tr>
+                                                        <th scope="row">{{ $index + 1 }}</th>
+                                                        <td><a href="{{ url('Exam@takeexam',['examid'=>$exam->id]) }}"><strong>{{ $exam->name }}</strong></a></td>
+                                                        <td>{{ $exam->questions }}</td>
+                                                        @if( $exam->status == "Published" )
+                                                        <td><span class="badge badge-success">{{sch_translate('published')}}</span></td>
+                                                        @else
+                                                        <td><span class="badge badge-danger">{{sch_translate('unpublished')}}</span></td>
+                                                        @endif
+                                                        <td>{{ $exam->students }} {{sch_translate('students')}} </td>
+                                          @if ( $user->role == "student" )
+                                          <td class="text-center">
+                                            <a href="{{ url('Exam@takeexam',['examid'=>$exam->id]) }} " class="btn btn-success btn-sm btn-icon"><i class=" mdi mdi-file-check"></i> {{sch_translate('go_to_exam')}}</a>
+                                        </td>
+                                          @else
+                                                    <td class="text-center">
+                                                        <div class="dropdown inline-block">
+                                                                <button class="btn btn-default btn-sm btn-icofn dropdown-toggle" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></button>
+                                                                <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                                                    <li role="presentation"><a role="menuitem" href="{{ url('Exam@takeexam',['examid'=>$exam->id]) }}"> <i class="mdi mdi-eye"></i>{{sch_translate('preview_exam')}}</a></li>
+                                                                    <li role="presentation"><a role="menuitem" href="{{ url('Exam@builder',['examid'=>$exam->id]) }}"> <i class="mdi mdi-pencil"></i>{{sch_translate('exam_editor')}}</a></li>
+                                                                    <li role="presentation"><a role="menuitem" href="{{ url('Exam@examstudents',['examid'=>$exam->id]) }}"> <i class="mdi mdi-account-multiple"></i> {{sch_translate('students_list')}} </a></li>
+                                                                </ul>
+                                                        </div>
+                                                        
+                                                    </td>
+                                                    @endif
+                                                 @endforeach 
+                                                @else
+                                                    <tr><td colspan="6" class="text-center">{{sch_translate('empty_here')}}</td></tr>
+                                                @endif     
+                                            </tbody>
+                                        </table>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                
+                @if ( $user->role != "student" )
+                <!-- students -->
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                                <h5>{{sch_translate('students')}}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive mt-15">
+                                <table class="table table-striped mb-0" id="data-table">
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>{{sch_translate('name')}}</th>
+                                                <th>{{sch_translate('classes')}}</th>
+                                                <th>{{sch_translate('started')}}</th>
+                                                <th>{{sch_translate('completed')}}</th>
+                                                <th>{{sch_translate('progress')}}</th>
+                                                <th>{{sch_translate('schedule')}}</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                             @if(!empty($enrolledstudents))
+                                                 @foreach($enrolledstudents as $index => $student)
+                                                    <tr>
+                                                        <th scope="row">{{ $index + 1 }}</th>
+                                                        <td><a href="{{url('Profile@get',['userid'=>$student->id])}}"><strong>{{ $student->fname}} {{ $student->lname}}</strong></a></td>
+                                                        <td>{{ $student->total_theory + $student->total_practical }}</td>
+                                                        <td>{{ date('d M Y', strtotime($student->created_at)) }}</td>
+                                                        @if ( !empty($student->completed_on) )
+                                                        <td>{{ date('d M Y', strtotime($student->completed_on)) }}</td>
+                                                        @else
+                                                        <td>{{sch_translate('ongoing')}}</td>
+                                                        @endif
+                                                        <td><span class="badge badge-success">{{ round((($student->completed_theory + $student->completed_practical) / ($student->total_theory + $student->total_practical)) * 100) }}%</span></td>
+                                                        <td><a class="btn btn-primary btn-sm" href="{{url('Schedule@get')}}?filter=student&filterid={{ $student->id }}">{{sch_translate('schedule')}}</a></td>
+                                                    </tr>   
+                                             @endforeach 
+                                            @else
+                                                <tr><td colspan="7" class="text-center">{{sch_translate('empty_here')}}</td></tr>
+                                            @endif     
+                                            </tbody>
+                                        </table>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scheduling -->
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <p class="pull-right schedule-map">
+                                <span> <i class=" mdi mdi-circle text-danger"></i> {{sch_translate('missed')}} </span>
+                                <span> <i class=" mdi mdi-circle text-success"></i> {{sch_translate('practical')}} </span>
+                                <span> <i class=" mdi mdi-circle text-primary"></i> {{sch_translate('theory')}} </span>
+                                <span> <i class=" mdi mdi-circle text-muted"></i> {{sch_translate('complete')}} </span>
+                            </p>
+                                <h5>{{$course->name}} {{sch_translate('schedule')}}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id='calendar'>
+                                <div class="loader-demo-box">
+                                    <div class="circle-loader"></div>
+                              </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+            <!-- Add class -->
+            <div class="modal right fade" id="scheduleclass" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                            <h4 class="modal-title" id="myModalLabel2">{{sch_translate('schedule_class')}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="simcy-form translateValidation" action="{{ url('Schedule@create') }}" method="POST" loader="true">
+                              <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label>{{sch_translate('class_starts')}}</label>
+                                        <input type="text" class="form-control" placeholder="{{sch_translate('class_starts')}}" name="start" data-date-format="dd MM yyyy - HH:ii p" required>
+                                        <input type="hidden" name="csrf-token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="course" value="{{$course->id}}">
+                                    </div>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label>{{sch_translate('class_ends')}}</label>
+                                        <input type="text" class="form-control" placeholder="{{sch_translate('class_ends')}}" name="end" data-date-format="dd MM yyyy - HH:ii p" required>                                    
+                                    </div>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label>{{sch_translate('student')}}</label>
+                                        <select class="form-control select2" name="student" required="">
+                                            @if(!empty($students))
+                                                @foreach($students as $student)
+                                                    <option value="{{$student->id}}">{{$student->fname}} {{$student->lname}}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12 hide-parsley">
+                                        <label>{{sch_translate('instructor')}}</label>
+                                        <div class="instructorDiv">
+                                          <select class="form-control select2" name="instructor" required requiredSelect2 placeholder="Select Instructor">
+                                              <option value="0" disabled selected>{{sch_translate('select_instructor')}} </option>                                    
+                                              @if(!empty($instructors))
+                                                @foreach($instructors as $instructor)
+                                                    <option value="{{$instructor->id}}" id="{{$instructor->course}}">{{$instructor->fname}} {{$instructor->lname}}</option>
+                                                @endforeach
+                                              @endif
+                                          </select>
+                                      </div>
+                                      <!-- <div id="instructor-error"></div> -->
+                                      <!-- <ul class="parsley-errors-list filled instructorUl d-none">
+                                          <li class="parsley-required">This value is required.</li>
+                                      </ul> -->
+                                      <span class="instructorUl d-none text-danger" style="font-size: 14px; font-weight: lighter;">This value is required.</span>
+                                    </div>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label>{{sch_translate('class')}}</label>
+                                        <select class="form-control select2" name="class_type" required="">
+                                            <option value="Theory">{{sch_translate('theory_class')}} </option>
+                                            <option value="Practical">{{sch_translate('practical')}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                              </div>
+                              <!-- <div class="form-group" id="car_field" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label>{{sch_translate('Car')}}</label>
+                                        <select class="form-control select2" name="car">
+                                            <option value="0">{{sch_translate('select_car')}}</option>
+                                            @if(!empty($fleets))
+                                                @foreach($fleets as $fleet)
+                                                    <option value="{{$fleet->id}}">{{$fleet->make}} {{$fleet->model}} ( {{$fleet->carplate}} ) </option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
+                              </div> -->
+
+                              <div class="form-group" id="car_field" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label>{{sch_translate('car')}}</label>
+                                            <div class="carDiv">
+                                                <select class="form-control select2" name="car" requiredSelect2 data-parsley-errors-container="#car-error">
+                                                    <option value="0">{{sch_translate('select_car')}}</option>
+                                                    @if(!empty($fleets))
+                                                        @foreach($fleets as $fleet)
+                                                            <option value="{{$fleet->id}}">{{$fleet->make}} {{$fleet->model}} ( {{$fleet->carplate}} ) </option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                            </div>
+                                            <!-- <div id="car-error"></div> -->
+                                            <ul class="parsley-errors-list filled carUl d-none">
+                                                <li class="parsley-required">This value is required.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                              <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label>{{sch_translate('status')}}</label>
+                                        <select class="form-control select2" name="status" required="">
+                                            <option value="New">{{sch_translate('new_booking')}}</option>
+                                            <option value="Complete">{{sch_translate('complete')}}</option>
+                                            <option value="Missed">{{sch_translate('missed')}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                              </div>
+                              <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button class="btn btn-red btn-block" type="submit" id="saveClass">{{sch_translate('save_class')}}</button>
+                                    </div>
+                                </div>
+                              </div>
+                            </form>
+                        </div>
+
+                    </div><!-- modal-content -->
+                </div><!-- modal-dialog -->
+            </div>
+        <!-- end Add class -->
+
+    <!-- scheduleupdate -->
+    <div class="modal right fade" id="scheduleupdate" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('scheduling')}}</h4>
+                </div>
+                <div class="scheduleupdate-holder"></div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end scheduleupdate -->
+
+
+    <!-- update -->
+    <div class="modal right fade" id="update" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('edit')}} </h4>
+                </div>
+                <div class="update-holder"></div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end update -->
+
+
+    <!-- modals -->
+    <div class="modal right fade" id="newcurriculum" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('new_online_class')}}</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form class="simcy-form translateValidation" action="{{ url('Course@createonline') }}"  data-parsley-validate="" method="POST" loader="true">
+                        <p>{{sch_translate('create_new_online_class')}}</p>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('class_name')}}</label>
+                            <input type="text" name="name" class="form-control" placeholder="{{sch_translate('class_name')}}" required="">
+                            <input type="hidden" name="csrf-token" value="{{csrf_token()}}">
+                            <input type="hidden" name="course" value="{{$course->id}}">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('class_desc')}}</label>
+                            <textarea class="form-control" name="description" placeholder="{{sch_translate('class_desc')}}" rows="8" required></textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <button class="btn btn-red btn-block" type="submit">{{sch_translate('continue')}} </button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                </div>
+
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div><!-- modal -->
+
+    <!-- modals -->
+    <div class="modal right fade" id="newexam" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('create_exam')}}</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form class="simcy-form translateValidation" action="{{ url('Exam@create') }}"  data-parsley-validate="" method="POST" loader="true">
+                        <p>{{sch_translate('create_a_new_exam')}}</p>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('exam_name')}}</label>
+                            <input type="text" name="name" class="form-control" placeholder="{{sch_translate('exam_name')}}" required="">
+                            <input type="hidden" name="csrf-token" value="{{csrf_token()}}">
+                            <input type="hidden" name="course" value="{{$course->id}}">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('exam_max_retakes')}}</label>
+                            <input type="number" name="retakes" class="form-control" placeholder="{{sch_translate('exam_max_retakes')}}" value="0" min="0" required="">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('exam_desc')}}</label>
+                            <textarea class="form-control" name="description" placeholder="Exam Description" rows="8" required></textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <button class="btn btn-red btn-block" type="submit">{{sch_translate('continue')}} </button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                </div>
+
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div><!-- modal -->
+    
+
+
+
+    <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.flash.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.print.min.js"></script>
+    @if(!empty($enrolledstudents))
+    <script>
+        // causing error - https://trello.com/c/SQZ0u5iY/31-section-not-loading 
+        // $(document).ready(function() {
+        //     $('#data-table').DataTable({
+        //         dom: 'Bfrtip',
+        //         "columnDefs": [ {
+        //             "targets"  : [5],
+        //             "orderable": false,
+                      
+        //         }],
+        //         buttons: [
+        //             'copyHtml5',
+        //             'excelHtml5',
+        //             'csvHtml5'
+        //         ]
+        //     });
+        // });
+    </script>
+    @endif
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/libs/datetimepicker/js/bootstrap-datetimepicker.js"></script>
+   <script src="{{ url('') }}assets/libs/fullcalendar/moment.min.js"></script>
+   <script src="{{ url('') }}assets/libs/fullcalendar/fullcalendar.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.js"></script>
+   <!-- <script src="{{ url('') }}assets/js/simcify.min.js"></script> -->
+   <script src="{{ url('') }}assets/js/simcify.js"></script>
+    @if(sch_translate('translate') == 'de')
+    <script src="{{ url('') }}assets/libs/datetimepicker/js/locales/bootstrap-datetimepicker.de.js" charset="UTF-8"></script>
+    @endif
+   <script src="{{ url('') }}assets/js/schedule.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   <script type="text/javascript">
+       // Jquery start
+    $(document).ready(function() {
+        $('.slimscroll-profile-menu').slimscroll({
+            height: 'auto',
+            position: 'right',
+            size: "3px",
+            color: '#9ea5ab',
+            wheelStep: 5,
+            touchScrollStep: 50
+        });
+        $('select[name=class_type]').on('change', function() {
+            var class_ = $(this).val();
+            if (class_ == "Practical") {
+                $('#car_field').show();
+                $('input[name=car]').attr('required','true');
+            } else {
+                $('#car_field').hide();
+                $('input[name=car]').removeAttr('required');
+            }
+        })
+    });
+
+    var filter = 'course';
+    var filterid = '{{ $course->id }}';
+    var schedulesUrl = '{{ url("Schedule@fetch") }}';
+    var schedulesUpdateView = '{{ url("Schedule@updateview") }}';
+
+    var $myGroup = $('#accordion');
+    $myGroup.on('show.bs.collapse','.collapse', function() {
+    $myGroup.find('.collapse.in').collapse('hide');
+});
+</script>
+
+<script>
+    $(document).ready(function(){
+        // Remove error message
+        function removeSelect2ErrorMessage(name) {
+            $('.' + name + 'Div').removeClass('border border-danger');
+            $('.' + name + 'Ul').addClass('d-none');
+            $('.select2HasError').val(0);
+        }
+
+        function addSelect2ErrorMessage(name) {
+            $('.' + name + 'Div').addClass('border border-danger');
+            $('.' + name + 'Ul').removeClass('d-none');
+            $('.select2HasError').val(1);
+        }
+
+        $(document).on('click', '#saveClass', function() {
+
+            let instructorAttr = $('select[name=instructor]').attr('requiredSelect2');
+            let instructor = $('select[name=instructor]').val();
+            // Check if the select2 has required attribute
+            if (typeof instructorAttr !== typeof undefined && instructorAttr !== false) {
+
+                if (instructor == '' || instructor == null)
+                    addSelect2ErrorMessage('instructor');
+                else
+                    removeSelect2ErrorMessage('instructor');
+            }
+
+            let carAttr = $('select[name=car]').attr('requiredSelect2');
+            let car = $('select[name=car]').val();
+            // Check if the select2 has required attribute
+            if (typeof carAttr !== typeof undefined && carAttr !== false) {
+
+                if (car == '' || car == null)
+                    addSelect2ErrorMessage('car');
+                else
+                    removeSelect2ErrorMessage('car');
+            }
+        });
+
+        $(document).on('change', 'select[name=instructor]', function() {
+            let instructor = $(this).val();
+            if (instructor != '' && instructor != null)
+                removeSelect2ErrorMessage('instructor');
+            else
+                addSelect2ErrorMessage('instructor');
+        });
+
+        // Select2 validation car
+        $(document).on('change', 'select[name=car]', function() {
+            let car = $(this).val();
+            if (car != '')
+                removeSelect2ErrorMessage('car');
+            else
+                addSelect2ErrorMessage('car');
+        });
+    })
+</script>
+@include("translate/validation")
+@include("schleier/bottomscript")
+</body>
+</html>

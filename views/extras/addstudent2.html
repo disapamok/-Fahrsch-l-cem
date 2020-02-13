@@ -1,0 +1,105 @@
+
+<!-- modals -->
+<div class="modal right fade" id="create" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+        <h4 class="modal-title" id="myModalLabel2">{{sch_translate('add_student')}}</h4>
+      </div>
+
+      <div class="modal-body">
+        <form class="simcy-form" data-parsley-validate="" action="{{ url('Student@create') }}" method="POST" loader="true">
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-12">
+                <label>{{sch_translate('first_name')}}</label>
+                <input type="text" class="form-control" placeholder="{{sch_translate('first_name')}}" name="fname" required="">
+                <input type="hidden" value="{{csrf_token()}}" name="csrf-token">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-12">
+                <label>{{sch_translate('last_name')}}</label>
+                <input type="text" class="form-control" placeholder="{{sch_translate('last_name')}}" name="lname" required="">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-12">
+                <label>{{sch_translate('email_address')}}</label>
+                <input type="text" class="form-control" placeholder="{{sch_translate('email_address')}}" name="email" required="">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-12">
+                <label>{{sch_translate('phone_number')}}</label>
+                <input type="text" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" required="">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-12">
+                <label for="email">{{sch_translate('gender')}}</label>
+                <select class="form-control"name="gender" required="">
+                  <option value="Male">{{sch_translate('male')}}</option>
+                  <option value="Female">{{sch_translate('female')}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-12">
+                <label>{{sch_translate('course')}}</label>
+                <select class="form-control select2" name="newcourse" required="">
+                  <option value="">{{sch_translate('select_course')}}</option>
+                  @foreach($courses as $course)
+                  <option value="{{$course->id}}">{{$course->name}} ( ${{$course->price }} )</option>
+                  @endforeach
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group newamount" style="display: none;">
+            <div class="row">
+              <div class="col-md-12">
+                <label>{{sch_translate('amount_paid')}}</label>
+                <input type="number" class="form-control" placeholder="{{sch_translate('amount_paid')}}" value="0" name="amountpaid">
+              </div>
+            </div>
+          </div>
+          <div class="form-group newmethod" style="display: none;">
+            <div class="row">
+              <div class="col-md-12">
+                <label for="email">{{sch_translate('method_of_payment')}}</label>
+                <select class="form-control method" name="method">
+                  <option value="Cash">{{sch_translate('cash')}}</option>
+                  <option value="Mpesa">{{sch_translate('mpesa')}}</option>
+                  <option value="Paypal">{{sch_translate('paypal')}}</option>
+                  <option value="Card">{{sch_translate('card')}}</option>
+                  <option value="Other">{{sch_translate('other')}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="row mt-md-5">
+              <div class="col-md-12">
+                <button class="btn btn-red btn-block" type="submit">{{sch_translate('create_account')}}</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div><!-- modal-content -->
+  </div><!-- modal-dialog -->
+    </div><!-- modal -->

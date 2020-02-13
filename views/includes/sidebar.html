@@ -1,0 +1,118 @@
+<?php
+// http://localhost/
+$currentPath = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]/";
+
+http://localhost/fahrs/students/
+$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+
+$pathLink = str_replace($currentPath,"",$actual_link);
+
+// remove fahrs
+$pathLink = str_replace("fahrs/", "", $pathLink);
+
+?>
+
+    <aside>
+        <div class="slimscroll-menu">
+            <!-- close menu -->
+            <a href="" class="close-aside"><i class="mdi mdi-close-circle-outline"></i></a>
+
+            <!-- Branding -->
+            <div class="side-branding">
+                <a href="{{ url('Dashboard@get') }}">
+                    <img src="{{ url('') }}uploads/app/{{ env('APP_LOGO'); }}" class="img-responsive">
+                </a>
+            </div>
+          
+            <!-- navigation -->
+            <ul>
+                <!-- <li class="menu-label">{{sch_translate('main')}} </li> -->
+                @if($user->role == 'superadmin' || $user->role == 'admin' || $user->role == 'staff')
+                <li class="nav-item {{ ($pathLink == '/' || $pathLink == '') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Dashboard@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/speedometer.png"></span>
+                      <span class="menu-title">{{sch_translate('dashboard')}}</span>
+                    </a>
+                </li>
+                @endif
+
+                @if($user->role == 'student')
+                <li class="nav-item {{ ($pathLink == 'courses/' || $pathLink == 'courses') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Course@get')}}">
+                      <i class="menu-icon mdi mdi-seal"></i>
+                      <span class="menu-title">{{sch_translate('my_courses')}}</span>
+                    </a>
+                </li>
+                @endif
+                @if($user->role == 'superadmin' || $user->role == 'admin' || $user->role == 'staff')
+                <li class="nav-item {{ ($pathLink == 'students/' || $pathLink == 'students') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Student@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/relationship-sm.png"></span>
+                      <span class="menu-title">{{sch_translate('students')}}</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ ($pathLink == 'instructors/' || $pathLink == 'instructors') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Instructor@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/teacher-sm.png"></span>
+                      <span class="menu-title">{{sch_translate('instructors')}}</span>
+                    </a>
+                </li>
+                
+                <!-- <li class="menu-label">{{sch_translate('planer')}}</li> -->
+                <li class="nav-item {{ ($pathLink == 'scheduling/' || $pathLink == 'scheduling') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Schedule@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/schedule.png"></span>
+                      <span class="menu-title">{{sch_translate('Kalender')}}</span>
+                    </a>
+                </li>
+
+                <br/>
+
+                <!-- <li class="menu-label">{{sch_translate('school')}}</li> -->
+                <li class="nav-item {{ ($pathLink == 'invoices/' || $pathLink == 'invoices') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Invoice@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/bill.png"></span>
+                      <span class="menu-title">{{sch_translate('payments')}}</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ ($pathLink == 'branches/' || $pathLink == 'branches') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Branch@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/placeholder-round-sm.png"></span>
+                      <span class="menu-title">{{sch_translate('Standorten')}}</span>
+                    </a>
+                </li>
+                <li class="nav-item {{ ($pathLink == 'communication/' || $pathLink == 'communication') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Communication@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/speech-bubble-sm.png"></span>
+                      <span class="menu-title">{{sch_translate('communication')}}</span>
+                    </a>
+                </li>
+                @endif
+
+                <br/>
+                <!-- <li class="menu-label">{{sch_translate('account')}}</li> -->
+                @if($user->role == 'superadmin' || $user->role == 'admin')
+                <li class="nav-item {{ ($pathLink == 'courses/' || $pathLink == 'courses') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Course@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/training.png"></span>
+                      <span class="menu-title">{{sch_translate('courses')}}</span>
+                    </a>
+                </li>
+                @endif
+                @if(env('SHOW_SCHOOLS_MENU') == 'Enabled' && $user->role == 'superadmin')
+                <li class="nav-item {{ ($pathLink == 'schools/' || $pathLink == 'schools') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('School@get')}}">
+                      <i class="menu-icon mdi mdi-blur-radial"></i>
+                      <span class="menu-title">{{sch_translate('schools')}}</span>
+                    </a>
+                </li>
+                @endif
+                <li class="nav-item {{ ($pathLink == 'settings/' || $pathLink == 'settings') ? 'bg-gray' : '' }}">
+                    <a class="nav-link text-black" href="{{url('Settings@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/controls.png"></span>
+                      <span class="menu-title">{{sch_translate('settings')}}</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>

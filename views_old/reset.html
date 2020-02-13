@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="<?=url('');?>assets/images/favicon.png">
+    <title>{{sch_translate('login')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="<?=url('');?>assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="<?=url('');?>assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?=url('');?>assets/libs/dropify/css/dropify.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="<?=url('');?>assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="<?=url('');?>assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+
+<div class="auth-page">
+        <div class="auth-card card">
+            <div class="auth-logo">
+                <img src="<?=url('');?>assets/images/logo.png" class="img-responsive">
+            </div>
+            <div class="login">
+                <div class="auth-heading mt-15">
+                    <h2>{{sch_translate('reset_password')}}</h2>
+                    <p>{{sch_translate('create_your_new_password_enter_the_form_below_to_proceed')}}</p>
+                </div>
+                <div class="auth-form">
+                    <form class="simcy-form" action="{{ url('Auth@reset') }}" data-parsley-validate="" method="POST" loader="true">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('password')}}</label>
+                                    <input type="Password" class="form-control" name="password" data-parsley-required="true" data-parsley-minlength="6" data-parsley-error-message="{{sch_translate('password_too_short')}}" id="new-password" placeholder="{{sch_translate('new_password')}}">
+                                    <input type="hidden" name="csrf-token" value="<?=csrf_token();?>" />
+                                    <input type="hidden" name="token" value="{{ $token }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('confirm_password')}}</label>
+                                    <input type="Password" class="form-control" data-parsley-required="true" data-parsley-equalto="#new-password" data-parsley-error-message="{{sch_translate('password_dont_match')}}" placeholder="{{sch_translate('confirm_password')}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button class="btn btn-primary btn-block">{{sch_translate('reset_password')}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="">
+                  <p><a href="{{ url('Auth@get') }}">{{sch_translate('go_to_login')}}</a></p>
+                </div>
+            </div>
+    </div>
+    <p class="copyright"> &copy; {{ date("Y") }}  {{ env("APP_NAME") }}. {{sch_translate('all_rights')}}</p>
+</div>
+
+
+
+   <script src="<?=url('');?>assets/js/jquery-3.3.1.min.js"></script>
+   <script src="<?=url('');?>assets/js/popper.min.js"></script>
+   <script src="<?=url('');?>assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="<?=url('');?>assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="<?=url('');?>assets/libs/dropify/js/dropify.min.js"></script>
+   <script src="<?=url('');?>assets/js/simcify.min.js"></script>
+   <script src="<?=url('');?>assets/js/app.js"></script>
+   @include("schleier/bottomscript")
+</body>
+</html>

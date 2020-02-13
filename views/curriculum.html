@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{ $curriculum->name }} | {{sch_translate('app_name_long')}}</title>
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/calendar.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h3>{{ $curriculum->name }}</h3>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+
+            <div class="page-rightbar profile-right-bar p-0">
+                <div class="slimscroll-profile-menu">
+                    <div class="course-image">
+                            <img src="<?=url('');?>uploads/courses/{{$course->image }}">
+                    </div>
+                    <div class="user-profile-info">
+                        <h5>{{$course->name}}</h5>
+                    </div>
+                    <div class="profile-more-section">
+                        <ul class="nav nav-tabs">
+                          <li><a data-toggle="tab" href="#account" class="active">{{sch_translate('course_info')}}</a></li>
+                          <li><a data-toggle="tab" href="#activity">{{sch_translate('instructor')}}</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                          <div id="account" class="tab-pane fade in show active">
+                            <table>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('duration')}}</td>
+                                    <td class="profile-item-value">{{ $course->duration }} {{ $course->period }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('cost')}}</td>
+                                    <td class="profile-item-value">{{ money($course->price) }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('pratical')}}</td>
+                                    <td class="profile-item-value">{{ $course->practical_classes }} {{sch_translate('classes')}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('theory')}}</td>
+                                    <td class="profile-item-value">{{ $course->theory_classes }} {{sch_translate('classes')}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="profile-item-title">{{sch_translate('students')}}</td>
+                                    <td class="profile-item-value">{{ $total }}</td>
+                                </tr>
+                            </table>
+                          </div>
+                          <div id="activity" class="tab-pane fade">
+                                <div class="instructors-list">
+
+                                    @if (!empty($courseinstructors))
+                                    @foreach ($courseinstructors as $instructor)
+                                    <!-- instructor -->
+                                    <div class="instructor-item">
+                                        <div class="instructor-item-img">
+                                            @if( !empty($instructor->avatar) )
+                                            <img src="{{ url('') }}uploads/avatar/{{ $instructor->avatar }}">
+                                            @else
+                                            <img src="{{ url('') }}assets/images/avatar.png">
+                                            @endif
+                                        </div>
+                                        <div class="instructor-item-info">
+                                            <h6><a href="{{ url('') }}profile/{{$instructor->id}}">{{$instructor->fname }} {{$instructor->lname }}</a></h6>
+                                            <p>{{$instructor->email }}</p>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                    @else
+                                    <p class="text-muted">{{sch_translate('no_instructors')}}</p>
+                                    @endif
+
+                                </div>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="halfpage-content">
+                
+                <!-- Curriculum Details -->
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                          <label class="pull-right publish-label"><span class="text-muted">{{sch_translate('unpublished')}}</span> <input type="checkbox" class="switch send-to-server-change-checkbox" loader="true" url="{{ url('Course@publishclass') }}" extradata="curriculumid:{{ $curriculum->id }}|csrf-token:{{ csrf_token() }}" name="status" value="Published" @if( !empty( $curriculum->status == "Published" ) ) checked
+                           @endif> <span class="text-primary">{{sch_translate('published')}}</span></label>
+                                <h5>{{sch_translate('class_details')}}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <p>{{sch_translate('these_are_class_details_will_be_visible_to_students.')}}</p>
+                        <form class="simcy-form" action="{{ url('Course@editonlineclass') }}" data-parsley-validate="" method="POST" loader="true">
+                            <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label>{{sch_translate('class_name')}}</label>
+                                            <input type="text" class="form-control class-name" name="name" placeholder="{{sch_translate('class_name')}}" value="{{ $curriculum->name }}" required>
+                                            <input type="hidden" name="csrf-token" value="{{ csrf_token() }}">
+                                            <input type="hidden" name="curriculumid" value="{{ $curriculum->id }}">
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <label>{{sch_translate('class_description')}}</label>
+                                            <textarea class="form-control" name="description" placeholder="{{sch_translate('class_description')}}" rows="6" required>{{ $curriculum->description }}</textarea>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-red">{{sch_translate('save_changes')}}</button>
+                                        <a href="{{ url('Course@learn',['curriculumid'=>$curriculum->id]) }}" class="btn btn-success ml-5 btn-icon pull-right pull-right" target="_blank"><i class=" mdi mdi-airplay"></i> {{sch_translate('preview_class')}} </a>
+                                        <button class="btn btn-default btn-icon pull-right send-to-server-click" data="curriculumid:{{ $curriculum->id }}|csrf-token:{{csrf_token()}}" href="" url="{{ url('Course@deletecurriculum') }}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('this_class_with_its_chapters_and_lectures_will_be_deleted')}}" warning-button="{{sch_translate('delete')}}" loader="true" type="button" data-cancel-button="{{sch_translate('cancel')}}"><i class=" mdi mdi-delete"></i> {{sch_translate('delete_class')}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- curriculum builder -->
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <button class="btn btn-primary btn-icon pull-right  add-chapter"><i class=" mdi mdi-plus-circle-outline"></i> {{sch_translate('add_chapter')}}</button>
+                                <h5>{{sch_translate('curriculum_builder')}}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <p>{{sch_translate('these_are_curriculum_chapters,_each_chapter_contains_multiple_lectures,_a_lecture_could_be_video,_downloads,_link,_pdfs_or_text')}}</p>
+                            <form class="landa-content-form" action="{{ url('Course@updatecontent') }}" data-parsley-validate="" method="POST" loader="true" enctype="multipart/form-data">
+                            <input type="hidden" name="class" value="{{ $curriculum->id }}">
+                            <input type="hidden" name="csrf-token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="course" value="{{ $curriculum->course }}">
+                            <div class="online-classes-list">
+                                <div class="panel-group chapter-holder" id="accordion">
+                                  @if (!is_null($chapters))
+                                    @foreach ($chapters as $index => $chapter)
+
+                                  <!-- single chapter -->
+                                  <div class="panel panel-default chapter">
+                                    <div class="panel-heading">
+                                      <div class="chapter-drag"><i class="mdi mdi-drag"></i></div>
+                                        <a href="" class="btn btn-black btn-sm pull-right manage-class delete-item" data-id="{{ $chapter->id }}" data-type="chapter" title="{{sch_translate('Delete chapter')}}"><i class=" mdi mdi-delete"></i></a>
+                                      <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#chapter{{ $chapter->id }}">
+                                        <span class="indexing">{{ $index + 1 }}.)</span><span class="panel-label">{{ $chapter->title }} </span> </a>
+                                      </h4>
+                                    </div>
+                                    <div id="chapter{{ $chapter->id }}" class="panel-collapse collapse chapter-body in">
+                                      <div class="panel-body">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label>{{sch_translate('chapter_title')}}</label>
+                                                        <input type="text" class="form-control chapter-title" name="chaptertitle[]" value="{{ $chapter->title }}" placeholder="{{sch_translate('chapter_title')}}" required>
+                                                        <input type="hidden" name="chapterid[]" value="{{ $chapter->id }}">
+                                                        <input type="hidden" class="chapter-indexing" name="indexing[]" value="{{ $chapter->indexing }}">
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <label>{{sch_translate('chapter_description')}}</label>
+                                                        <textarea class="form-control" name="description[]" placeholder="{{sch_translate('chapter_description')}}" rows="3" required>{{ $chapter->description }}</textarea>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        <div class="divider"></div>
+                                        <p>{{sch_translate('below_are_lectures_of_this_chapter')}}</p>
+                                        <div class="panel-group chapter-lecture-holder" id="lecture-accordion">
+                                          @if (!empty($chapter->lectures))
+                                            @foreach ($chapter->lectures as $key => $lecture)
+                                                <!-- single link lecture -->
+                                                <div class="panel panel-default lecture">
+                                                   <div class="panel-heading">
+                                                      <div class="chapter-drag"><i class="mdi mdi-drag"></i></div>
+                                                      <a href="" class="btn btn-black btn-sm pull-right manage-class delete-item" data-type="lecture" data-id="{{ $lecture->id }}" title="{{sch_translate('Delete Lecture')}}"><i class=" mdi mdi-delete"></i></a> 
+                                                      <h4 class="panel-title">
+                                                         <a data-toggle="collapse" data-parent="#lecture-accordion" href="#lecture{{ $lecture->id }}">
+
+                                                              @if ( $lecture->type == "link" )
+                                                            <div class="lecture-type"><i class=" mdi mdi-link-variant"></i> </div>
+                                                               @elseif ( $lecture->type == "text" )
+                                                            <div class="lecture-type"><i class=" mdi mdi-clipboard-text"></i> </div>
+                                                               @elseif ( $lecture->type == "downloads" )
+                                                            <div class="lecture-type"><i class=" mdi mdi-cloud-download"></i> </div>
+                                                               @elseif ( $lecture->type == "pdf" )
+                                                            <div class="lecture-type"><i class=" mdi mdi-file-pdf-box"></i> </div>
+                                                               @elseif ( $lecture->type == "video" )
+                                                            <div class="lecture-type"><i class=" mdi mdi-play-circle"></i> </div>
+                                                               @endif
+                                                            <span class="indexing">{{ $key + 1 }}.)</span><span class="panel-label">{{ $lecture->title }}</span>
+                                                         </a>
+                                                      </h4>
+                                                   </div>
+                                                   <div id="lecture{{ $lecture->id }}" class="panel-collapse collapse lecture-body in">
+                                                      <div class="panel-body">
+                                                         <div class="form-group">
+                                                            <div class="row">
+                                                               <div class="col-md-12"> <label>{{sch_translate('lecture_title')}}</label> 
+                                                                <input type="text" class="form-control chapter-title" name="title{{ $chapter->indexing }}[]" original-name="title" placeholder="{{sch_translate('lecture_title')}}" value="{{ $lecture->title }}" required><input type="hidden" class="lecture-indexing" name="lectureindexing{{ $chapter->indexing }}[]" original-name="lectureindexing" value="{{ $lecture->indexing }}"> <input type="hidden" name="lectureid{{ $chapter->indexing }}[]" original-name="lectureid"  value="{{ $lecture->id }}"> <input type="hidden" name="type{{ $chapter->indexing }}[]" original-name="type" value="{{ $lecture->type }}"> 
+                                                                @if ( $lecture->type == "link" || $lecture->type == "text" )
+                                                                <input type="file" class="hidden" name="content{{ $chapter->indexing }}[]" original-name="content" value="z:/null.null"> 
+                                                                @else
+                                                                <input type="hidden" name="content{{ $chapter->indexing }}[]" original-name="content" value="null"> 
+                                                                @endif
+                                                              </div>
+                                                            </div>
+                                                         </div>
+                                                         <div class="form-group">
+                                                            <div class="row">
+                                                               <div class="col-md-12"> <label>{{sch_translate('lecture_description')}}</label> <textarea class="form-control" name="description{{ $chapter->indexing }}[]" original-name="description" placeholder="{{sch_translate('lecture_description')}}" rows="3" required>{{ $lecture->description }}</textarea> </div>
+                                                            </div>
+                                                         </div>
+                                                         <div class="form-group">
+                                                            <div class="row">
+                                                              @if ( $lecture->type == "link" )
+                                                               <div class="col-md-12"> <label>{{sch_translate('enter_link_slash_url')}}</label> <input type="url" class="form-control" name="content{{ $chapter->indexing }}[]" original-name="content" placeholder="{{sch_translate('enter_link_slash_url')}}" value="{{ $lecture->content }}" required> </div>
+                                                               @elseif ( $lecture->type == "text" )
+                                                               <div class="col-md-12"> <label>{{sch_translate('lecture_text_body')}}</label> <textarea class="form-control" name="content[]" original-name="content{{ $chapter->indexing }}[]" placeholder="{{sch_translate('lecture_description')}}" rows="6" required>{{ $lecture->content }}</textarea> </div>
+                                                               @elseif ( $lecture->type == "downloads" )
+                                                               <div class="col-md-12"> <label>{{sch_translate('resource_to_download')}}</label> <a href="/uploads/lectures/{{ $lecture->content }}" class="btn btn-default btn-block" download="{{ $lecture->title }}"><i class=" mdi mdi-cloud-download"></i> {{sch_translate('download_resource')}}</a></div>
+                                                               @elseif ( $lecture->type == "pdf" )
+                                                               <div class="col-md-12"> <label>{{sch_translate('uploaded_pdf')}}</label><a href="/uploads/lectures/{{ $lecture->content }}" class="btn btn-default btn-block" download="{{ $lecture->title }}"><i class=" mdi mdi-cloud-download"></i> {{sch_translate('download_pdf')}}</a></div>
+                                                               @elseif ( $lecture->type == "video" )
+                                                               <div class="col-md-12"> <label>{{sch_translate('uploaded_video')}}</label><a href="/uploads/lectures/{{ $lecture->content }}" class="btn btn-default btn-block" download="{{ $lecture->title }}"><i class=" mdi mdi-cloud-download"></i> {{sch_translate('download_video')}}</a> </div>
+                                                               @endif
+                                                            </div>
+                                                         </div>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <!-- end lecture -->
+                                            @endforeach
+                                          @else
+                                          <div class="empty-section">
+                                            <i class="mdi mdi-clipboard-text"></i>
+                                            <h5>{{sch_translate('no_lectures_here,_add_a_new_one_below')}}</h5>
+                                          </div>
+                                          @endif
+                                        </div>
+                                        <div class="lecture-buttons-holder">
+                                          <p class="text-thin text-muted mb-5">{{sch_translate('add_another_lecture')}}</p>
+                                          <div class="btn-group btn-group-justified">
+                                            <a href="" class="btn btn-black add-lecture" data-type="video"><i class=" mdi mdi-play-circle"></i> {{sch_translate('video')}}</a>
+                                            <a href="" class="btn btn-black add-lecture" data-type="downloads"><i class=" mdi mdi-cloud-download"></i> {{sch_translate('downloads')}}</a>
+                                            <a href="" class="btn btn-black add-lecture" data-type="link"><i class=" mdi mdi-link-variant"></i> {{sch_translate('link')}}</a>
+                                            <a href="" class="btn btn-black add-lecture" data-type="pdf"><i class=" mdi mdi-file-pdf-box"></i> {{sch_translate('pdf')}}</a>
+                                            <a href="" class="btn btn-black add-lecture" data-type="text"><i class=" mdi mdi-note-text"></i> {{sch_translate('text')}}</a>
+                                          </div>
+
+                                        </div>
+
+                                    </div>
+                                    </div>
+                                  </div>
+                                    @endforeach
+                                  @else
+                                  <div class="empty-section empty-chapter"><i class="mdi mdi-clipboard-text"></i><h5>{{sch_translate('no_chapters_here,_add_a_new_one')}}</h5></div>
+                                  @endif
+                                </div>
+
+                                <!-- here -->
+                              <div class="form-group">
+                                  <div class="row">
+                                      <div class="col-md-12 mt-15">
+                                        <button class="btn btn-primary btn-icon" type="submit"><i class=" mdi mdi-content-save"></i> {{sch_translate('save_changes')}}</button>
+                                        <button class="btn btn-black btn-icon add-chapter" type="button"><i class=" mdi mdi-plus-circle-outline"></i>{{sch_translate('add_chapter')}} </button>
+                                      </div>
+                                  </div>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- update -->
+    <div class="modal right fade" id="update" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('edit')}} </h4>
+                </div>
+                <div class="update-holder"></div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end update -->
+
+
+   <script type="text/javascript">
+        var sectionsUrl = "{{ url('Course@sections') }}";
+    </script>
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/libs/datetimepicker/js/bootstrap-datetimepicker.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"></script>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css" />
+   <script src="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   <script src="{{ url('') }}assets/js/builder.js"></script>
+   <script type="text/javascript">
+    var deleteSectionUrl = "{{ url('Course@deletecontent') }}";
+       // Jquery start
+    $(document).ready(function() {
+        $('.slimscroll-profile-menu').slimscroll({
+            height: 'auto',
+            position: 'right',
+            size: "3px",
+            color: '#9ea5ab',
+            wheelStep: 5,
+            touchScrollStep: 50
+        });
+    });
+
+</script>
+   @include("schleier/bottomscript")
+</body>
+</html>

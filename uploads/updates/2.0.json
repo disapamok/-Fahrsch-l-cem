@@ -1,0 +1,94 @@
+CREATE TABLE IF NOT EXISTS `exams` (
+  `id` int(11) NOT NULL,
+  `school` int(11) NOT NULL,
+  `branch` int(11) NOT NULL,
+  `course` int(11) NOT NULL,
+  `name` varchar(256) NOT NULL,
+  `retakes` int(11) NOT NULL,
+  `description` text NOT NULL,
+  `status` enum('Unpublished','Published') NOT NULL DEFAULT 'Unpublished',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1@signer
+CREATE TABLE IF NOT EXISTS `examsreports` (
+  `id` int(11) NOT NULL,
+  `school` int(11) NOT NULL,
+  `branch` int(11) NOT NULL,
+  `course` int(11) NOT NULL,
+  `exam` int(11) NOT NULL,
+  `student` int(11) NOT NULL,
+  `score` int(11) NOT NULL,
+  `correctlyAnswered` int(11) NOT NULL,
+  `totalQuestions` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1@signer
+CREATE TABLE IF NOT EXISTS `lectureprogress` (
+  `id` int(11) NOT NULL,
+  `student` int(11) NOT NULL,
+  `lecture` int(11) NOT NULL,
+  `school` int(11) NOT NULL,
+  `branch` int(11) NOT NULL,
+  `course` int(11) NOT NULL,
+  `class` int(11) NOT NULL,
+  `chapter` int(11) NOT NULL,
+  `started_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1@signer
+CREATE TABLE IF NOT EXISTS `lectures` (
+  `id` int(11) NOT NULL,
+  `title` varchar(256) NOT NULL,
+  `description` text NOT NULL,
+  `type` enum('pdf','link','text','downloads','video') NOT NULL,
+  `content` text NOT NULL,
+  `indexing` int(11) NOT NULL,
+  `school` int(11) NOT NULL,
+  `branch` int(11) NOT NULL,
+  `course` int(11) NOT NULL,
+  `class` int(11) NOT NULL,
+  `chapter` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1@signer
+CREATE TABLE IF NOT EXISTS `onlineclasschapters` (
+  `id` int(11) NOT NULL,
+  `school` int(11) NOT NULL,
+  `branch` int(11) NOT NULL,
+  `course` int(11) NOT NULL,
+  `class` int(11) NOT NULL,
+  `title` varchar(256) NOT NULL,
+  `description` text NOT NULL,
+  `indexing` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1@signer
+CREATE TABLE IF NOT EXISTS `onlineclasses` (
+  `id` int(11) NOT NULL,
+  `school` int(11) NOT NULL,
+  `branch` int(11) NOT NULL,
+  `course` int(11) NOT NULL,
+  `name` varchar(256) NOT NULL,
+  `description` text NOT NULL,
+  `status` enum('Unpublished','Published') NOT NULL DEFAULT 'Unpublished',
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1@signer
+CREATE TABLE IF NOT EXISTS `questions` (
+  `id` int(11) NOT NULL,
+  `school` int(11) NOT NULL,
+  `branch` int(11) NOT NULL,
+  `course` int(11) NOT NULL,
+  `exam` int(11) NOT NULL,
+  `question` varchar(256) NOT NULL,
+  `answers` text NOT NULL,
+  `correct` text NOT NULL,
+  `indexing` int(11) NOT NULL,
+  `required` enum('yes','no') NOT NULL,
+  `type` enum('multiple','single') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1@signer
+ALTER TABLE `schedules` ADD `instructor_google_id` varchar(64) DEFAULT NULL@signer
+ALTER TABLE `schedules` ADD `student_google_id` varchar(64) DEFAULT NULL@signer
+CREATE TABLE IF NOT EXISTS `studentexamresults` (
+  `id` int(11) NOT NULL,
+  `school` int(11) NOT NULL,
+  `branch` int(11) NOT NULL,
+  `course` int(11) NOT NULL,
+  `exam` int(11) NOT NULL,
+  `question` varchar(256) NOT NULL,
+  `answer` text NOT NULL,
+  `correct` enum('yes','no') NOT NULL,
+  `indexing` int(11) NOT NULL,
+  `student` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1@signer
+ALTER TABLE `users` ADD `google_access_token` varchar(600) DEFAULT NULL

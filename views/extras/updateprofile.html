@@ -1,0 +1,424 @@
+{{"";//<=important dont remove
+    $sch_is_schuler= $profile->role == "student";
+    //only students have rows in userinfo, so else create an empty object
+    $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[]; 
+
+    $fuehrerschein_class = $user_info -> licensetype.",";
+
+    //Remove extra space
+    $user_classes = str_replace(" ", "", $user_info -> licensetype);
+    // Convert to array
+    $user_classes = explode (",", $user_classes);    
+
+    $fuehrerschein_class_1_array = ["", "A", "A1", "A2", "AM"];
+    $fuehrerschein_class_2_array = ["", "B", "B96", "BE", "C", "C1", "C1E", "CE"];
+    $fuehrerschein_class_3_array = ["", "D", "DE", "D1", "D1E", "L", "T"];
+
+    $fuehrerschein_class_all_array = ["", "A", "A1", "A2", "AM", "B", "B96", "BE", "C", "C1", "C1E", "CE", "D", "DE", "D1", "D1E", "L", "T"];
+    
+    $fahrpruefung_languages = ["Englisch", "Deutsch", "Franzoesisch", "Griechisch", "Italienisch", "Polnisch", "Portugiesisch", "Rumaenisch", "Russisch", "Kroatisch", "Spanisch", "Tuerkisch", "arabisch_hocharabisch"];
+}}
+<!-- edit user profile -->
+<div class="modal right fade" id="update" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                <h4 class="modal-title" id="myModalLabel2">{{sch_translate('edit_profile')}}</h4>
+            </div>
+
+            <div class="modal-body">
+                <form class="simcy-form translateValidation" data-parsley-validate="" action="{{ url('Profile@update') }}" method="POST" loader="true">
+                    
+                    <input type="hidden" @if($sch_is_schuler) value="yes" @else value="no" @endif name="is_schuler">
+                    <!-- For student -->
+                    @if($sch_is_schuler)
+
+                    <input type="hidden" value="yes" name="is_schuler">
+                    <!-- <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('Karteikennung')}}</label>
+                                <select class="form-control" name="karteikennung" required="">
+                                    <option value="Male" @if($user_info->cardnumber == "") selected @endif>
+                                    {{sch_translate('male')}}</option>
+                                    <option value="Female">{{sch_translate('female')}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <div class="row">
+                        <div class="mb-5 mr-3 w-100">
+                          <p class="float-left ml-3">Status</p>
+                          <label class="switch float-right">
+                              @if($profile->status == 'Active')
+                                <input type="checkbox" name="student_status" id="student_status" value="Active" checked>
+                              @else
+                                <input type="checkbox" name="student_status" id="student_status" value="Inactive">
+                              @endif
+                             <span class="slider round"></span>
+                          </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('Anrede')}}</label>
+                                <select class="form-control" name="title" required="">
+                                    <option value="Mr" @if($user_info->title == "Mr") selected @endif>
+                                    {{sch_translate('mr')}}</option>
+                                    <option value="Mrs" @if($user_info->title == "Mrs") selected @endif>
+                                    {{sch_translate('mrs')}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('first_name')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('first_name')}}" value="{{ $profile->fname }}" name="fname" required="">
+                                <input type="hidden" value="{{ csrf_token() }}" name="csrf-token">
+                                <input type="hidden" value="{{ $profile->id }}" name="userid">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('last_name')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('last_name')}}" value="{{ $profile->lname }}" name="lname" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('street_nr')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('street_nr')}}" name="street_nr" value="{{$user_info->street}}" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('plz_ort')}}</label>
+                                <div class="row">
+                                    <div class="col-5 pr-0">
+                                        <input type="number" class="form-control" placeholder="{{sch_translate('plz')}}" name="plz" value="{{$user_info->plz}}" required="">
+                                    </div>
+                                    <div class="col-7">
+                                        <input type="text" class="form-control" placeholder="{{sch_translate('ort')}}" name="ort" value="{{$user_info->city}}" required="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('email_address')}}</label>
+                                <input type="email" class="form-control" placeholder="{{sch_translate('email_address')}}" name="email" value="{{ $profile->email }}" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                            <label>{{sch_translate('phone_number')}}</label>
+                            <input type="number" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" value="{{ str_replace('+', '', $profile->phone) }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="email">{{sch_translate('gender')}}</label>
+                                <select class="form-control" name="gender" required="">
+                                    <option value="Male" @if( !empty( $profile->gender == "Male" ) ) selected @endif> 
+                                        {{sch_translate('male')}}
+                                    </option>
+                                    <option value="Female" @if( !empty( $profile->gender == "Female" ) ) selected @endif>
+                                     {{sch_translate('female')}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('job')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('job')}}" name="job" value="{{$user_info->job}}" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('Staatsangehoerigkeit')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('Staatsangehoerigkeit')}}" name="nationality" value="{{$user_info->nationality}}" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('Ausweis-Nr')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('Ausweis-Nr')}}" name="ausweis_nr" value="{{$user_info->id_number}}" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('language')}}</label>
+                                <select class="form-control" name="language" required="">
+                                  @foreach($fahrpruefung_languages as $fahrpruefung_language)
+                                    <option value="{{$fahrpruefung_language}}">{{sch_translate($fahrpruefung_language)}}</option>
+                                  @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="">{{sch_translate('Standort')}}</label>
+                                <select class="form-control" name="branch" required="">
+                                    <option disabled="">{{sch_translate('select_branch')}}</option>
+                                    @if(!empty($branches)) 
+                                    @foreach($branches as $branch)
+                                    <option value="{{$branch->id}}" @if($profile->branch == "$branch->id") selected @endif>{{$branch->name}}</option>
+                                    @endforeach 
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('Anmeldedatum')}}</label>
+                                <input type="text" class="form-control datepickerx" data-date-format="dd-mm-yyyy" placeholder="{{sch_translate('Anmeldedatum')}}" name="anmeldedatum" value="{{$user_info->register_date}}" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="email">{{sch_translate('fuehrerschein_class')}}</label>
+                                <div class="row">
+                                  <div class="col-4">
+                                    <select class="form-control" name="fuehrerschein_class_1">
+                                      @foreach($fuehrerschein_class_all_array as $fuehrerschein_class_1)
+                                        <option value="{{$fuehrerschein_class_1}}" @if($user_classes[0] == $fuehrerschein_class_1 && !empty($fuehrerschein_class_1)) selected @endif>{{$fuehrerschein_class_1}}</option>
+                                      @endforeach
+                                    </select>
+                                  </div>
+                                  <div class="col-4">
+                                    <select class="form-control" name="fuehrerschein_class_2">
+                                      @foreach($fuehrerschein_class_all_array as $fuehrerschein_class_2)
+                                        <option value="{{$fuehrerschein_class_2}}" @if($user_classes[1] == $fuehrerschein_class_2 && !empty($fuehrerschein_class_2)) selected @endif>{{$fuehrerschein_class_2}}</option>
+                                      @endforeach
+                                    </select>
+                                  </div>
+                                  <div class="col-4">
+                                    <select class="form-control" name="fuehrerschein_class_3">
+                                      @foreach($fuehrerschein_class_all_array as $fuehrerschein_class_3)
+                                        <option value="{{$fuehrerschein_class_3}}" @if($user_classes[2] == $fuehrerschein_class_3 && !empty($fuehrerschein_class_3)) selected @endif>{{$fuehrerschein_class_3}}</option>
+                                      @endforeach
+                                    </select>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <label>{{sch_translate('Erteilungsart')}}</label>
+                                        <select class="form-control" name="erteilungsart" required="">
+                                            <option value="ersterwerb" @if($user_info->erteilungsart == "ersterwerb") selected @endif>
+                                            {{sch_translate('Ersterwerb')}}</option>
+                                            <option value="erweiterung" @if($user_info->erteilungsart == "erweiterung") selected @endif>
+                                            {{sch_translate('Erweiterung')}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4 pl-0">
+                                        <label>bF17</label>
+                                        <select class="form-control" name="bF17" required="">
+                                            <option value="yes" @if($user_info->bf17 == "yes") selected @endif>
+                                            {{sch_translate('yes')}}</option>
+                                            <option value="no" @if($user_info->bf17 == "no") selected @endif>
+                                            {{sch_translate('no')}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label for="email">{{sch_translate('Preisliste')}}</label>
+                            <select class="form-control"name="preisliste" required="">
+                            <option value="Male">{{sch_translate('male')}}</option>
+                            <option value="Female">{{sch_translate('female')}}</option>
+                            </select>
+                        </div>
+                        </div>
+                    </div> -->
+
+                    @else
+                    <!-- Begin instructor -->
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('first_name')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('first_name')}}" value="{{ $profile->fname }}" name="fname" required="">
+                                <input type="hidden" value="{{ csrf_token() }}" name="csrf-token">
+                                <input type="hidden" value="{{ $profile->id }}" name="userid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('last_name')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('last_name')}}" value="{{ $profile->lname }}" name="lname" required="">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('address')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('address')}}" name="address" value="{{ $profile->address }}" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('email_address')}}</label>
+                                <input type="email" class="form-control" placeholder="{{sch_translate('email_address')}}" name="email" value="{{ $profile->email }}" required="">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                            <label>{{sch_translate('phone_number')}}</label>
+                            <input type="number" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" value="{{ str_replace('+', '', $profile->phone) }}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="email">{{sch_translate('gender')}}</label>
+                                <select class="form-control" name="gender" required="">
+                                    <option value="Male" @if( !empty( $profile->gender == "Male" ) ) selected @endif> 
+                                        {{sch_translate('male')}}
+                                    </option>
+                                    <option value="Female" @if( !empty( $profile->gender == "Female" ) ) selected @endif>
+                                     {{sch_translate('female')}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>{{sch_translate('date_of_birth')}}</label>
+                                @if( $profile->date_of_birth == '0000-00-00' )
+                                <input type="text" class="form-control datepickerx" data-date-format="dd-mm-yyyy" name="date_of_birth" placeholder="{{sch_translate('date_of_birth')}}" required="" autoc> @else
+                                <input type="text" class="form-control datepickerx" data-date-format="dd-mm-yyyy" name="date_of_birth" value="{{ date('d-m-Y', strtotime($profile->date_of_birth)) }}" placeholder="{{sch_translate('date_of_birth')}}" required=""> @endif
+                            </div>
+                        </div>
+                    </div>
+
+                        @if ( $user->role == "admin" && $profile->role == "staff" || $user->role == "superadmin" && $profile->role == "staff" || $user->role == "admin" && $profile->role == "instructor" || $user->role == "superadmin" && $profile->role == "instructor" )
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="email">{{sch_translate('permission')}}</label>
+                                        <select class="form-control" name="permissions" required="">
+                                            <option value="read_write_delete" @if( !empty( $profile->permissions == "read_write_delete" ) ) selected @endif>
+                                                {{sch_translate('read,_write_&_delete')}}
+                                            </option>
+                                            <option value="read_write" @if( !empty( $profile->permissions == "read_write" ) ) selected @endif >
+                                                {{sch_translate('read_&_write')}}
+                                            </option>
+                                            <option value="read_only" @if( !empty( $profile->permissions == "read_only" ) ) selected @endif>
+                                                {{sch_translate('read_only')}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label for="email">{{sch_translate('branch')}}</label>
+                                        <select class="form-control" name="branch" required="">
+                                            <!-- <option value="" selected disabled>{{sch_translate('select_branch')}}</option> -->
+                                            @foreach($branches as $branch)
+                                            <option value="{{$branch->id}}" @if( !empty( $profile->branch == $branch->id ) ) selected @endif>
+                                                {{$branch->name}}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    
+                    @endif
+                    <!-- End of instructor -->
+                        
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="btn btn-red btn-block">{{sch_translate('save_changes')}}</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <!-- modal-content -->
+    </div>
+    <!-- modal-dialog -->
+</div>
+<!-- end edit user profile -->

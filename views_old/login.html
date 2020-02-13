@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+    @include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('login')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/dropify/css/dropify.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+
+</head>
+<body>
+    <div id="loginoverlay"></div>
+    <div style="background-image: url({{url('')}}assets/images/signin_bg/sign_in.png);" class="login-body">
+    </div>
+    <div class="login-body-content">
+        <div class="auth-page">
+            <div class="auth-card mb-0 px-0">        
+                <div class="auth-logo mb-5">
+                    <b><h5 class="m-0 text-black"> {{sch_translate('welcome_back')}}</h5></b>
+                    <img src="{{ url('') }}uploads/app/{{ env('APP_LOGO'); }}" class="img-responsive m-0 auth-img">
+                </div>
+            </div>
+            <!-- <div class="auth-card bg-white" style="opacity: 0.4;min-height: 360px; min-width: 480px; height: 450px;"></div> -->
+            <div class="auth-card my-0 card rounded-14 p-0 bg-cover bg-none" style="background: rgba(255, 255, 255, 0.4);">
+                <!-- <div class="row mr-0 pull-in">                
+                    <div class="col-6 text-center auth-separator rounded-top-left-14 auth-switch auth-login" show=".login">{{sch_translate('login')}}</div>
+                    <div class="col-6 text-center auth-separator rounded-top-right-14 auth-switch inactive auth-register" show=".register">{{sch_translate('register')}}</div>
+                </div> -->
+                <div class="auth-all hide-parsley p-4 rounded-bottom-14 text-grey" style="padding-top: 50px !important;">
+                    <div class="login mt-3 bg-transparent-white">
+                        <div class="auth-form">
+                            <form class="simcy-form" action="{{ url('Auth@signin') }}" data-parsley-validate="" method="POST" loader="true">
+                                <input type="hidden" name="csrf-token" value="{{csrf_token()}}">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12">   
+                                            <div class="form-group" style="margin-bottom: 0px !important;">
+                                                 <i class="fas fa-user text-danger inside_icon" ></i>                        
+                                                <input  type="email" class="form-control custom-input" data-parsley-type="email" data-parsley-trigger="keyup" name="email" id="email" placeholder="{{sch_translate('email_address')}}" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12">  
+                                            <div class="form-group">
+                                                 <i class="fas fa-key text-danger inside_icon" ></i>                        
+                                                <input  type="password" id="password" class="form-control custom-input" name="password" placeholder="{{sch_translate('password')}}" required>
+                                            </div>                           
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                                <div class="checkbox checkbox-circle">
+                                                    <input id="checkbox7" type="checkbox" name="remember_me">
+                                                    <label for="checkbox7">{{sch_translate("remember_me")}}</label>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-md-12 text-center">
+                                            <button type="submit" class="btn btn-grey btn-sm btn-wide rounded py-2 parsley-check">{{sch_translate('login')}}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="">
+                          @if(env('ALLOW_SIGNUP') == 'Enabled')
+                          <!-- <p><a href="" class="auth-switch text-primary" show=".register">{{sch_translate('create_an_account')}}</a></p> -->
+                          @endif
+                      </div>
+                  </div>
+                  <!-- forgot password start -->
+                  <div class="forgot">
+                    <div class="auth-heading mt-15">
+                        <h2>{{sch_translate('forgot_password')}}</h2>
+                        <p>{{sch_translate('dont_worry_if_you_forgot_your_password_enter_your_email_and_you_can_reset_it')}}</p>
+                    </div>
+                    <div class="auth-form">
+                        <form class="simcy-form" action="{{ url('Auth@forgot') }}" method="POST" loader="true" data-parsley-validate="">
+                            <input type="hidden" name="csrf-token" value="{{csrf_token()}}">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">                             
+                                        <!-- <div class="input-group">
+                                            <input type="email" class="form-control border-right-0" name="email" placeholder="{{sch_translate('email_address')}}" required="">
+                                            <div class="input-group-append border-left-0 border-2">
+                                                <span class="input-group-text bg-transparent border-0" id="basic-addon2"><i class="fas fa-envelope text-danger"></i> </span>
+                                            </div>
+                                        </div> -->
+                                         <div class="form-group">
+                                                 <i class="fas fa-envelope text-danger inside_icon" ></i>                        
+                                                <input  type="email" id="forgot_email" class="form-control custom-input" name="email" placeholder="{{sch_translate('email_address')}}" data-parsley-type="email" data-parsley-trigger="keyup" required>
+                                            </div> 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <button class="btn btn-grey btn-sm btn-wide rounded py-2 parsley-check">{{sch_translate('reset_password')}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="">
+                      <!-- <p>{{sch_translate('remembered_your_password')}}? <a href="" class="auth-switch text-primary" show=".login">{{sch_translate('login_now')}}</a></p> -->
+                  </div>
+              </div>
+              <!-- forgot password end -->
+
+              @if(env('ALLOW_SIGNUP') == 'Enabled')
+              <div class="register">
+                <div class="auth-form">
+                    <form class="simcy-form" action="{{ url('Auth@signup') }}"  data-parsley-validate="" method="POST" loader="true">
+                        <!-- wird von js ausgefullt -->
+                        <input type="hidden" name="lname" id="reg_lname">
+                        <!-- wird von js ausgefullt -->
+                        <input type="hidden" name="fname" id="reg_fname">
+                        <input type="hidden" name="school" value="Diese Schule">
+                        <input type="hidden" name="csrf-token" value="{{csrf_token()}}">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">                             
+                                    <div class="input-group">
+                                        <input type="text" class="form-control border-right-0 input-bg" name="fullname" id="fullname_register" placeholder="{{sch_translate('name')}}" required="">
+                                        <div class="input-group-append border-left-0 border-2">
+                                            <span class="input-group-text bg-transparent border-0" id="basic-addon2"><i class="fa fa-user text-danger"></i> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">                             
+                                    <div class="input-group">
+                                        <input type="email" class="form-control border-right-0" name="email" placeholder="{{sch_translate('email')}}" required="">
+                                        <div class="input-group-append border-left-0 border-2">
+                                            <span class="input-group-text bg-transparent border-0" id="basic-addon2"><i class="fas fa-envelope text-danger"></i> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">                             
+                                    <div class="input-group">
+                                        <input type="password" class="form-control border-right-0" name="password" placeholder="{{sch_translate('password')}}" required="">
+                                        <div class="input-group-append border-left-0 border-2">
+                                            <span class="input-group-text bg-transparent border-0" id="basic-addon2"><i class="fas fa-key text-danger"></i> </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="parsley-holder">                                        
+                                        <span class="mt-2" style="vertical-align: middle;">     
+                                            <input type="radio" class="d-inline" name="remember_me" required>
+                                        </span>
+                                        <span class="ml-0">{{sch_translate("accept_terms")}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12 text-center">
+                                    <button class="btn btn-grey btn-sm btn-wide rounded py-2 parsley-check">{{sch_translate('create_user_account')}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="">
+                  <!-- <p>{{sch_translate('already_have_an_account')}}? <a href="" class="auth-switch text-primary" show=".login">{{sch_translate('login_now')}}</a></p> -->
+              </div>
+          </div>
+          @endif
+      </div><!-- auth-all -->
+  </div>
+  <div class="auth-card mt-0 pt-2">
+      <p class="pull-right"><a href="" class="auth-switch text-white" show=".forgot" id="forgot-btn">{{sch_translate('forgot_password')}}?</a></p>
+  </div>
+
+<!-- <p class="copyright text-white"> &copy; {{ date("Y") }}  {{ env("APP_NAME") }}. {{sch_translate('all_rights')}}</p> -->
+</div>
+
+
+
+<style type="text/css">
+    body, html {
+      height: 100%;
+  }
+
+  *{
+      box-sizing: border-box;
+  }
+  .bg-anmeldung2{
+    background-image: url({{url('')}}assets/images/signin_bg/anmeldung2.png);
+  }
+  .bg-anmeldung{
+    background-image: url({{url('')}}assets/images/signin_bg/anmeldung.png);
+  }
+  .input-group-append, .input-bg{
+    background-color: #fff;
+  }
+  .form-control{
+        border: 2px solid #fff;
+        border-radius: 10px;
+  }
+.inside_icon {
+    position: absolute;
+    top: 13px;
+    right: 30px;
+    color: red;
+    font-size: 20px;
+    z-index: 9999;
+}
+
+.form-control {
+    position: relative !important;
+   padding-left: 10px !important;
+   background-clip:inherit;
+   height: 50px !important;
+
+}
+.checkbox.checkbox-circle label::before {
+    border-radius: 50%; 
+    margin-bottom: 2px;
+}
+
+</style>
+<script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+<script src="{{ url('') }}assets/js/popper.min.js"></script>
+<script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+<script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+<script src="{{ url('') }}assets/libs/dropify/js/dropify.min.js"></script>
+<script src="{{ url('') }}assets/js/simcify.min.js"></script>
+<script src="{{ url('') }}assets/js/app.js"></script>
+ <script src="https://cdn.rawgit.com/PascaleBeier/bootstrap-validate/v2.2.0/dist/bootstrap-validate.js" ></script>
+@include("schleier/bottomscript")
+</div>
+</body>
+</html>
+<script>
+    bootstrapValidate(['#email','#forgot_email'],'email:Enter a valid E-Mail Address!');
+    bootstrapValidate('#password','required:Enter a valid Password');
+
+    $('#forgot-btn').on('click',function(){
+        $(this).hide();
+        // alert();
+    })
+</script>

@@ -1,0 +1,25 @@
+<div class="lecture-box mt-15">
+    @if(empty($lecture))
+     <div class="empty-section empty-chapter"><i class="mdi mdi-clipboard-text"></i><h5>{{sch_translate("no_lecture_found")}}</h5></div>
+     @else
+    <h4>{{ $lecture->title }}</h4>
+    <p>{{ $lecture->description }}</p>
+    <div class="divider"></div>
+    @if ( $lecture->type == "text" )
+    <p>{{ $lecture->content }}</p>
+    @elseif ( $lecture->type == "link" )
+    <a href="{{ $lecture->content }}" target="_blank" class="btn btn-danger btn-icon"> <i class=" mdi mdi-link-variant"></i> {{sch_translate("visit_link")}}</a>
+    @elseif ( $lecture->type == "downloads" )
+    <a href="{{ url('').'uploads/lectures/'.$lecture->content }}" class="btn btn-danger btn-icon" download="Downloadable Resource"> <i class=" mdi mdi-cloud-download"></i> {{sch_translate("download_resource")}}</a>
+    @elseif ( $lecture->type == "pdf" )
+    <object data="{{ url('').'uploads/lectures/'.$lecture->content }}" width="100%" height="900px" type="application/pdf">
+        <embed src="{{ url('').'uploads/lectures/'.$lecture->content }}" width="100%" height="900px" type="application/pdf" />
+    </object>
+    @elseif ( $lecture->type == "video" )
+    <video width="500" controls>
+      <source src="{{ url('').'uploads/lectures/'.$lecture->content }}" type="video/mp4">
+      {{sch_translate("no_html5_support")}}
+    </video>
+    @endif
+    @endif
+</div>

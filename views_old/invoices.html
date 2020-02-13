@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('invoices')}} | {{sch_translate('app_name_long')}}</title>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css" />
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- Used for select2 indicator validation -->
+    <input type="hidden" name="select2HasError" class="select2HasError" value="0" />
+    
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h3>{{sch_translate('payments')}}</h3>
+        </div>
+
+        <!-- page content -->
+        <div class="row">
+            <div class="col-md-12 search-filter d-md-block">
+                <div class="card">
+                    <form id="search_form" method="POST">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>{{sch_translate('Rechnungsnummer')}}</label>
+                                    <select class="form-control" name="bill_number">
+                                        <option value="all" selected="">{{sch_translate('all')}}</option>
+                                        @foreach($invoices as $key => $invoice)
+                                            <option value="{{ $invoice->reference }}">#{{ $invoice->reference }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>{{ sch_translate('Fahrschüler') }}</label>
+                                    <select class="form-control" name="learner">
+                                        <option value="all" selected="">{{ sch_translate('all') }}</option>
+                                        @foreach($students as $id => $student)
+                                            <option value="{{ $id }}">{{ $student['fname'] }} {{ $student['lname'] }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-grey btn-block" id="btn-search" type="button"><i class="fas fa-search mr-2"></i>{{sch_translate('search')}}</button>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-grey btn-block" id="btn-reset" type="button"><i class="fas fa-undo mr-2"></i>{{sch_translate('Reset')}}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive longer">
+                            <table class="table table-striped table-left mb-0 mw-1000" id="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>{{sch_translate('students')}}</th>
+                                        <th>{{sch_translate('ref')}}</th>
+                                        <th>{{sch_translate('amount')}}</th>
+                                        <th>{{sch_translate('paid')}}</th>
+                                        <th>{{sch_translate('balance')}}</th>
+                                        <th>{{sch_translate('date')}}</th>
+                                        <th class="text-center">{{sch_translate('action')}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <!-- @if(!empty($invoices))
+                                    @foreach($invoices as $key => $invoice)
+                                    <tr>
+                                        <th scope="row">{{$key+1}}</th>
+                                        <td class="p-8">
+                                            @if( !empty($invoice->avatar) )
+                                            <img src="{{ url('') }}uploads/avatar/{{ $invoice->avatar }}" class="table-avatar communication-avatar">
+                                            @else
+                                            <img src="{{ url('') }}assets/images/avatar.png" class="table-avatar communication-avatar">
+                                            @endif
+                                            <a href="{{ url('Profile@get',['userid'=>$invoice->student]) }}" class="text-primary"><strong>{{ $invoice->fname }} {{ $invoice->lname }}</strong></a><br>
+                                            <span class="communication-contact">{{ $invoice->email }}</span>
+                                        </td>
+                                        <td>#{{ $invoice->reference }}</td>
+                                        <td>{{ money($invoice->amount) }}</td>
+                                        <td>{{ money($invoice->amountpaid) }}</td>
+                                        <td>{{ money($invoice->amount - $invoice->amountpaid) }}</td>
+                                        <td>{{ date('d F Y',strtotime($invoice->created_at)) }}</td>
+                                        <td class="text-center">
+                                            <a class="btn btn-primary btn-sm btn-icon" target="_blank" href="{{ url('Invoice@preview',['invoiceid'=>$invoice->id]) }}"><i class="mdi mdi-eye"></i> {{sch_translate('Preview')}}</a>
+                                            <div class="dropdown inline-block">
+                                                    <button class="btn btn-default btn-sm btn-icofn dropdown-toggle" data-toggle="dropdown"><i class="mdi mdi-dots-vertical"></i></button>
+                                                    <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                                        <li role="presentation"><a role="menuitem" href=""  input="invoice" modal="#addpayment" class="pass-data" value="{{ $invoice->id }}" > <i class="mdi mdi-credit-card-plus"></i> {{sch_translate('add_payment')}}</a></li>
+                                                        <li role="presentation"><a role="menuitem" href="" class="fetch-display-click" data="invoiceid:{{ $invoice->id }}|csrf-token:{{ csrf_token() }}" url="<?=url('Invoice@viewpayments');?>" holder=".update-holder" modal="#update"> <i class="mdi mdi-credit-card"></i> {{sch_translate('Payments')}}</a></li>
+                                                        <li role="presentation"><a role="menuitem" href="{{ url('Invoice@download',['invoiceid'=>$invoice->id]) }}"> <i class="mdi mdi-cloud-download"></i> {{sch_translate('Download')}}</a></li>
+                                                        <li role="presentation"><a role="menuitem" href="" class="fetch-display-click" data="invoiceid:{{ $invoice->id }}|csrf-token:{{ csrf_token() }}" url="<?=url('Invoice@updateview');?>" holder=".update-holder" modal="#update"> <i class="mdi mdi-pencil"></i> {{sch_translate('edit')}}</a></li>
+                                                        <li role="presentation"><a role="menuitem" href="" data="invoiceid:{{ $invoice->id }}|csrf-token:{{csrf_token()}}" url="{{url('Invoice@delete')}}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('this_invoice_deleted')}}" warning-button="{{sch_translate('delete')}}" data-cancel-button="{{sch_translate('cancel')}}" class="send-to-server-click"> <i class="mdi mdi-delete"></i> {{sch_translate('delete')}}</a></li>
+                                                    </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                <tr><th class="text-center" colspan="8">{{sch_translate('empty_here')}}</th></tr>
+                                @endif -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+    <!-- Add Payment -->
+    <div class="modal right fade" id="addpayment" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('add_payment')}}</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form class="simcy-form translateValidation" data-parsley-validate="" method="POST" action="{{ url('Invoice@addpayment') }}" loader="true">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('amount')}} ({{ currency() }})</label>
+                                    <input type="number" class="form-control" placeholder="{{sch_translate('amount')}}" name="amount" required>
+                                    <input type="hidden" value="{{csrf_token()}}" name="csrf-token">
+                                    <input type="hidden" name="invoice">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('date')}}</label>
+                                    <input type="text" class="form-control datepicker" data-date-format="dd-mm-yyyy"  placeholder="{{sch_translate('date')}}" name="payday" required>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label for="method">{{sch_translate('method_of_payment')}}</label>
+                                    <select class="form-control" name="method" required>
+                                        <option value="">{{sch_translate('select_payment_method')}}</option>
+                                        <option value="Cash">{{sch_translate('cash')}}</option>
+                                        <option value="Mpesa">{{sch_translate('mpesa')}}</option>
+                                        <option value="Paypal">{{sch_translate('paypal')}}</option>
+                                        <option value="Card">{{sch_translate('card')}}</option>
+                                        <option value="Other">{{sch_translate('other')}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div> -->
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label for="method">{{sch_translate('method_of_payment')}}</label>
+                                    <div class="methodDiv">
+                                        <select class="form-control select2" name="method" id="myMethod" requiredSelect2>
+                                            <option value="" disabled selected>{{sch_translate('select_payment_method')}}</option>
+                                            <option value="Cash">{{sch_translate('cash')}}</option>
+                                            <option value="Mpesa">{{sch_translate('mpesa')}}</option>
+                                            <option value="Paypal">{{sch_translate('paypal')}}</option>
+                                            <option value="Card">{{sch_translate('card')}}</option>
+                                            <option value="Other">{{sch_translate('other')}}</option>
+                                        </select>
+                                        <!-- <div id="method-error"></div> -->
+                                    </div>
+                                    <ul class="parsley-errors-list filled methodUl d-none">
+                                        <li class="parsley-required">
+                                            @if(sch_translate('translate') == 'de')
+                                                Dies ist ein Pflichtfeld.
+                                            @else
+                                                This value is required.
+                                            @endif
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button class="btn btn-red btn-block" type="submit" id="addPayment">{{sch_translate('add_payment')}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end Add payment -->
+
+    <!-- update -->
+    <div class="modal right fade" id="update" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('invoice_info')}}</h4>
+                </div>
+                <div class="update-holder"></div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end update -->
+
+    <!-- dataTables buttons modal -->
+    <div class="modal fade" id="dataTablesBtn" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content" style="background-color: transparent !important;">
+                <div class="card" style="background-color: #f5f5f5;">
+                    <div class="form-group">
+                        <button type="button" class="btn btn-block download" id="" style="background-color: #fff;box-shadow: 0 4px 5px -6px black;">{{ sch_translate('download') }}</button>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-block print" id="" style="background-color: #fff;box-shadow: 0 4px 5px -6px black;">{{ sch_translate('to_print') }}</button>
+                    </div>
+                </div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- dataTables buttons modal -->
+
+    <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.flash.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.print.min.js"></script>
+    <script src="{{ url('') }}assets/libs/datepicker/js/bootstrap-datepicker.js"></script>
+    
+    <script>
+
+        // Remove error message
+        function removeSelect2ErrorMessage(name) {
+            $('.select2HasError').val(0);
+            $('.' + name + 'Div').removeClass('border border-danger');
+            $('.' + name + 'Ul').addClass('d-none');
+        }
+
+        function addSelect2ErrorMessage(name) {
+            $('.select2HasError').val(1);
+            $('.' + name + 'Div').addClass('border border-danger');
+            $('.' + name + 'Ul').removeClass('d-none');
+        }
+
+        // Student add payment
+        $(document).on('click', '#addPayment', function() {
+
+        let methodAttr = $('#myMethod').attr('requiredSelect2');
+        let method = $('#myMethod').val()
+        // Check if the select2 has required attribute
+        if (typeof methodAttr !== typeof undefined && methodAttr !== false) {
+
+            if (method === '' || method == null)
+                addSelect2ErrorMessage('method');
+            else
+                removeSelect2ErrorMessage('method');
+        }
+        });
+
+        // Select2 validation method
+        $(document).on('change', '#myMethod', function() {
+            let methodAttr = $('#myMethod').attr('requiredSelect2');
+            let method = $('#myMethod').val()
+            // Check if the select2 has required attribute
+            if (typeof methodAttr !== typeof undefined && methodAttr !== false) {
+
+                if (method === '' || method == null)
+                    addSelect2ErrorMessage('method');
+                else
+                    removeSelect2ErrorMessage('method');
+            }
+        });
+    </script>
+
+    <script>
+        $('.datepicker').datepicker({ language: "{{ sch_translate('translate') }}", autoclose: true });
+        $(document).ready(function() {
+
+            $('#data-table').DataTable({
+                dom: 'Bfrtip',
+                "columnDefs": [ {
+                    "targets"  : [7],
+                    "orderable": false,
+                      
+                }],
+                // "destroy": true,
+                "processing": false,
+                "ajax": {
+                    "url": '{{ url("Invoice@search") }}',
+                    "type": "POST",
+                    "data": {'csrf-token': Cookies.get('CSRF-TOKEN')},
+                },
+                "language": {
+                    "lengthMenu": "Einträge _MENU_ anzeigen",
+                    "zeroRecords": "Keine Daten vorhanden",
+                    "info": "Eintrag _PAGE_ von _PAGES_ Einträgen",
+                    "infoEmpty": "Keine Daten vorhanden",
+                    "infoFiltered": "(filtered from _MAX_ total records)",
+                    "paginate": {
+                        "previous": "Zurück",
+                        "next":"Weiter"
+                    },
+                    "search": "Suche _INPUT_",
+                },
+                columns: [
+                    { 'data': 'id'},
+                    { 'data': 'student'},
+                    { 'data': 'ref'},
+                    { 'data': 'amount'},
+                    { 'data': 'paid'},
+                    { 'data': 'balance'},
+                    { 'data': 'date'},
+                    { 'data': 'action'},
+                ],
+                searching: false,
+                buttons: [
+                    {
+                        extend: 'print',
+                        title: "{{sch_translate('payments')}}",
+                        exportOptions: {
+                            columns: [ 0, 1, 2, 3, 4, 5, 6 ],
+                            stripHtml: false
+                        },
+                    },
+                    {
+                        extend: 'copyHtml5',
+                        text: "{{sch_translate('Copy')}}"
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        title: "{{sch_translate('payments')}}",
+                        charset: 'UTF-16LE',
+                        bom: true,
+                        exportOptions: {
+                            columns: [ 0, 1, 2, 3, 4, 5, 6 ],
+                            trim: true,
+                            stripHtml: true,
+                            format: {
+                                body: function ( data, row, column ) {
+                                    if(column === 1){
+                                      var a = data.replace(/(<([^>]+)>)/ig,"");
+                                      var b =  a.replace(/\s+/g, " ");
+                                      var c = b.split(" ");
+                                      return d = c[1]+' '+c[2]+'  ('+ c[3]+ ')';
+
+                                    }else{
+                                        return data;
+                                    }
+                                }
+                            }
+            
+                        },
+                        action: function(e, dt, node, config) {
+                            $('#dataTablesBtn #dataTablesBtnLabel').text('Excel');
+                            $('#dataTablesBtn .print').attr('id','printExcel');
+                            $('#dataTablesBtn .download').attr('id','downloadExcel');
+                            $('#dataTablesBtn').modal({show: true, keyboard: false});
+                            var thisExcel = this;
+                            $('#printExcel').on('click', function() {
+                                // $.fn.dataTable.ext.buttons.print.action(e, dt, node, config);
+                                $(".buttons-print")[0].click();
+                            })
+                            $('#downloadExcel').on('click', function() {
+                                $.fn.dataTable.ext.buttons.excelHtml5.action.call(thisExcel, e, dt, node, config);
+                            })
+                        }
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        title: "{{sch_translate('payments')}}",
+                        charset: 'UTF-16LE',
+                        bom: true,
+                        exportOptions: {
+                            columns: [ 0, 1, 2, 3, 4, 5, 6 ],
+                            trim: true,
+                            stripHtml: true,
+                            format: {
+                                body: function ( data, row, column ) {
+                                    if(column === 1){
+                                      var a = data.replace(/(<([^>]+)>)/ig,"");
+                                      var b =  a.replace(/\s+/g, " ");
+                                      var c = b.split(" ");
+                                      return d = c[1]+' '+c[2]+'  ('+ c[3]+ ')';
+
+                                    }else{
+                                        return data;
+                                    }
+                                }
+                            }
+                        },
+                        action: function (e, dt, node, config) {
+                            $('#dataTablesBtn #dataTablesBtnLabel').text('CSV');
+                            $('#dataTablesBtn .print').attr('id','printCsv');
+                            $('#dataTablesBtn .download').attr('id','downloadCsv');
+                            $('#dataTablesBtn').modal({show: true, keyboard: false});
+                            var thisCsv = this;
+                            $('#printCsv').on('click', function() {
+                                // $.fn.dataTable.ext.buttons.print.action(thisCsv, e, dt, node, config);  
+                                $(".buttons-print")[0].click();
+                            });
+                            $('#downloadCsv').on('click', function() {
+                                $.fn.dataTable.ext.buttons.csvHtml5.action.call(thisCsv, e, dt, node, config);  
+                            });
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        title: "{{sch_translate('payments')}}",
+                        exportOptions: {
+                            columns: [ 0, 1, 2, 3, 4, 5, 6 ],
+                            stripHtml: true,
+                               format: {
+                                body: function ( data, row, column ) {
+                                    if(column === 1){
+                                      var a = data.replace(/(<([^>]+)>)/ig,"");
+                                      var b =  a.replace(/\s+/g, " ");
+                                      var c = b.split(" ");
+                                      return d = c[1]+' '+c[2]+'  ('+ c[3]+ ')';
+
+                                    }else{
+                                        return data;
+                                    }
+                                }
+                            }
+                        },
+                        action: function(e, dt, node, config) {
+                            $('#dataTablesBtn #dataTablesBtnLabel').text('PDF');
+                            $('#dataTablesBtn .print').attr('id','printPdf');
+                            $('#dataTablesBtn .download').attr('id','downloadPdf');
+                            $('#dataTablesBtn').modal({show: true, keyboard: false});
+                            var thisPdf = this;
+                            $('#printPdf').on('click', function() {
+                                // $.fn.dataTable.ext.buttons.print.action(thisPdf, e, dt, node, config); 
+                                $(".buttons-print")[0].click(); 
+                            });
+                            $('#downloadPdf').on('click', function() {
+                                $.fn.dataTable.ext.buttons.pdfHtml5.action.call(thisPdf, e, dt, node, config);  
+                            });
+                        }
+                    }
+                ]
+            });
+            // when dataTables loaded
+            $('#data-table').on( 'draw.dt', function () {
+                $('#data-table tbody tr td:nth-child(2)').attr('class','p-8');
+                $('#data-table tbody tr td:nth-child(8)').attr('class','text-center');
+                $(".pass-data").click(function(event){
+                    event.preventDefault();
+                    inputName = $(this).attr("input");
+                    inputValue = $(this).attr("value");
+                    modal = $(this).attr("modal");
+                    $("input[name="+inputName+"]").val(inputValue);
+                    $(modal).modal({show: true, backdrop: 'static', keyboard: false});
+                });
+            } );
+
+            $(".buttons-print").css('display','none'); // hide print button
+
+            $('#btn-search').on('click', function() {
+                var formData = new FormData(document.getElementById('search_form'));
+                formData.append('csrf-token', Cookies.get('CSRF-TOKEN'));
+                var url = '{{ url("Invoice@search") }}';
+                $.ajax({
+                    url : url,             
+                    type : "POST",
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    error : function(error) {
+                        console.log(error)
+                    },
+                    success : function(data) {
+                        if (data.length > 2) {
+                            $('#data-table').DataTable().clear().draw();
+                            $('#data-table').DataTable().rows.add(JSON.parse(data)['data']);
+                            $('#data-table').DataTable().columns.adjust().draw();
+                        } else {
+                            $('#data-table tbody').html('<tr><th class="text-center" colspan="8">Keine Einträge verfügbar</th></tr>');
+                        }                        
+                        $(".pass-data").click(function(event){
+                            event.preventDefault();
+                            inputName = $(this).attr("input");
+                            inputValue = $(this).attr("value");
+                            modal = $(this).attr("modal");
+                            $("input[name="+inputName+"]").val(inputValue);
+                            $(modal).modal({show: true, backdrop: 'static', keyboard: false});
+                        })
+                    }
+                })
+            });
+
+            $('#btn-reset').on('click', function() {
+                $('select[name=bill_number]').val("all");
+                $('select[name=learner]').val("all");
+            });
+        });
+    </script>
+    <script src="{{ url('') }}assets/js/popper.min.js"></script>
+    <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <!-- <script src="{{ url('') }}assets/js/simcify.min.js"></script> -->
+    <script src="{{ url('') }}assets/js/simcify.js"></script>
+    <script src="{{ url('') }}assets/js/app.js"></script>
+
+    @include("translate/validation")
+    @include("schleier/bottomscript")
+</body>
+</html>

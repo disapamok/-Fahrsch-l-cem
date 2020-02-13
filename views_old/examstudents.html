@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{ $exam->name }} | {{sch_translate('app_name_long')}}</title>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css" />
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/fullcalendar/fullcalendar.min.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/calendar.css" rel="stylesheet">
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h3>{{sch_translate('exam:')}} <strong>{{$exam->name}}</strong></h3>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+
+                <!-- students -->
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                                <h5>{{sch_translate('enrolled_students')}}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive mt-15">
+                                <table class="table table-striped mb-0" id="data-table">
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>{{sch_translate('name')}}</th>
+                                                <th>{{sch_translate('exam')}}</th>
+                                                <th>{{sch_translate('correct')}}</th>
+                                                <th>{{sch_translate('total')}}</th>
+                                                <th>{{sch_translate('score')}}</th>
+                                                <th>{{sch_translate('profile')}}</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                             @if(!empty($students))
+                                                 @foreach($students as $index => $student)
+                                                    <tr>
+                                                        <th scope="row">{{ $index + 1 }}</th>
+                                                        <td><a href="{{url('Profile@get',['userid'=>$student->id])}}"><strong>{{ $student->fname}} {{ $student->lname}}</strong></a></td>
+                                                        <td>{{ $exam->name }}</td>
+                                                        <td>{{ $student->correctlyAnswered }} <span class="text-xs">{{sch_translate('questions')}}</span></td>
+                                                        <td>{{ $student->totalQuestions }} <span class="text-xs">{{sch_translate('questions')}}</span></td>
+                                                        <td>
+                                                          <div class="progress">
+                                                          <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+                                                          aria-valuenow="{{ $student->score }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ $student->score }}%">
+                                                            {{ $student->score }}%
+                                                          </div>
+                                                        </div>
+                                                        </td>
+                                                        <td><a class="btn btn-primary btn-sm" href="{{url('Profile@get',['userid'=>$student->id])}}">{{sch_translate('profile')}}</a></td>
+                                                    </tr>   
+                                             @endforeach 
+                                            @else
+                                                <tr><td colspan="7" class="text-center">{{sch_translate('empty_here')}}</td></tr>
+                                            @endif     
+                                            </tbody>
+                                        </table>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+    <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.flash.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/buttons.print.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#data-table').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'copyHtml5',
+                    'excelHtml5',
+                    'csvHtml5'
+                ]
+            });
+        });
+    </script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   @include("schleier/bottomscript")
+</body>
+</html>

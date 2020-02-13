@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('settings')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h3>{{sch_translate('settings')}}</h3>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card settings-card">
+
+                        <ul class="nav nav-tabs" id="myTab">
+                          <li><a data-toggle="tab" href="#profile" class="">{{sch_translate('profile')}}</a></li> <!-- active -->
+                          @if($user->role == 'admin' || $user->role == 'superadmin')
+                          <li><a data-toggle="tab" href="#school">{{sch_translate('school')}}</a></li>
+                          <li><a data-toggle="tab" href="#reminders">{{sch_translate('reminders')}}</a></li>
+                          @endif
+                          @if($user->role == 'superadmin')
+                          <li><a data-toggle="tab" href="#system">{{sch_translate('system')}}</a></li>
+                          @endif
+                          <li><a data-toggle="tab" href="#security">{{sch_translate('security')}}</a></li>
+                          <li><a data-toggle="tab" href="#general">{{sch_translate('general')}}</a></li>
+                        </ul>
+
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="tab-content">
+                                    <!-- profile  -->
+                                  <div id="profile" class="tab-pane fade in">  <!-- show active -->
+                                    <p>{{sch_translate('update_your_personal_profile_here')}}.</p>
+                                  <form class="simcy-form translateValidation" action="<?=url('Settings@updateprofile');?>" data-parsley-validate="" loader="true" method="POST" enctype="multipart/form-data">
+
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('profile_picture')}}</label>
+                                                  @if( !empty($user->avatar) )
+                                                  <input type="file" name="avatar" class="croppie" default="{{ url('') }}uploads/avatar/{{ $user->avatar }}" crop-width="200" crop-height="200" accept="image/*">
+                                                  @else
+                                                  <input type="file" name="avatar" class="croppie" crop-width="200" crop-height="200" accept="image/*">
+                                                  @endif
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('first_name')}}</label>
+                                                  <input type="text" class="form-control" name="fname" value="{{ $user->fname }}" placeholder="{{sch_translate('first_name')}}" required>
+                                                  <input type="hidden" name="csrf-token" value="{{ csrf_token() }}" />
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('last_name')}}</label>
+                                                  <input type="text" class="form-control" name="lname" value="{{ $user->lname }}" placeholder="{{sch_translate('last_name')}}" required>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('email_address')}}</label>
+                                                  <input type="email" class="form-control" name="email" value="{{ $user->email }}" placeholder="{{sch_translate('email_address')}}" required>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('phone_number')}}</label>
+                                                  <input type="text" class="form-control" name="phone" value="{{ $user->phone }}" placeholder="{{sch_translate('phone_number')}}" required="">
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('address')}}</label>
+                                                  <input type="text" class="form-control" name="address" value="{{ $user->address }}" placeholder="{{sch_translate('address')}}">
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('gender')}}</label>
+                                                  <select class="form-control" name="gender" required="">
+                                                    <option value="Male" @if( $user->gender == "Male" ) selected @endif>
+                                                    {{sch_translate('male')}}</option>
+                                                    <option value="Female" @if( $user->gender == "Female" ) selected @endif>
+                                                    {{sch_translate('female')}}</option>
+                                                  </select>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('date_of_birth')}}</label>
+                                                  @if( $user->date_of_birth == '0000-00-00' )
+                                                  <input type="text" class="form-control datepicker" data-date-format="dd-mm-yyyy"  name="date_of_birth" placeholder="{{sch_translate('date_of_birth')}}" required="">
+                                                  @else
+                                                  <input type="text" class="form-control datepicker" data-date-format="dd-mm-yyyy"  name="date_of_birth" value="{{ date('d-m-Y', strtotime($user->date_of_birth)) }}" placeholder="{{sch_translate('date_of_birth')}}" required="">
+                                                  @endif
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12 text-right">
+                                                  <button class="btn btn-red" type="submit">{{sch_translate('save_changes')}}</button>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </form>
+                                  </div>
+                                  @if($user->role == 'admin' || $user->role == 'superadmin')
+
+                                  <!-- School  -->
+                                  <div id="school" class="tab-pane fade">
+                                    <p>{{sch_translate('update_your_school_information_here')}}</p>
+                                    <form class="simcy-form translateValidation" action="<?=url('Settings@updatecompany');?>" data-parsley-validate="" loader="true" method="POST">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('school_name')}}</label>
+                                                    <input type="text" class="form-control" name="name" placeholder="{{sch_translate('school_name')}}" value="{{ $school->name }}" required>
+                                                    <input type="hidden" name="csrf-token" value="{{ csrf_token() }}" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('email_address')}}</label>
+                                                    <input type="email" class="form-control" name="email" placeholder="{{sch_translate('email_address')}}" value="{{ $school->email }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('phone_number')}}</label>
+                                                    <input type="text" class="form-control" name="phone" placeholder="{{sch_translate('phone_number')}}" value="{{ $school->phone }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('address')}}</label>
+                                                    <input type="text" class="form-control" name="address" placeholder="{{sch_translate('address')}}" value="{{ $school->address }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('currency')}}</label>
+                                                  <select class="form-control select2" name="currency" required="">
+                                                    @foreach ( $currencies as $currency )
+                                                    <option value="{{ $currency->code }}" @if( $currency->code == $school->currency ) selected @endif>
+{{ $currency->name }} - {{ $currency->code }}</option>
+                                                    @endforeach
+                                                  </select>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="form-group">
+                                          <div class="row">
+                                              <div class="col-md-12">
+                                                  <label>{{sch_translate('time_zone')}}</label>
+                                                  <select class="form-control select2" name="timezone" required="">
+                                                    @foreach ( $timezones as $timezone )
+                                                    <option value="{{ $timezone->zone }}" @if( $timezone->zone == $school->timezone ) selected @endif>
+{{ $timezone->name }}</option>
+                                                    @endforeach
+                                                  </select>
+                                              </div>
+                                          </div>
+                                      </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <input type="hidden" name="multibooking" value="Disabled" />
+                                                    @if ( $school->multibooking == "Enabled" ) 
+                                                    <input type="checkbox" class="switch" name="multibooking" value="Enabled" checked />
+                                                    @else
+                                                    <input type="checkbox" class="switch" name="multibooking" value="Enabled" />
+                                                    @endif
+                                                    <label>{{sch_translate('allow_multi_booking_on_practical_classes')}}.</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <input type="hidden" name="class_sms_notifications" value="Disabled" />
+                                                    @if ( $school->class_sms_notifications == "Enabled" ) 
+                                                    <input type="checkbox" class="switch" name="class_sms_notifications" value="Enabled" checked />
+                                                    @else
+                                                    <input type="checkbox" class="switch" name="class_sms_notifications" value="Enabled" />
+                                                    @endif
+                                                    <label>{{sch_translate('send_sms_notifications_on_schedule_creation_8nd_cancellation')}}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12 text-right">
+                                                    <button class="btn btn-red" type="submit">{{sch_translate('save_changes')}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                  </div>
+
+                                  <!-- Reminders  -->
+                                  <div id="reminders" class="tab-pane fade">
+                                    <p>{{sch_translate('payment_reminders_are_for_students_who_have_not_cleared_fees_while_class_reminders_are_for_notifing_upcoming_classes')}}.</p>
+                                    <form class="simcy-form translateValidation" action="<?=url('Settings@updatereminders');?>" data-parsley-validate="" loader="true" method="POST">
+                                      <input type="hidden" name="csrf-token" value="{{ csrf_token() }}" />
+                                      <div class="form-group">
+                                        @if( $school->payment_reminders == "On" )
+                                        <input type="checkbox" class="switch" name="payment_reminders" value="On" checked />
+                                        @else
+                                        <input type="checkbox" class="switch" name="payment_reminders" value="Off" />
+                                        @endif
+                                        <label for="payment-reminders">{{sch_translate('enable_payment_reminders')}}</label>
+                                      </div>
+                                      <div class="form-group">
+                                        @if( $school->class_reminders == "On" )
+                                        <input type="checkbox" class="switch" name="class_reminders" value="On" checked />
+                                        @else
+                                        <input type="checkbox" class="switch" name="class_reminders" value="Off" />
+                                        @endif
+                                        <label for="class-reminders">{{sch_translate('enable_class_reminders')}}</label>
+                                      </div>
+
+                                      <div class="panel-group reminders-holder" id="accordion">
+                                      @if( !empty($reminders) )
+                                      @foreach ($reminders as $index => $reminder)
+                                            <!-- reminder -->
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                  @if ( $index > 0 )
+                                                    <span class="delete-reminder remove-parent" parent=".panel" title="Delete reminder"><i class="mdi mdi-delete"></i></span>
+                                                  @endif
+                                                    <h4 class="panel-title"><a data-parent="#accordion" data-toggle="collapse" href="#collapse{{ $index + 1 }}">{{sch_translate('reminder')}}#<span class="count">{{ $index + 1 }}</span></a></h4>
+                                                </div>
+                                                <div class="panel-collapse collapse in" id="collapse{{ $index + 1 }}">
+                                                    <div class="panel-body m-15">
+                                                        <div class="remider-item">
+                                                            <div class="form-group">
+                                                                <div class="row">
+                                                                  <div class="col-md-6">
+                                                                      <label>{{sch_translate('reminder_type')}}</label> 
+                                                                      <select class="form-control" name="type[]" required="">
+                                                                          <option value="payment" @if( $reminder->type == "payment" ) selected @endif>
+                                                                          {{sch_translate('Payment')}}</option>
+                                                                          <option value="class" @if( $reminder->type == "class" ) selected @endif>
+                                                                          {{sch_translate('Class')}}</option>
+                                                                      </select>
+                                                                  </div>
+                                                                  <div class="col-md-6">
+                                                                      <label>{{sch_translate('send_via')}}</label> 
+                                                                      <select class="form-control send_via" name="send_via[]" required="">
+                                                                          <option value="email" @if( $reminder->send_via == "email" ) selected @endif>
+                                                                          {{sch_translate('email')}}</option>
+                                                                          <option value="sms" @if( $reminder->send_via == "sms" ) selected @endif>
+                                                                          {{sch_translate('sms')}}</option>
+                                                                      </select>
+                                                                  </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <label>{{sch_translate('days')}}</label>
+                                                                        <input type="number" class="form-control"  name="days[]" placeholder="Days" value="{{ $reminder->days }}" required="" min="0" required="">
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label>{{sch_translate('timing')}}</label> 
+                                                                        <select class="form-control" name="timing[]" required="">
+                                                                            <option value="before_due" @if( $reminder->timing == "before_due" ) selected @endif>
+                                                                            {{sch_translate('before_due_date')}}</option>
+                                                                            <option value="after_due" @if( $reminder->timing == "after_due" ) selected @endif>
+                                                                            {{sch_translate('after_due_date')}}</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            @if( $reminder->send_via == "sms" )
+                                                            <div class="form-group email-subject" style="display: none;">
+                                                            @else
+                                                            <div class="form-group email-subject">
+                                                            @endif
+                                                                  <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <label>{{sch_translate('email_subject')}}</label> 
+                                                                        @if( $reminder->send_via == "sms" )
+                                                                        <input class="form-control" name="subject[]" placeholder="{{sch_translate('email_subject')}}" type="text" value="{{ $reminder->subject }}">
+                                                                        @else
+                                                                        <input class="form-control" name="subject[]" placeholder="{{sch_translate('email_subject')}}" required type="text" value="{{ $reminder->subject }}">
+                                                                        @endif
+                                                                    </div>
+                                                               </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                  <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <label>{{sch_translate('message')}}</label> 
+                                                                        <textarea class="form-control" name="message[]" required rows="10">{{ $reminder->message }}</textarea>
+                                                                    <p class="help">{{sch_translate('supported_tags__for_payment')}}: <code>[firstname]</code>, <code>[lastname]</code>, <code>[amountdue]</code>, <code>[duedate]</code> & <code>[course]</code>. Class: <code>[firstname]</code>, <code>[lastname]</code>, <code>[course]</code>, <code>[class]</code>, <code>[classdate]</code>, <code>[classtime]</code> & <code>[instructorname]</code> </p>
+                                                                  </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                      @endforeach
+                                      @else
+                                            <!-- reminder -->
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title"><a data-parent="#accordion" data-toggle="collapse" href="#collapse1">{{sch_translate('reminder')}}#<span class="count">1</span></a></h4>
+                                                </div>
+                                                <div class="panel-collapse collapse in" id="collapse1">
+                                                    <div class="panel-body m-15">
+                                                        <div class="remider-item">
+                                                            <div class="form-group">
+                                                                <div class="row">
+                                                                  <div class="col-md-6">
+                                                                      <label>{{sch_translate('reminder_type')}}</label> 
+                                                                      <select class="form-control" name="type[]" required="">
+                                                                          <option value="Payment">{{sch_translate('payment')}}</option>
+                                                                          <option value="Class">{{sch_translate('class')}}</option>
+                                                                      </select>
+                                                                  </div>
+                                                                  <div class="col-md-6">
+                                                                      <label>{{sch_translate('send_via')}}</label> 
+                                                                      <select class="form-control send_via" name="send_via[]" required="">
+                                                                          <option value="email">{{sch_translate('email')}}</option>
+                                                                          <option value="sms">{{sch_translate('sms')}}</option>
+                                                                      </select>
+                                                                  </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <label>{{sch_translate('days')}}</label>
+                                                                        <input type="number" class="form-control"  name="days[]" placeholder="{{sch_translate('days')}}" value="1" required="" min="0" required="">
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label>{{sch_translate('timing')}}</label> 
+                                                                        <select class="form-control" name="timing[]" required="">
+                                                                            <option value="before_due">{{sch_translate('before_due_date')}}</option>
+                                                                            <option value="after_due">{{sch_translate('after_due_date')}}</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group email-subject">
+                                                                  <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <label>{{sch_translate('email_subject')}}</label> 
+                                                                        <input class="form-control" name="subject[]" placeholder="{{sch_translate('email_subject')}}" required type="text" value="{{sch_translate('Payment reminder')}}">
+                                                                    </div>
+                                                               </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                  <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <label>{{sch_translate('message')}}</label> 
+                                                                        <textarea class="form-control" name="message[]" required rows="10">{{sch_translate('payment_reminder_text')}}</textarea>
+                                                                    <p class="help">{{sch_translate('supported_tags__for_payment')}}: <code>[firstname]</code>, <code>[lastname]</code>, <code>[amountdue]</code>, <code>[duedate]</code> & <code>[course]</code>. Class: <code>[firstname]</code>, <code>[lastname]</code>, <code>[course]</code>, <code>[class]</code>, <code>[classdate]</code>, <code>[classtime]</code> & <code>[instructorname]</code> </p>
+                                                                  </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                      @endif
+
+
+                                      </div>
+                                      <div class="form-group mt-15">
+                                        <button class="btn btn-red pull-right ml-5">{{sch_translate('save_changes')}}</button>
+                                        <button class="btn btn-default pull-right btn-icon add-reminder" type="button">
+                                            <i class="mdi mdi-plus-circle-outline"></i> {{sch_translate('add_reminder')}}</button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                  @endif
+                                  @if($user->role == 'superadmin')
+                                  <!-- System  -->
+                                  <div id="system" class="tab-pane fade">
+                                    <p>Update system configuration here.</p>
+                                    <form class="simcy-form translateValidation" action="<?=url('Settings@updatesystem');?>" data-parsley-validate="" loader="true" method="POST" enctype="multipart/form-data">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('system_name')}}</label>
+                                                    <input type="text" class="form-control system-name" placeholder="{{sch_translate('system_name')}}" name="APP_NAME" value="{{ env('APP_NAME'); }}" required>
+                                                    <input type="hidden" name="csrf-token" value="{{ csrf_token() }}" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('system_logo')}}</label>
+                                                    <input type="file" name="APP_LOGO" class="croppie" default="{{ url('') }}uploads/app/{{ env('APP_LOGO'); }}" crop-width="541" crop-height="152" accept="image/*">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('system_favicon')}}/icon </label>
+                                                    <input type="file" name="APP_ICON" class="croppie" default="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}" crop-width="152" crop-height="152" accept="image/*">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="divider"></div>
+                                    <p class="mt-40">{{sch_translate('update_email_smtp_settings')}}</p>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    @if ( env('SMTP_AUTH') == "Enabled" ) 
+                                                    <input type="checkbox" class="switch" name="SMTP_AUTH" value="true" checked />
+                                                    @else
+                                                    <input type="checkbox" class="switch" name="SMTP_AUTH" value="true" />
+                                                    @endif
+                                                    <label>{{sch_translate('use_smtp_authentication')}}.</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('smtp_username')}}</label>
+                                                    <input type="text" class="form-control" name="MAIL_USERNAME" placeholder="{{sch_translate('smtp_username')}}" value="{{ env('MAIL_USERNAME'); }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('smtp_host')}}</label>
+                                                    <input type="text" class="form-control" placeholder="{{sch_translate('smtp_host')}}" name="SMTP_HOST" value="{{ env('SMTP_HOST'); }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('smtp_port')}}</label>
+                                                    <input type="text" class="form-control" placeholder="{{sch_translate('smtp_port')}}" name="SMTP_PORT" value="{{ env('SMTP_PORT'); }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('smtp_password')}}</label>
+                                                    <input type="password" class="form-control" placeholder="{{sch_translate('smtp_password')}}" name="SMTP_PASSWORD" value="{{ env('SMTP_PASSWORD'); }}" autocomplete="false" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('smtp_encryption')}}</label>
+                                                    <input type="text" class="form-control" placeholder="{{sch_translate('smtp_encryption')}}" name="MAIL_ENCRYPTION" value="{{ env('MAIL_ENCRYPTION'); }}" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="divider"></div>
+
+                                    <p class="mt-40">{{sch_translate('sms_settings')}}</p>
+                                    <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                  <label>{{sch_translate('default_sms_gateway')}}</label>
+                                                  <select class="form-control" name="DEFAULT_SMS_GATEWAY">
+                                                    <option value="africastalking" @if ( env('DEFAULT_SMS_GATEWAY') == 'africastalking' ) selected @endif>
+                                                    {{sch_translate('africas_talking')}}</option>
+                                                    <option value="twilio" @if ( env('DEFAULT_SMS_GATEWAY') == 'twilio' ) selected @endif>
+                                                    {{sch_translate('twilio')}}</option>
+                                                  </select>
+                                                </div>
+                                            </div>
+                                      </div>
+                                      @if ( env('DEFAULT_SMS_GATEWAY') == 'africastalking' )
+                                    <div class="form-group africastalking">
+                                      @else
+                                    <div class="form-group africastalking" style="display: none;">
+                                      @endif
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                  <label>{{sch_translate('africa_stalking_username')}}</label>
+                                                  <input type="text" name="AFRICASTALKING_USERNAME" value="{{ env('AFRICASTALKING_USERNAME') }}" class="form-control" placeholder="{{sch_translate('africa_stalking_username')}}">
+                                                </div>
+                                            </div>
+                                      </div>
+                                      @if ( env('DEFAULT_SMS_GATEWAY') == 'africastalking' )
+                                    <div class="form-group africastalking">
+                                      @else
+                                    <div class="form-group africastalking" style="display: none;">
+                                      @endif
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('africas_talking_api_key')}}</label>
+                                                    <input type="text" name="AFRICASTALKING_KEY" value="{{ env('AFRICASTALKING_KEY') }}" class="form-control" placeholder="{{sch_translate('africas_talking_api_key')}}">
+                                                </div>
+                                            </div>
+                                      </div>
+                                      @if ( env('DEFAULT_SMS_GATEWAY') == 'africastalking' )
+                                    <div class="form-group africastalking">
+                                      @else
+                                    <div class="form-group africastalking" style="display: none;">
+                                      @endif
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                  <label>{{sch_translate('africas_talking_senderid')}}</label>
+                                                  <input type="text" name="AFRICASTALKING_SENDERID"  value="{{ env('AFRICASTALKING_SENDERID') }}" class="form-control" placeholder="{{sch_translate('africas_talking_senderid')}}">
+                                                </div>
+                                            </div>
+                                      </div>
+
+                                      @if ( env('DEFAULT_SMS_GATEWAY') == 'twilio' )
+                                    <div class="form-group twilio">
+                                      @else
+                                    <div class="form-group twilio" style="display: none;">
+                                      @endif
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('twilio_sid')}}</label>
+                                                    <input type="text" name="TWILIO_SID" value="{{ env('TWILIO_SID') }}" class="form-control" placeholder="{{sch_translate('twilio_sid')}}">
+                                                </div>
+                                            </div>
+                                      </div>
+                                      @if ( env('DEFAULT_SMS_GATEWAY') == 'twilio' )
+                                    <div class="form-group twilio">
+                                      @else
+                                    <div class="form-group twilio" style="display: none;">
+                                      @endif
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('twilio_authtoken')}}</label>
+                                                    <input type="text" name="TWILIO_AUTHTOKEN" value="{{ env('TWILIO_AUTHTOKEN') }}" class="form-control" placeholder="{{sch_translate('twilio_authtoken')}}">
+                                                </div>
+                                            </div>
+                                      </div>
+                                      @if ( env('DEFAULT_SMS_GATEWAY') == 'twilio' )
+                                    <div class="form-group twilio">
+                                      @else
+                                    <div class="form-group twilio" style="display: none;">
+                                      @endif
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('twilio_phone_number')}}</label>
+                                                    <input type="text" name="TWILIO_PHONENUMBER"  value="{{ env('TWILIO_PHONENUMBER') }}" class="form-control" placeholder="{{sch_translate('twilio_phone_number')}}">
+                                                </div>
+                                            </div>
+                                      </div>
+
+                                        <div class="divider"></div>
+
+                                    <p class="mt-40">{{sch_translate('google_calendar_keys')}}</p>
+                                    <div class="form-group ">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                  <label>{{sch_translate('google_client_id')}}</label>
+                                                  <input type="text" name="GOOGLE_CLIENT_ID"  value="{{ env('GOOGLE_CLIENT_ID') }}" class="form-control" placeholder="{{sch_translate('google_client_id')}}">
+                                                </div>
+                                            </div>
+                                      </div>
+                                    <div class="form-group ">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                  <label>{{sch_translate('google_client_secret')}}</label>
+                                                  <input type="text" name="GOOGLE_CLIENT_SECRECT"  value="{{ env('GOOGLE_CLIENT_SECRECT') }}" class="form-control" placeholder="{{sch_translate('google_client_secret')}}">
+                                                </div>
+                                            </div>
+                                      </div>
+
+                                    <p class="mt-40">{{sch_translate('addittional_settings')}}.</p>
+                                      <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                      <input type="checkbox" name="SHOW_SCHOOLS_MENU" class="switch" name="smtp" value="Enabled" @if(env('SHOW_SCHOOLS_MENU') == 'Enabled') checked @endif />
+                                                      <label>{{sch_translate('show_schools_menu')}}.</label>
+                                                </div>
+                                            </div>
+                                      </div>  
+                                      <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                      <input type="checkbox" name="ALLOW_SIGNUP" class="switch" name="allow_signup" value="Enabled" @if(env('ALLOW_SIGNUP') == 'Enabled') checked @endif />
+                                                      <label>{{sch_translate('allow_new_driving_schools_to_create_accounts')}}.</label>
+                                                </div>
+                                            </div>
+                                      </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12 text-right">
+                                                    <button class="btn btn-red" type="submit">{{sch_translate('save_changes')}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                  </div>
+                                  @endif
+                                  <!-- Security  -->
+                                  <div id="security" class="tab-pane fade">
+                                    <p>{{sch_translate('update_your_password_here')}}.</p>
+
+                                    <form class="simcy-form translateValidation" action="{{ url('Settings@updatepassword') }}" data-parsley-validate="" loader="true" method="POST">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('current_password')}}</label>
+                                                    <input type="password" class="form-control" name="current" required placeholder="{{sch_translate('current_password')}}">
+                                                    <input type="hidden" name="csrf-token" value="{{ csrf_token() }}" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('new_password')}}</label>
+                                                    <input type="password" class="form-control" name="password" data-parsley-required="true" data-parsley-minlength="6" data-parsley-error-message="{{sch_translate('password_too_short')}}" id="newPassword" placeholder="{{sch_translate('new_password')}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('confirm_password')}}</label>
+                                                    <input type="password" class="form-control" data-parsley-required="true" data-parsley-equalto="#newPassword" data-parsley-error-message="{{sch_translate('password_dont_match')}}" placeholder="{{sch_translate('confirm_password')}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12 text-right">
+                                                    <button class="btn btn-red" type="submit">{{sch_translate('save_changes')}}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                  </div>
+                                  <!-- general  -->
+                                  <div id="general" class="tab-pane fade">
+                                    <!-- language change is done by js in schleier/assets/schleier.js -->
+                                    <form class="simcy-form">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label>{{sch_translate('change_language')}}</label>
+                                                    <select class="form-control sch-language-selector">
+                                                      <option value="{{ sch_getCurrentLang() }}" class="sch-language">
+                                                        {{ sch_translate(sch_getCurrentLang()) }}
+                                                      </option>                       
+                                                      @foreach ( sch_getSupportedLanguages() as $language )
+                                                        @if(sch_translate(sch_getCurrentLang()) != sch_translate($language))
+                                                          <option value="{{ $language }}" class="sch-language">
+                                                            {{sch_translate($language)}}
+                                                          </option>
+                                                        @endif
+                                                      @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+        
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+
+    <!-- scripts -->
+   <script type="text/javascript">
+     school = '{{ $school->name }}';
+   </script>
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   <script src="{{ url('') }}assets/libs/datepicker/js/bootstrap-datepicker.js"></script>
+   <script>
+     $('.datepicker').datepicker({ language: "{{ sch_translate('translate') }}"});
+     var href = window.location.href;
+     if (href == window.location.origin + window.location.pathname) {
+      $('#profile').addClass('show active')
+     }
+     // // store the currently selected tab in the hash value
+      // $("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
+      //   var id = $(e.target).attr("href").substr(1);
+      //   console.log(id)
+      //   window.location.hash = id;
+      // });  
+
+      // // on load of the page: switch to the currently selected tab
+      // var hash = window.location.hash;
+      // $('#myTab a[href="' + hash + '"]').tab('show');
+
+      // $('ul.nav-tabs > li > a').on('show.bs.tab', function(e) {
+      //   localStorage.setItem('activeTab', $(e.target).attr('href'));
+      // });
+      // var activeTab = localStorage.getItem('activeTab');
+      // if(activeTab){
+      //     $('#myTab a[href="' + activeTab + '"]').tab('show');
+      // }
+      $(document).ready(function() {
+        if (location.hash) {
+          $("a[href='" + location.hash + "']").tab("show");
+        }
+        $(document.body).on("click", "a[data-toggle='tab']", function(event) {
+            location.hash = this.getAttribute("href");
+          });
+      });
+      $(window).on("popstate", function() {
+          var anchor = location.hash || $("a[data-toggle='tab']").first().attr("href");
+          $("a[href='" + anchor + "']").tab("show");
+      });
+
+      // ----------------------------
+      // $('#myTab a').click(function(e) {
+      //   e.preventDefault();
+      //   $(this).tab('show');
+      // });
+
+      // // store the currently selected tab in the hash value
+      // $("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
+      //   var id = $(e.target).attr("href").substr(1);
+      //   window.location.hash = id;
+      // });
+
+      // // on load of the page: switch to the currently selected tab
+      // var hash = window.location.hash;
+      // $('#myTab a[href="' + hash + '"]').tab('show');
+      //  --------------------
+      // $(function() {
+      //     $('a[data-toggle="tab"]').on('click', function(e) {
+      //         window.localStorage.setItem('activeTab', $(e.target).attr('href'));
+      //     });
+      //     var activeTab = window.localStorage.getItem('activeTab');
+      //     if (activeTab) {
+      //         $('#myTab a[href="' + activeTab + '"]').tab('show');
+      //         window.localStorage.removeItem("activeTab"); // remove in second refresh
+      //     }
+      // });
+   </script>
+   @include("translate/validation")
+   @include("schleier/bottomscript")
+</body>
+</html>

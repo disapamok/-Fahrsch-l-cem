@@ -1,0 +1,50 @@
+<div class="modal-body">
+    <form class="simcy-form needs-validation" action="{{ url('Branch@update') }}" method="POST" loader="true" novalidate data-parsley-validate="">
+        <p class="text-white">{{sch_translate("enter_new_branch_name")}}</p>
+      <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate("branch_name")}}</label>
+                @if($branch->name == 'Headquarters')
+                  <input type="text" class="form-control" placeholder="{{sch_translate('branch_name')}}" value="{{ $branch->name }}" name="name" required="" readonly="">
+                @else
+                  <input type="text" class="form-control" placeholder="{{sch_translate('branch_name')}}" value="{{ $branch->name }}" name="name" required="">
+                @endif
+                <input type="hidden" value="{{ csrf_token() }}" name="csrf-token" />
+                <input type="hidden" value="{{ $branch->id }}" name="branchid" />
+            </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate("email_address")}}</label>
+                <input type="email" class="form-control" placeholder="{{sch_translate('email_address')}}" value="{{ $branch->email }}" name="email" required="">
+            </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('phone_number')}}</label>
+                <input type="text" class="form-control" placeholder="{{sch_translate('phone_number')}}" value="{{ $branch->phone }}" name="phone" required="" data-parsley-type="digits">
+            </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('address')}}</label>
+                <input type="text" class="form-control" placeholder="{{sch_translate('address')}}" value="{{ $branch->address }}" name="address" required="">
+            </div>
+        </div>
+      </div>
+      <div class="form-group mt-md-5">
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-red btn-block" type="submit">{{sch_translate('save_changes')}}</button>
+            </div>
+        </div>
+      </div>
+    </form>
+</div>

@@ -1,0 +1,23 @@
+<!-- THIS FILE MAKES ALL STRINGS IN THe php TRANSLATE array AVAILABLE IN JAVSCRIPT -->
+
+<script type="text/javascript">
+	var translation_strings_array = [];
+<?php 
+	//generate js array of all strings
+	$languages_pack = sch_getTranslationArray();
+	foreach ($languages_pack as $key => $value) {
+		$replacte = '"+'."".'"';
+?>
+		 translation_strings_array["<?php echo $key; ?>"] = "<?php echo str_replace("\n", $replacte, $value); ?>";
+<?php
+	}
+?>
+//function to translate in js
+function sch_TranslateJsWord($string){
+	$string = (""+$string).trim();
+	$string_ = ($string.toLowerCase());
+	var translatedd = (translation_strings_array[$string_]==undefined)? $string: translation_strings_array[$string_];
+	translatedd = (translation_strings_array[$string]==undefined)? translatedd: translation_strings_array[$string];
+	return translatedd;
+}
+</script>

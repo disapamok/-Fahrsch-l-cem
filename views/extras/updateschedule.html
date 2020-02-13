@@ -1,0 +1,195 @@
+
+<div class="modal-body">
+    <form class="simcy-form needs-validation translateValidation" novalidate data-parsley-validate="" action="{{ url('Schedule@update') }}" method="POST" loader="true">
+        <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('class_starts')}} </label>
+                <input type="text" class="form-control datetimepickerx" placeholder="{{sch_translate('class_starts')}}" value="{{ date('d F Y - h:i a', strtotime($schedule->start)) }}" name="start" data-date-format="dd MM yyyy - HH:ii p" required>
+                <input type="hidden" name="csrf-token" value="{{ csrf_token() }}">
+                <input type="hidden" name="scheduleid" value="{{ $schedule->id }}">
+            </div>
+        </div>
+        </div>
+        <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('class_ends')}}</label>
+                <!-- 09 January 2019 - 02:30 am -->
+                <input type="text" class="form-control datetimepickerx" placeholder="{{sch_translate('class_ends')}}" value="{{ date('d F Y - h:i a', strtotime($schedule->end)) }}" name="end" data-date-format="dd MM yyyy - HH:ii p" required>                                    
+            </div>
+        </div>
+        </div>
+        <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('student')}}</label>
+                <select class="form-control select2-dynamic" id="update-student" name="student" required="">
+                    @if(!empty($students))
+                        @foreach($students as $student)
+                        <option value="{{$student->id}}" @if( $schedule->student == $student->id ) selected @endif>
+    {{$student->fname}} {{$student->lname}}</option>
+                        @endforeach
+                    @endif
+                </select>
+                <div id="student-update-error"></div>
+            </div>
+        </div>
+        </div>
+        <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('course')}}</label>
+                <select class="form-control select2-dynamic" id="update-course" name="course" required=""> 
+                <!-- <option value="0" disabled>{{sch_translate('select_course')}} </option> -->
+                    @if(!empty($courses))
+                    @foreach($courses as $course)
+                    <option value="{{$course->id}}" @if( $schedule->course == $course->id ) selected @endif>
+{{$course->name}}</option>
+                    @endforeach
+                    @endif
+                </select>
+                <div id="course-update-error"></div>
+            </div>
+        </div>
+        </div>
+        <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('instructor')}}</label>
+                <select class="form-control select2-dynamic" id="update-instructor" name="instructor" required="">
+                    <!-- <option value="0">{{sch_translate('select_instructor')}}</option> -->
+                    @if(!empty($instructors))
+                        @foreach($instructors as $instructor)
+                        <option value="{{$instructor->id}}" @if( $schedule->instructor == $instructor->id ) selected @endif>
+    {{$instructor->fname}} {{$instructor->lname}}</option>
+                        @endforeach
+                    @endif
+                </select>
+                <div id="instructor-update-error"></div>
+            </div>
+        </div>
+        </div>
+        <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('class')}}</label>
+                <select class="form-control select2-dynamic" id="update-class" name="class_type" required="">
+                    <option value="Theory" @if( $schedule->class_type == "Theory" ) selected
+                        @endif>
+                    {{sch_translate('thoery_class')}} </option>
+                    <option value="Practical" @if( $schedule->class_type == "Practical" ) selected @endif>
+                    {{sch_translate('practical')}}</option>
+                </select>
+                <div id="class-update-error"></div>
+            </div>
+        </div>
+        </div>
+        <div class="form-group" id="car_field_update" @if( $schedule->class_type == "Theory" ) style="display:none;" @endif>
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('car')}}</label>
+                <select class="form-control select2-dynamic" name="car" id="updateMyCar"> 
+                    <!-- <option value="0">{{sch_translate('select_car')}}</option> -->
+                    @if(!empty($fleets))
+                        @foreach($fleets as $fleet)
+                        <option value="{{$fleet->id}}" @if( $schedule->car == $fleet->id ) selected @endif>
+    {{$fleet->make}} {{$fleet->model}} - {{$fleet->carplate}}</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+        </div>
+        </div>
+        <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('status')}}</label>
+                <select class="form-control select2-dynamic" name="status" required="">
+                    <option value="New" @if( $schedule->status == "New" ) selected @endif>
+                    {{sch_translate('new_booking')}}</option>
+                    <option value="Complete" @if( $schedule->status == "Complete" ) selected @endif>
+                    {{sch_translate('complete')}}</option>
+                    <option value="Missed" @if( $schedule->status == "Missed" ) selected @endif>
+{{sch_translate('missed')}}</option>
+                </select>
+            </div>
+        </div>
+        </div>
+        <div class="form-group">
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-red btn-block" type="submit" id="updateSchedul">{{sch_translate('save_class')}}</button>
+            </div>
+        </div>
+        </div>
+    </form>
+    <p class="text-muted text-center">{{sch_translate('or_capital')}}</p>
+    <div class="row">
+        <div class="col-md-12">
+            <button class="btn btn-primary btn-block send-to-server-click" data="scheduleid:{{ $schedule->id }}|csrf-token:{{ csrf_token() }}" url="{{ url('Schedule@delete') }}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('delete_and_inform_schedule')}}" warning-button="{{sch_translate('yes_delete')}}" data-cancel-button="{{sch_translate('cancel')}}" loader="true">{{sch_translate('delete_class')}}</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">    
+$('.select2-dynamic').select2();
+// $(".datepickerx").datepicker({ autoclose: true });
+$('.datetimepickerx').datetimepicker({ autoclose: true });
+
+
+// Remove error message
+function removeSelect2ErrorMessage(name) {
+    $('.' + name + 'Div').removeClass('border border-danger');
+    $('.' + name + 'Ul').addClass('d-none');
+    $('.select2HasError').val(0);
+}
+
+function addSelect2ErrorMessage(name) {
+    $('.' + name + 'Div').addClass('border border-danger');
+    $('.' + name + 'Ul').removeClass('d-none');
+    $('.select2HasError').val(1);
+}
+
+// Select2 validation car
+$(document).on('change', 'select[name=car]', function() {
+    let car = $(this).val();
+    if (car != '' && car != null)
+        removeSelect2ErrorMessage('car');
+    else
+        addSelect2ErrorMessage('car');
+});
+
+$(document).on('click', '#updateSchedul', function() {
+    let carAttr = $('select[name=car]').attr('requiredSelect2');
+    let car = $('select[name=car]').val();
+    // Check if the select2 has required attribute
+    if (typeof carAttr !== typeof undefined && carAttr !== false) {
+
+        if (car == '' || car == null)
+            addSelect2ErrorMessage('car');
+        else
+            removeSelect2ErrorMessage('car');
+    }
+});
+
+
+// $('#update-course').parsley().options.errorsContainer = function(instance) { return $('#course-update-error') }
+// $('#update-student').parsley().options.errorsContainer = function(instance) { return $('#student-update-error') }
+// $('#update-instructor').parsley().options.errorsContainer = function(instance) { return $('#instructor-update-error') }
+$('#update-class').parsley().options.errorsContainer = function(instance) { return $('#class-update-error') }
+
+$('select[name=class_type]').on('change', function() {
+    var class_ = $(this).val();
+    if (class_ == "Practical") {
+        $('#car_field_update').show();
+        $('input[name=car]').attr('required','true');
+        // Set required
+        $('#updateMyCar').attr('requiredSelect2','requiredSelect2');
+    } else {
+        $('#car_field_update').hide();
+        $('input[name=car]').removeAttr('required');
+        $('#updateMyCar').removeAttr('requiredSelect2');
+    }
+})
+</script>

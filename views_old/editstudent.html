@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('edit_profile')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h3>{{sch_translate('edit_profile')}}</h3>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">  
+          <div class="col-12 col-lg-6 offset-lg-3">    
+            <!-- saved -->
+            @if(isset($_GET["saved"]))
+            <div class="card">    
+              <h5 class="text-success">
+                {{sch_translate('Changes saved')}}
+              </h5>
+            </div>
+            @endif
+            <!-- saved -->
+
+            <div class="card">     
+              <a href="{{url('')}}students/" class="w-100 text-right"><button class="btn btn-secondary btn-sm">{{sch_translate('back')}}</button></a>  
+
+                <form class="simcy-form" action="{{ url('Profile@update') }}" method="POST" loader="true">
+                <!-- if it is a parent note==uberschrift -->
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>{{sch_translate('first_name')}}</label>
+                            <input type="text" class="form-control" placeholder="{{sch_translate('first_name')}}" value="{{ $profile->fname }}" name="fname"required>
+                            <input type="hidden" value="{{ csrf_token() }}" name="csrf-token">
+                            <input type="hidden" value="{{ $profile->id }}" name="userid">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>{{sch_translate('last_name')}}</label>
+                            <input type="text" class="form-control" placeholder="{{sch_translate('last_name')}}" value="{{ $profile->lname }}" name="lname" required>
+                        </div>
+                    </div> 
+                </div>
+                <input type="hidden" name="gender" value="Male">
+                <input type="hidden" name="date_of_birth" value="10/12/2002">
+                <input type="hidden" name="address" value="Ungegeben, 9. Musterstrasse.">
+                <!-- <input type="hidden" name="branch" value="1"> -->
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>{{sch_translate('email_address')}}</label>
+                            <input type="text" class="form-control" placeholder="{{sch_translate('email_address')}}" name="email" value="{{ $profile->email }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label>{{sch_translate('phone_number')}}</label>
+                            <input type="text" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" value="{{ $profile->phone }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button class="btn btn-primary btn-block">{{sch_translate('save_changes')}}</button>
+                        </div>
+                    </div>
+                </div>  
+              </form>
+            </div>
+          </div>
+          <div class="col-12 col-lg-3"></div>
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   @include("schleier/bottomscript")
+
+  <script type="text/javascript">
+    var current_id = 0;
+    $(function(){
+      $("#add_new_line").click(function(){
+        current_id++;
+        var note_text_id = "note_text_"+current_id;
+        var listtype_id = "listtype_"+current_id;
+        var html_content = `<div class="col-md-12 mt-1">
+                        <label>`+ "{{sch_translate('Hinweisentext')}} #"+(current_id+1) +`</label>
+                        <textarea name="`+ note_text_id +`" class="form-control " placeholder="`+ "{{sch_translate('Hinweisentext')}}" +`"></textarea>
+                      </div>
+                      <div class="col-md-12 mt-1">
+                      <label>{{sch_translate('Auflistungsart')}} #`+(current_id+1) +`<i class="ml-1 fa fa-info-circle"></i>({{sch_translate('Auflistungsart_desc')}})</label>
+                      <select name="`+ listtype_id +`" class="form-control">
+                        <option selected value="accordion">
+                        {{sch_translate('Akkordion')}}</option>
+                        <option value="checkbox">
+                        {{sch_translate('Checkbox')}}</option>
+                      </select>
+                    </div>`;
+        $("#add_new_line-target").append(html_content);
+      });       
+    })
+  </script>
+</body>
+</html>

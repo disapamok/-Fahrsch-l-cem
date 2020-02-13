@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('notification')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <h3>{{sch_translate('notification')}}</h3>
+        </div>
+
+        <!-- page content -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="notifications">
+                        @if(!empty($notifications))
+                        @foreach($notifications as $notification)
+                        <!-- single notification -->
+
+                        @if(($notification->is_read == 0))
+                            <div class="single-notification bg-gray mb-1 notification-div notification-div_{{$notification->id}} hoverMe" unread index="{{ $notification->id }}">
+                                
+                                @if ( $notification->type == "message" )
+                                <div class="notification-icon bg-purple"> <a href="{{url('')}}communication?read_this={{ $notification->id }}" class="text-white"><i class=" mdi mdi-message-text-outline"></i></a></div>
+                                <div class="notification-message">
+                                    <div class="hideIconCheck hideIconCheck_{{ $notification->id }} d-none">
+                                        <i index="{{ $notification->id }}" class="d-none checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                        <i index="{{ $notification->id }}" class='noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                    </div>
+                                    <a href="{{url('')}}communication?read_this={{ $notification->id }}">
+                                        {{ $notification->message }}
+                                        <br/>
+                                        <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                    </a>
+                                </div>
+                                @elseif ( $notification->type == "delete" )
+                                <div class="notification-icon bg-danger"> <a href="{{url('')}}invoices?read_this={{ $notification->id }}" class="text-white"><i class=" mdi mdi-delete"></i></a></div>
+                                <div class="notification-message">
+                                    <div class="hideIconCheck hideIconCheck_{{ $notification->id }} d-none">
+                                        <i index="{{ $notification->id }}" class="d-none checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                        <i index="{{ $notification->id }}" class='noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                    </div>
+                                    <a href="{{url('')}}invoices?read_this={{ $notification->id }}">
+                                        {{ $notification->message }}
+                                        <br/>
+                                        <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                    </a>
+                                </div>
+                                @elseif ( $notification->type == "calendar" )
+                                <div class="notification-icon bg-secondary"> <a href="{{url('')}}scheduling?read_this={{ $notification->id }}" class="text-white"><i class=" mdi mdi-calendar"></i> </a></div>
+                                <div class="notification-message">
+                                    <div class="hideIconCheck hideIconCheck_{{ $notification->id }} d-none">
+                                        <i index="{{ $notification->id }}" class="d-none checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                        <i index="{{ $notification->id }}" class='noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                    </div>
+                                    <a href="{{url('')}}scheduling?read_this={{ $notification->id }}">
+                                        {{ $notification->message }}
+                                        <br/>
+                                        <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                    </a>
+                                </div>
+                                @elseif ( $notification->type == "newaccount" )
+                                <div class="notification-icon bg-warning"> <a href="{{url('')}}students?read_this={{ $notification->id }}" class="text-white"><i class="mdi mdi-account-plus"></i></a></div>
+                                    <div class="notification-message">
+                                        <div class="hideIconCheck hideIconCheck_{{ $notification->id }} d-none">
+                                            <i index="{{ $notification->id }}" class="d-none checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                            <i index="{{ $notification->id }}" class='noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                        </div>
+                                        <a href="{{url('')}}students?read_this={{ $notification->id }}">
+                                        {{ $notification->message }}
+                                        <br/>
+                                        <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                        </a>
+                                    </div>
+                                @elseif ( $notification->type == "payment" )
+                                <div class="notification-icon bg-success"> <a href="{{url('')}}invoices?read_this={{ $notification->id }}" class="text-white"><i class="mdi mdi-credit-card"></i></a></div>
+                                    <div class="notification-message">
+                                        <div class="hideIconCheck hideIconCheck_{{ $notification->id }} d-none">
+                                            <i index="{{ $notification->id }}" class="d-none checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                            <i index="{{ $notification->id }}" class='noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                        </div>
+                                        <a href="{{url('')}}invoices?read_this={{ $notification->id }}">
+                                        {{ $notification->message }}
+                                        <br/>
+                                        <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        @else
+                            <div class="single-notification bg-white mb-1 notification-div notification-div_{{$notification->id}} hoverMe" index="{{ $notification->id }}">
+                                
+                                @if ( $notification->type == "message" )
+                                <div class="notification-icon bg-purple"> <a href="{{url('')}}communication" class="text-white"><i class=" mdi mdi-message-text-outline"></i></a></div>
+                                <div class="notification-message">
+                                    <div class='hideIconCheck hideIconCheck_{{$notification->id}} d-none'>
+                                        <i index="{{ $notification->id }}" class="checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                        <i index="{{ $notification->id }}" class='d-none noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                    </div>
+                                    <a href="{{url('')}}communication">
+                                        {{ $notification->message }}
+                                        <br/>
+                                        <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                    </a>
+                                </div>
+                                @elseif ( $notification->type == "delete" )
+                                <div class="notification-icon bg-danger"> <a href="{{url('')}}invoices" class="text-white"><i class=" mdi mdi-delete"></i></a></div>
+                                <div class="notification-message">
+                                    <div class='hideIconCheck hideIconCheck_{{$notification->id}} d-none'>
+                                        <i index="{{ $notification->id }}" class="checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                        <i index="{{ $notification->id }}" class='d-none noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                    </div>
+                                    <a href="{{url('')}}invoices">
+                                        {{ $notification->message }}
+                                        <br/>
+                                        <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                    </a>
+                                </div>
+                                @elseif ( $notification->type == "calendar" )
+                                <div class="notification-icon bg-secondary"> <a href="{{url('')}}scheduling" class="text-white"><i class=" mdi mdi-calendar"></i> </a></div>
+                                <div class="notification-message">
+                                    <div class='hideIconCheck hideIconCheck_{{$notification->id}} d-none'>
+                                        <i index="{{ $notification->id }}" class="checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                        <i index="{{ $notification->id }}" class='d-none noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                    </div>
+                                    <a href="{{url('')}}scheduling">
+                                        {{ $notification->message }}
+                                        <br/>
+                                        <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                    </a>
+                                </div>
+                                @elseif ( $notification->type == "newaccount" )
+                                <div class="notification-icon bg-warning"> <a href="{{url('')}}students" class="text-white"><i class="mdi mdi-account-plus"></i></a></div>
+                                    <div class="notification-message">
+                                        <div class='hideIconCheck hideIconCheck_{{$notification->id}} d-none'>
+                                            <i index="{{ $notification->id }}" class="checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                            <i index="{{ $notification->id }}" class='d-none noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                        </div>
+                                        <a href="{{url('')}}students">
+                                            {{ $notification->message }}
+                                            <br/>
+                                            <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                        </a>
+                                    </div>
+                                @elseif ( $notification->type == "payment" )
+                                <div class="notification-icon bg-success"> <a href="{{url('')}}students" class="text-white"><i class="mdi mdi-credit-card"></i></a></div>
+                                    <div class="notification-message">
+                                        <div class='hideIconCheck hideIconCheck_{{$notification->id}} d-none'>
+                                            <i index="{{ $notification->id }}" class="checkCircle checkCircle_{{$notification->id}} float-right fa fa-check-circle text-secondary mt-3" title='Mark as Unread'></i>
+                                            <i index="{{ $notification->id }}" class='d-none noCheckCircle noCheckCircle_{{$notification->id}} float-right fa fa-circle text-secondary mt-3' title='Mark as Read'></i>
+                                        </div>
+                                        <a href="{{url('')}}invoices">
+                                            {{ $notification->message }}
+                                            <br/>
+                                            <div class="notification-dat">{{ date('F j, Y h:ia', strtotime($notification->created_at)) }}</div>
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+                        
+                        @endforeach
+                        @else
+                            <div class="col-md-12">
+                                <div class="empty">
+                                    <i class="mdi mdi-alert-circle-outline"></i>
+                                    <h3>{{sch_translate('empty_here')}}</h3>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+    <script>
+        $(document).ready(function() {
+            // $(".bubble").hide();
+            // readNotifications("<?=url("Notification@read");?>");
+        });
+    </script>
+   @include("schleier/bottomscript")
+</body>
+</html> 

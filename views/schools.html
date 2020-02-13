@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('schools')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <button type="button" class="btn btn-red btn-icon pull-right ml-5" data-toggle="modal" data-target="#create"><i class=" mdi mdi-plus-circle-outline"></i> {{sch_translate('add_school')}} </button>
+            <h3>{{sch_translate('schools')}}</h3>
+            <p>{{sch_translate('these_are_independent_schools_that_signed_up')}} </p>
+        </div>
+        <!-- page content -->
+        <div class="row">
+
+            @if(!empty($schools))
+            @foreach($schools as $school)
+            <!-- school -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="school">
+                        <div class="school-heading">
+                            <div class="school-icon">{{ mb_substr($school->name, 0, 1, 'utf-8') }}</div>
+                            <div class="school-details">
+                                <h5>{{$school->name}}</h5>
+                                <span>{{$school->email}}</span>
+                                <span>
+                               @if ( !empty($school->phone) ) {{ $school->phone }} @else 
+                               {{sch_translate('phone_not_set')}}
+                                @endif
+                               </span>
+                            </div>
+                        </div>
+                        <div class="school-info">
+                            <p>
+                                <span><i class="mdi mdi-account-convert"></i></span>
+                                {{ $school->students }} {{sch_translate('active_students')}}
+                            </p>
+                            <p>
+                                <span><i class="mdi mdi-account-multiple-outline"></i></span>
+                                {{ $school->instructors }} {{sch_translate('instructors')}}
+                            </p>
+                            <p>
+                                <span><i class="mdi mdi-map-marker-multiple"></i></span>
+                                {{ $school->branches }} {{sch_translate('branches')}}
+                            </p>
+                            <p>
+                                <span><i class="mdi mdi-map"></i></span>
+                               @if ( !empty($school->address) ) {{ $school->address }} @else 
+                               {{sch_translate('address_not_set')}}
+                                @endif
+                            </p>
+                        </div>
+                        <div class="school-footer">
+                            <div class="dropdown pull-right">
+                                    <span class="dropdown-toggle" data-toggle="dropdown">
+                                        <i class="mdi mdi-dots-horizontal"></i> </span>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                      <li role="presentation"><a role="menuitem" class="fetch-display-click" data="schoolid:{{ $school->id }}|csrf-token:{{ csrf_token() }}" url="{{ url('School@updateview') }}" holder=".update-holder" modal="#update" loader="true" href=""> <i class="mdi mdi-pencil"></i> {{sch_translate('edit')}}</a></li>
+                                      <li role="presentation"><a role="menuitem" href="" input="schoolid" modal="#sendemail" class="pass-data" value="{{ $school->id }}"> <i class="mdi mdi-email-outline"></i> {{sch_translate('send_email')}}</a></li>
+                                      <li role="presentation"><a role="menuitem" href="" input="schoolid" modal="#sendsms" class="pass-data" value="{{ $school->id }}"> <i class="mdi mdi-message-text-outline"></i> {{sch_translate('send_sms')}}</a></li>
+                                      <li role="presentation"><a role="menuitem" href="" class="send-to-server-click" data="schoolid:{{ $school->id }}|csrf-token:{{ csrf_token() }}" url="{{ url('School@delete') }}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('this_school_and_all_its_data_will_be_deleted')}}" warning-button="{{sch_translate('continue')}}" loader="true" data-cancel-button="{{sch_translate('cancel')}}"> <i class="mdi mdi-delete"></i> {{sch_translate('delete')}}</a></li>
+                                    </ul>
+                            </div>
+                            @if(($school->status) == 'Active')
+                            <span class="badge badge-success">{{sch_translate('active_school')}}</span>
+                            @else
+                            <span class="badge badge-danger">{{sch_translate('suspended_school')}}</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        @else
+            <div class="col-md-12">
+                <div class="empty">
+                    <i class="mdi mdi-alert-circle-outline"></i>
+                    <h3>{{sch_translate('empty_here')}}</h3>
+                </div>
+            </div>
+        @endif
+        </div>
+
+    </div>
+
+        <!-- footer -->
+        @include("includes/footer")
+
+    <!-- add school -->
+    <div class="modal right fade" id="create" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('add_school')}}</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url('School@create') }}" class="simcy-form translateValidation" data-parsley-validate=""  loader="true" method="post">
+                        <p>{{sch_translate('a_welcome_email_will_be_set_and_recepient_will_complete_setup_of_their_school_account')}}</p>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12"></div>
+                            </div><label>{{sch_translate('school_name')}}</label> 
+                            <input class="form-control" name="schoolname" placeholder="{{sch_translate('school_name')}}" required="" type="text"> <input name="csrf-token" type="hidden" value="{{ csrf_token() }}">
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('email_address')}}</label> 
+                                    <input class="form-control" data-parsley-trigger="change" name="email" placeholder="{{sch_translate('email_address')}}" required="" type="email">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('phone_number')}}</label> <input class="form-control" name="phone" placeholder="{{sch_translate('phone_number')}}" required="" type="text" data-parsley-type="digits">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('address')}}</label> <input class="form-control" name="address" placeholder="{{sch_translate('address')}}" required="" type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('founder_first_name')}}</label> <input class="form-control" name="fname" placeholder="{{sch_translate('founder_first_name')}}" required="" type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('founder_last_name')}}</label> <input class="form-control" name="lname" placeholder="{{sch_translate('founder_last_name')}}" required="" type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button class="btn btn-red btn-block">{{sch_translate('add_school')}}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end add school -->
+    <!-- update -->
+    <div class="modal right fade" id="update" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('edit_school')}}</h4>
+                </div>
+                <div class="update-holder"></div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end update -->
+    <!-- Send Email-->
+    <div class="modal right fade" id="sendemail" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('send_email')}}</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url('School@sendemail') }}" class="simcy-form translateValidation" data-parsley-validate=""  loader="true" method="post">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('subject')}}</label> 
+                                    <input class="form-control" name="subject" placeholder="{{sch_translate('subject')}}" type="text" required="">
+                                    <input name="csrf-token" type="hidden" value="{{csrf_token()}}">
+                                    <input name="schoolid" type="hidden">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('message')}}</label> 
+                                    <textarea class="form-control" name="message" placeholder="{{sch_translate('message')}}" rows="6" required=""></textarea>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-red btn-block">{{sch_translate('send_email')}}</button>
+                                </div>
+                            </div>
+                        </div> 
+                    </form>
+                </div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end Send Email-->
+    <!-- Send SMS-->
+    <div class="modal right fade" id="sendsms" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('send_sms')}}</h4>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url('School@sendsms') }}" class="simcy-form translateValidation" data-parsley-validate=""  loader="true" method="post">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>{{sch_translate('message')}}</label> 
+                                    <textarea class="form-control" placeholder="{{sch_translate('message')}}" name="message" rows="6" required=""></textarea>
+                                    <input name="csrf-token" type="hidden" value="{{ csrf_token() }}">
+                                    <input name="schoolid" type="hidden">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button type="submit" class="btn btn-red btn-block">{{sch_translate('send_sms')}}</button>
+                                </div>
+                            </div>
+                        </div> 
+                    </form>
+                </div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div><!-- end SMS-->
+
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   @include("translate/validation")
+   @include("schleier/bottomscript")
+</body>
+</html>

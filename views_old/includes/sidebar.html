@@ -1,0 +1,101 @@
+    <aside>
+        <div class="slimscroll-menu">
+            <!-- close menu -->
+            <a href="" class="close-aside"><i class="mdi mdi-close-circle-outline"></i></a>
+
+            <!-- Branding -->
+            <div class="side-branding">
+                <a href="{{ url('Dashboard@get') }}">
+                    <img src="{{ url('') }}uploads/app/{{ env('APP_LOGO'); }}" class="img-responsive">
+                </a>
+            </div>
+          
+            <!-- navigation -->
+            <ul>
+                <li class="menu-label">{{sch_translate('main')}} </li>
+                @if($user->role == 'superadmin' || $user->role == 'admin' || $user->role == 'staff')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Dashboard@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/speedometer.png"></span>
+                      <span class="menu-title">{{sch_translate('dashboard')}}</span>
+                    </a>
+                </li>
+                @endif
+
+                @if($user->role == 'student')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Course@get')}}">
+                      <i class="menu-icon mdi mdi-seal"></i>
+                      <span class="menu-title">{{sch_translate('my_courses')}}</span>
+                    </a>
+                </li>
+                @endif
+                @if($user->role == 'superadmin' || $user->role == 'admin' || $user->role == 'staff')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Student@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/relationship-sm.png"></span>
+                      <span class="menu-title">{{sch_translate('students')}}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Instructor@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/teacher-sm.png"></span>
+                      <span class="menu-title">{{sch_translate('instructors')}}</span>
+                    </a>
+                </li>
+                
+                <li class="menu-label">{{sch_translate('planer')}}</li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Schedule@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/schedule.png"></span>
+                      <span class="menu-title">{{sch_translate('Kalender')}}</span>
+                    </a>
+                </li>
+
+                <li class="menu-label">{{sch_translate('school')}}</li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Invoice@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/bill.png"></span>
+                      <span class="menu-title">{{sch_translate('payments')}}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Branch@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/placeholder-round-sm.png"></span>
+                      <span class="menu-title">{{sch_translate('Standorten')}}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Communication@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/speech-bubble-sm.png"></span>
+                      <span class="menu-title">{{sch_translate('communication')}}</span>
+                    </a>
+                </li>
+                @endif
+
+                <li class="menu-label">{{sch_translate('account')}}</li>
+                @if($user->role == 'superadmin' || $user->role == 'admin')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Course@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/training.png"></span>
+                      <span class="menu-title">{{sch_translate('courses')}}</span>
+                    </a>
+                </li>
+                @endif
+                @if(env('SHOW_SCHOOLS_MENU') == 'Enabled' && $user->role == 'superadmin')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('School@get')}}">
+                      <i class="menu-icon mdi mdi-blur-radial"></i>
+                      <span class="menu-title">{{sch_translate('schools')}}</span>
+                    </a>
+                </li>
+                @endif
+                <li class="nav-item">
+                    <a class="nav-link" href="{{url('Settings@get')}}">
+                      <span class="menu-icon"><img src="{{url('')}}assets/images/icons/controls.png"></span>
+                      <span class="menu-title">{{sch_translate('settings')}}</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>

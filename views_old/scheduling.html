@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="{{sch_translate('app_desc')}}">
+      <meta name="author" content="{{sch_translate('app_author')}}">
+      @include("schleier/topscript")
+      <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+      <title>{{sch_translate('scheduling')}} | {{sch_translate('app_name_long')}}</title>
+      <!-- Material design icons -->
+      <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+      <link href="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.css" rel="stylesheet">
+      <!-- Bootstrap CSS -->
+      <link href="{{ url('') }}assets/libs/datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+      <link href="{{ url('') }}assets/libs/fullcalendar/fullcalendar.min.css" rel="stylesheet">
+      <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+      <!-- Simcify CSS -->
+      <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+      <!-- Landa CSS -->
+      <link href="{{ url('') }}assets/css/calendar.css" rel="stylesheet">
+      <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+   </head>
+   <body>
+      <!-- sidebar -->
+      @include("includes/sidebar")
+      <!-- header -->
+      @include("includes/header")
+      <!-- Used for select2 indicator validation -->
+      <input type="hidden" name="select2HasError" class="select2HasError" value="0" />
+      <!-- main content -->
+      <div class="main-content">
+         <div class="page-header">
+            @if(!empty(env("GOOGLE_CLIENT_ID")) && !empty(env("GOOGLE_CLIENT_SECRECT")))
+                @if(!empty($user->google_access_token))
+                    <button class="btn btn-success btn-icon pull-right" data-toggle="modal" data-target="#googlecalendar"><i class="mdi mdi-calendar-text"></i> {{sch_translate('google_calendar_connected')}} </button>
+                @elseif($user->role == "student" || $user->role == "instructor")
+                    <button class="btn btn-primary btn-icon pull-right" data-toggle="modal" data-target="#googlecalendar"><i class="mdi mdi-calendar-text"></i> {{sch_translate('connect_google_calendar')}} </button>
+                @endif
+            @endif
+            @if( $filter != "none" )
+                <a href="{{url('Schedule@get')}}" class="btn btn-success btn-icon pull-right"><i class="mdi mdi-calendar-text"></i> {{sch_translate('View All')}} </a>
+            @endif
+            <h3>{{sch_translate('Kalender')}}</h3>
+         </div>
+         <!-- page content -->
+         <div class="row">
+            <!-- Scheduling -->
+            <div class="col-md-12">
+               <div class="card">
+                  <div class="card-header">
+                     <p class="pull-right schedule-map">
+                        <span> <i class=" mdi mdi-circle text-danger"></i> {{sch_translate('missed')}} </span>
+                        <span> <i class=" mdi mdi-circle text-success"></i> {{sch_translate('practical')}}</span>
+                        <span> <i class=" mdi mdi-circle text-primary"></i> {{sch_translate('theory')}}</span>
+                        <span> <i class=" mdi mdi-circle text-muted"></i> {{sch_translate('complete')}} </span>
+                     </p>
+                  </div>
+                  <div class="card-body p-0">
+                     <div id='calendar'>
+                        <div class="loader-demo-box">
+                           <div class="circle-loader"></div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- footer -->
+      @include("includes/footer")
+      <!-- Google calendar -->
+      <div class="modal right fade" id="googlecalendar" role="dialog">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                  <h4 class="modal-title" id="myModalLabel2">{{sch_translate('google_calendar')}}</h4>
+               </div>
+               <div class="modal-body">
+                  @if(!empty($user->google_access_token)) 
+                    <p>{{sch_translate('your_google_calendar_account_is_connected_click_the_button_below_if_you_want_to_disconnect')}}</p>
+                    <div class="text-center">
+                        <button class="btn btn-danger btn-icon send-to-server-click" url="{{ url('Profile@disconnectgoogle') }}" data="userid:{{ $user->id }}|csrf-token:{{csrf_token()}}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('your_goole_calendar_will_be_disconnected')}}" warning-button="{{sch_translate('proceed')}}" data-cancel-button="{{sch_translate('cancel')}}"><i class="mdi mdi-calendar-text"></i> {{sch_translate('disconnect_google_calendar')}} </button>
+                    </div>
+                  @elseif($user->role == "student" || $user->role == "instructor")
+                    <p>{{sch_translate('connect_with_google_and_all_your_classes_sheduled_from_now_on_will_be_synced_with_your_google_calendar')}}</p>
+                    <div class="text-center">
+                        <a href="{{ $googleCalendarUrl }}" class="btn btn-primary btn-icon"><i class="mdi mdi-calendar-text"></i> {{sch_translate('connect_google_calendar')}} </a>
+                    </div>
+                  @endif
+               </div>
+            </div>
+            <!-- modal-content -->
+         </div>
+         <!-- modal-dialog -->
+      </div>
+      <!-- Google calendar -->
+      @if( $user->role != 'student' )
+      <!-- Add class -->
+      <div class="modal right fade" id="scheduleclass" role="dialog">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                  <h4 class="modal-title" id="myModalLabel2">{{sch_translate('schedule_class')}}</h4>
+               </div>
+               <div class="modal-body">
+                  <form class="simcy-form translateValidation" data-parsley-validate="" action="{{ url('Schedule@create') }}" method="POST" loader="true">
+                     <div class="form-group">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label>{{sch_translate('class_starts')}}</label>
+                              <input type="text" class="form-control" placeholder="{{sch_translate('class_starts')}}" name="start" data-date-format="dd MM yyyy - HH:ii p" required>
+                              <input type="hidden" name="csrf-token" value="{{ csrf_token() }}">
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label>{{sch_translate('class_ends')}}</label>
+                              <input type="text" class="form-control" placeholder="{{sch_translate('class_ends')}}" name="end" data-date-format="dd MM yyyy - HH:ii p" required>                                    
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label>{{sch_translate('student')}}</label>
+                              <select class="form-control select2" name="student" required="">
+                                 @if(!empty($students))
+                                    @foreach($students as $student)
+                                        <option value="{{$student->id}}">{{$student->fname}} {{$student->lname}}</option>
+                                    @endforeach
+                                 @endif
+                              </select>
+                              <div id="student-error"></div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label>{{sch_translate('course')}}</label>
+                              <div class="courseDiv">
+                                 <select class="form-control select2" name="course" requiredSelect2>
+                                    <option value="0">{{sch_translate('select_courses')}}</option>
+                                    @if(!empty($courses))
+                                        @foreach($courses as $course)
+                                            <option value="{{$course->id}}">{{$course->name}}</option>
+                                        @endforeach
+                                    @endif
+                                 </select>
+                              </div>
+                              <!-- <div id="course-error"></div> -->
+                              <ul class="parsley-errors-list filled courseUl d-none">
+                                 <li class="parsley-required">
+                                    @if(sch_translate('translate') == 'de')
+                                       Dies ist ein Pflichtfeld.
+                                    @else
+                                        This value is required.
+                                    @endif
+                                 </li>
+                              </ul>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label>{{sch_translate('instructor')}}</label>
+                              <div class="instructorDiv">
+                                 <select class="form-control select2" name="instructor" requiredSelect2>
+                                    <option value="0">{{sch_translate('select_instructor')}}</option>
+                                    @if(!empty($instructors))
+                                        @foreach($instructors as $instructor)
+                                            <option value="{{$instructor->id}}" id="{{$instructor->course}}">{{$instructor->fname}} {{$instructor->lname}}</option>
+                                        @endforeach
+                                    @endif
+                                 </select>
+                              </div>
+                              <!-- <div id="instructor-error"></div> -->
+                              <ul class="parsley-errors-list filled instructorUl d-none">
+                                 <li class="parsley-required">
+                                    @if(sch_translate('translate') == 'de')
+                                       Dies ist ein Pflichtfeld.
+                                    @else
+                                        This value is required.
+                                    @endif
+                                 </li>
+                              </ul>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label>{{sch_translate('class')}}</label>
+                              <select class="form-control select2" name="class_type" required="">
+                                 <option value="Theory">{{sch_translate('thoery_class')}}</option>
+                                 <option value="Practical">{{sch_translate('practical')}} </option>
+                              </select>
+                              <div id="class-error"></div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group" id="car_field" style="display: none;">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label>{{sch_translate('car')}}</label>
+                              <div class="carDiv">
+                                 <select class="form-control select2" name="car" id="addMyCar">
+                                    <option value="0">{{sch_translate('select_car')}}</option>
+                                    @if(!empty($fleets))
+                                        @foreach($fleets as $fleet)
+                                            <option value="{{$fleet->id}}">{{$fleet->make}} {{$fleet->model}} ( {{$fleet->carplate}} ) </option>
+                                        @endforeach
+                                    @endif
+                                 </select>
+                              </div>
+                              <ul class="parsley-errors-list filled carUl d-none">
+                                 <li class="parsley-required">
+                                    @if(sch_translate('translate') == 'de')
+                                       Dies ist ein Pflichtfeld.
+                                    @else
+                                        This value is required.
+                                    @endif
+                                 </li>
+                              </ul>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label>{{sch_translate('status')}}</label>
+                              <select class="form-control select2" name="status" required="">
+                                 <option value="New">{{sch_translate('new_booking')}}</option>
+                                 <option value="Complete">{{sch_translate('complete')}}</option>
+                                 <option value="Missed">{{sch_translate('missed')}}</option>
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group mt-md-5">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <button class="btn btn-red btn-block" type="submit" id="saveClass">{{sch_translate('save_class')}}</button>
+                           </div>
+                        </div>
+                     </div>
+                  </form>
+               </div>
+            </div>
+            <!-- modal-content -->
+         </div>
+         <!-- modal-dialog -->
+      </div>
+      <!-- end Add class -->
+      <!-- scheduleupdate -->
+      <div class="modal right fade" id="scheduleupdate" role="dialog" tabindex="-1">
+         <div class="modal-dialog" role="document">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                  <h4 class="modal-title" id="myModalLabel2">{{sch_translate('scheduling')}}</h4>
+               </div>
+               <div class="scheduleupdate-holder"></div>
+            </div>
+            <!-- modal-content -->
+         </div>
+         <!-- modal-dialog -->
+      </div>
+      <!-- end scheduleupdate -->
+      @endif
+      <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+      <script src="{{ url('') }}assets/js/popper.min.js"></script>
+      <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+      <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+      <script src="{{ url('') }}assets/libs/datetimepicker/js/bootstrap-datetimepicker.js"></script>
+      <script src="{{ url('') }}assets/libs/fullcalendar/moment.min.js"></script>
+      <script src="{{ url('') }}assets/libs/fullcalendar/fullcalendar.min.js"></script>
+      <script src="{{ url('') }}assets/libs/jquery-ui/jquery-ui.min.js"></script>
+      <!-- <script src="{{ url('') }}assets/js/simcify.min.js"></script> -->
+      <script src="{{ url('') }}assets/js/simcify.js"></script>
+      @if(sch_translate('translate') == 'de')
+        <script src="{{ url('') }}assets/libs/datetimepicker/js/locales/bootstrap-datetimepicker.de.js" charset="UTF-8"></script>
+      @endif
+      <script src="{{ url('') }}assets/js/schedule.js"></script>
+      <script src="{{ url('') }}assets/js/app.js"></script>
+
+      @include("translate/validation")
+      
+      <script>
+         $(document).ready(function(){
+
+            $('.datetimepickerx').datetimepicker({ autoclose: true });
+
+             // Remove error message
+             function removeSelect2ErrorMessage(name) {
+                 $('.' + name + 'Div').removeClass('border border-danger');
+                 $('.' + name + 'Ul').addClass('d-none');
+                 $('.select2HasError').val(0);
+             }
+         
+             function addSelect2ErrorMessage(name) {
+                 $('.' + name + 'Div').addClass('border border-danger');
+                 $('.' + name + 'Ul').removeClass('d-none');
+                 $('.select2HasError').val(1);
+             }
+         
+             // Select2 validation course
+             $(document).on('change', 'select[name=course]', function() {
+                 let course = $(this).val();
+                 if (course != '' && course != null)
+                     removeSelect2ErrorMessage('course');
+                 else
+                     addSelect2ErrorMessage('course');
+             });
+         
+             $(document).on('click', '#saveClass', function() {
+         
+                 let courseAttr = $('select[name=course]').attr('requiredSelect2');
+                 let course = $('select[name=course]').val();
+                 // Check if the select2 has required attribute
+                 if (typeof courseAttr !== typeof undefined && courseAttr !== false) {
+         
+                     if (course == '' || course == null)
+                         addSelect2ErrorMessage('course');
+                     else
+                         removeSelect2ErrorMessage('course');
+                 }
+         
+                 let instructorAttr = $('select[name=instructor]').attr('requiredSelect2');
+                 let instructor = $('select[name=instructor]').val();
+                 // Check if the select2 has required attribute
+                 if (typeof instructorAttr !== typeof undefined && instructorAttr !== false) {
+         
+                     if (instructor == '' || instructor == null)
+                         addSelect2ErrorMessage('instructor');
+                     else
+                         removeSelect2ErrorMessage('instructor');
+                 }
+         
+                 let carAttr = $('select[name=car]').attr('requiredSelect2');
+                 let car = $('select[name=car]').val();
+                 // Check if the select2 has required attribute
+                 if (typeof carAttr !== typeof undefined && carAttr !== false) {
+         
+                     if (car == '' || car == null)
+                         addSelect2ErrorMessage('car');
+                     else
+                         removeSelect2ErrorMessage('car');
+                 }
+             });
+             // Onchange instructor
+             $(document).on('change', 'select[name=instructor]', function() {
+                 let instructor = $(this).val();
+                 if (instructor != '' && instructor != null)
+                     removeSelect2ErrorMessage('instructor');
+                 else
+                     addSelect2ErrorMessage('instructor');
+             });
+         
+             // Onchange car
+             $(document).on('change', 'select[name=car]', function() {
+                 let car = $(this).val();
+                 if (car != '' && car != null)
+                     removeSelect2ErrorMessage('car');
+                 else
+                     addSelect2ErrorMessage('car');
+             });
+         })
+      </script>
+      <script type="text/javascript">
+         @if( $user->role == "student" || $user->role == "instructor" )
+         var filter = '{{ $user->role }}';
+         var filterid = '{{ $user->id }}';
+         @else
+         var filter = '{{ $filter }}';
+         var filterid = '{{ $filterid }}';
+         @endif
+         var schedulesUrl = '{{ url("Schedule@fetch") }}';
+         var schedulesUpdateView = '{{ url("Schedule@updateview") }}';
+         
+         
+         // $('select[name=course]').parsley().options.errorsContainer = function(instance) { return $('#course-error') }
+         $('select[name=student]').parsley().options.errorsContainer = function(instance) { return $('#student-error') }
+         // $('select[name=instructor]').parsley().options.errorsContainer = function(instance) { return $('#instructor-error') }
+         $('select[name=class_type]').parsley().options.errorsContainer = function(instance) { return $('#class-error') }
+         
+         $(function(){
+         
+             //translate all days in full calender
+             var toBeChecked = [".fc-button", ".fc-today-button", ".fc-month-button", ".fc-agendaWeek-button", ".fc-agendaDay-button"];
+             for (var i = 0; i < toBeChecked.length; i++) {
+                 $(document).on("click", toBeChecked[i], function(){
+                     resetFullCalender();
+                 })
+             }
+             resetFullCalender();
+         })
+         
+         function resetFullCalender(){
+             var ttoday = sch_TranslateJsWord("today");
+             $(".fc-today-button").text(ttoday);  
+             $(".fc-month-button").text(sch_TranslateJsWord("month"));  
+             $(".fc-agendaWeek-button").text(sch_TranslateJsWord("Week"));  
+             $(".fc-agendaDay-button").text(sch_TranslateJsWord("Day"));
+         
+             //translate all days in full calender
+             $(".fc-day-header.fc-mon > span").text(sch_TranslateJsWord("mon"));  
+             $(".fc-day-header.fc-tue > span").text(sch_TranslateJsWord("tue"));  
+             $(".fc-day-header.fc-wed > span").text(sch_TranslateJsWord("wed"));  
+             $(".fc-day-header.fc-thu > span").text(sch_TranslateJsWord("thu"));  
+             $(".fc-day-header.fc-fri > span").text(sch_TranslateJsWord("fri"));  
+             $(".fc-day-header.fc-sat > span").text(sch_TranslateJsWord("sat"));  
+             $(".fc-day-header.fc-sun > span").text(sch_TranslateJsWord("sun"));
+             $("#calendar > div.fc-view-container > div > table > tbody > tr > td > div.fc-day-grid.fc-unselectable > div > div.fc-bg > table > tbody > tr > td.fc-axis.fc-widget-content > span").text(sch_TranslateJsWord("all_day"))
+         
+             var toBechanged = [".fc-left > h2"];
+         
+             for (var i = 0; i < toBechanged.length; i++) {
+                 translateWordbeforeSpace(toBechanged[i]);
+             }
+         }
+         
+         //translate word b4 space in selector
+         function translateWordbeforeSpace(selector){
+             $(document).find(selector).each(function(){
+                 var word = $(this).text();
+                 //get the first word before the space
+                 var word_ = (word.split(" "))[0];  
+                 var c_day = sch_TranslateJsWord(word_.toLowerCase());
+                 //replace occurence
+                 var word__ = word.replace(word_, c_day);
+                 $(this).text(word__);               
+             })
+         }
+         
+         $('select[name=class_type]').on('change', function() {
+             var class_ = $(this).val();
+             if (class_ == "Practical") {
+                 $('#car_field').show();
+                 $('input[name=car]').attr('required','true');
+                 // Set required
+                 $('#addMyCar').attr('requiredSelect2','requiredSelect2');
+             } else {
+                 $('#car_field').hide();
+                 $('input[name=car]').removeAttr('required');
+                 $('#addMyCar').removeAttr('requiredSelect2');
+             }
+         });
+      </script>
+      @include("schleier/bottomscript")
+   </body>
+</html>

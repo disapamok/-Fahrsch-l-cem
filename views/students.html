@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+   <?php 
+      $fuehrerschein_classes_array = ["A", "A1", "A2", "AM", "B", "B96", 
+      "BE", "C", "C1", "C1E", "CE", "D", "DE", "D1", "D1E", "L", "T"];
+      ?>
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="description" content="{{sch_translate('app_desc')}}">
+      <meta name="author" content="{{sch_translate('app_author')}}">
+      @include("schleier/topscript")
+      <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+      <title>{{sch_translate('students')}} | {{sch_translate('app_name_long')}}</title>
+      <!-- Material design icons -->
+      <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+      <!-- Bootstrap CSS -->
+      <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+      <!-- Simcify CSS -->
+      <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+      <!-- Landa CSS -->
+      <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+
+   </head>
+   <body>
+      <!-- sidebar -->
+      @include("includes/sidebar")
+      <!-- header -->
+      @include("includes/header")
+      <!-- Used for select2 indicator validation -->
+      <input type="hidden" name="select2HasError" class="select2HasError" value="0" />
+      <!-- main content -->
+      <div class="main-content">
+         <div class="page-header">
+            <button type="button" class="btn btn-red pull-right ml-5" data-toggle="modal" data-target="#create">{{sch_translate('add_student')}} </button>
+            <button type="button" class="btn btn-grey pull-right toggle-search d-block d-sm-block d-md-none">{{sch_translate('filter_search')}}</button>
+            <h3>{{sch_translate('students')}}</h3>
+         </div>
+         <!-- page content -->
+         <div class="row">
+            <!-- search & Filter -->
+            <div class="col-md-12 search-filter d-none d-md-block">
+               <div class="card">
+                  <form class="row"  id="search_form" method="POST">
+                     <input type="hidden" name="status" value="All">
+                     <div class="col-md-3">
+                        <div class="form-group">
+                           <label>{{sch_translate('search_name_email')}}</label>
+                           <input type="text" class="form-control" placeholder="{{sch_translate('search_name_email')}}" name="search">
+                        </div>
+                     </div>
+                     <div class="col-md-1">
+                        <div class="form-group">
+                           <label>{{sch_translate('Klasse')}}</label>
+                           <select class="form-control" name="fuehrerschein_class">
+                              <option value="All">{{sch_translate('All')}}</option>
+                              @foreach($fuehrerschein_classes_array as $fuehrerschein_class_)
+                              <option value="{{$fuehrerschein_class_}}">{{$fuehrerschein_class_}}</option>
+                              @endforeach
+                           </select>
+                        </div>
+                     </div>
+                     <div class="col-md-2">
+                        <div class="form-group">
+                           <label>{{sch_translate('Zahlstatus')}}</label>
+                           <select class="form-control" name="istatus">
+                              <option value="All">{{sch_translate('all')}}</option>
+                              <option value="Paid">{{sch_translate('paid')}}</option>
+                              <option value="Partially">{{sch_translate('partially')}}</option>
+                              <option value="Unpaid">{{sch_translate('unpaid')}}</option>
+                           </select>
+                        </div>
+                     </div>
+                     <div class="col-md-2">
+                        <div class="form-group">
+                           <label>{{sch_translate('Standort')}}</label>
+                           <select class="form-control" name="location">
+                              <option value="All">{{sch_translate('all')}}</option>
+                              @foreach($branches as $branch)
+                              <option value="{{$branch->id}}">{{$branch->name}}</option>
+                              @endforeach
+                           </select>
+                        </div>
+                     </div>
+                     <div class="col-md-2">
+                        <button class="btn btn-grey btn-block" type="button" id="btn-search" ><i class="fas fa-search mr-2"></i> {{sch_translate('search')}}</button>
+                     </div>
+                     <div class="col-md-2">
+                        <button class="btn btn-grey btn-block" type="button" id="btn-reset" ><i class="fas fa-undo mr-2"></i>{{sch_translate('Reset')}}</button>
+                     </div>
+                  </form>
+               </div>
+               <div class="mb-5 w-100">
+                  <label class="switch float-right">
+                     <input type="checkbox" name="switch_status" id="switch_status" value="Active" checked>
+                     <span class="slider round"></span>
+                  </label>
+                  <p class="float-right mr-3"><span id="total_status">{{ count($students) }}</span> <span id="status_word">Active</span> {{sch_translate('students')}}</p>
+               </div>
+            </div>
+               
+            <div class="container-fluid row mt-2" id="default">
+               @if(!empty($students))
+               @foreach($students as $student)
+               <!-- user grid -->
+               <div class="col-sm-6 col-md-4 col-lg-3">
+                  <div class="user-grid card p-0 shadow-sm">
+                     <div class="p-0 bg-grey p-3">
+                        <div class="user-grid-pic pt-5">
+                           <!-- @if( !empty($student->avatar) )
+                              <img src="{{ url('') }}uploads/avatar/{{ $student->avatar }}" class="student-image mb-2">
+                              @else
+                              <img src="{{ url('') }}assets/images/avatar.png" class="student-image mb-2">
+                              @endif -->
+                        </div>
+                        <div class="user-grid-info pb-2">
+                           <h5 class=" text-gray text-uppercase font-14">{{ $student['fname'] }} {{ $student['lname'] }}</h5>
+                        </div>
+                     </div>
+                     <div class="p-3 px-4">
+                        <div class="row user-grid-buttons">
+                           <div class="col-12 px-0 ml-1 mr-2 mb-2">
+                              <span class="bg-dark p-2 text-white float-left w-25 rounded-left"><img src="{{url('')}}assets/images/icons/telephone.png"></span>
+                              <div class="pr-2 d-inline w-75 float-right">
+                                 <div class="text-center p-2 bg-grey rounded-right letter_spacing_phone">{{ $student['phone'] }}</div>
+                              </div>
+                           </div>
+                           <div class="col-md-6 p-5">
+                              <a class="btn btn-red btn-block" href="{{ url('Profile@get',['userid'=>$student['user']]) }}">
+                              <i class="fa fa-user mr-2"></i>{{sch_translate('profile')}}</a>
+                           </div>
+                           <div class="col-md-6 p-5">
+                              <button type="button" class="btn btn-default btn-block text-black" style="cursor: default;"><i class="fa fa-car mr-2 mt-1" aria-hidden="true" style="font-size: 16px;"></i>{{$student['licensetype']}}</button>
+                              <!-- <a class="btn btn-default btn-block" href="{{url('Schedule@get')}}?filter=student&filterid={{ $student['user'] }}"><i class="fa fa-car mr-2 mt-1" aria-hidden="true" style="font-size: 16px;"></i>{{$student['licensetype']}}</a> -->
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               @endforeach
+               @else 
+               <div class="col-md-12">
+                  <div class="empty">
+                     <i class="mdi mdi-alert-circle-outline"></i>
+                     <h3>{{sch_translate('empty_here')}}</h3>
+                  </div>
+               </div>
+               @endif
+            </div>
+            <div  class="container-fluid row" id="search_result"></div>
+         </div>
+      </div>
+      <!-- footer -->
+      @include("includes/footer")
+      @include("extras/addstudent")
+      <!-- <script src="{{ url('') }}assets/js/parsely_de.js"></script> -->
+      <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+      <script src="{{ url('') }}assets/js/popper.min.js"></script>
+      <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+      <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+      <!-- <script src="{{ url('') }}assets/js/simcify.min.js"></script> -->
+      <script src="{{ url('') }}assets/js/simcify.js"></script>
+      <script src="{{ url('') }}assets/js/app.js"></script>
+      <script src="{{ url('') }}assets/js/parsley_de.js"></script>
+      <script src="{{ url('') }}assets/js/parsley.min.js"></script>
+
+      <script src="{{ url('') }}assets/libs/datepicker/js/bootstrap-datepicker.js"></script>
+      <script>
+         $('.datepicker').datepicker({ language: "{{ sch_translate('translate') }}"});
+      </script>
+      @include("schleier/bottomscript")
+   </body>
+</html>
+<!-- VALIDATION MESSAGE ERROR TRANSLATION -->
+@if(sch_translate('translate') == 'de')
+<script>$('#add_student').parsley().options.requiredMessage = "Dies ist ein Pflichtfeld"</script>
+@else
+<script>$('#add_student').parsley().options.requiredMessage = "This value is required"</script>
+@endif
+<script>
+   // $.Parsley.options.requiredMessage = "truyryrtyr"
+   
+  $(document).keypress(
+    function(event){
+      if (event.which == '13') {
+        event.preventDefault();
+        $('#btn-search').click();
+      }
+  });
+   
+  $(document).ready(function () {
+    $(".datepickerx").datepicker({ autoclose: true });
+  });
+
+   // Switch button
+  $(document).on('click', '#switch_status', function(){
+     
+   let switch_status = $(this).val();
+
+   if(switch_status == 'Active'){
+      $(this).val('Inactive');
+      switch_status = 'Inactive';
+   }
+   else{
+      $(this).val('Active');
+      switch_status = 'Active'
+   }
+
+   // Trigger button click
+   $('#btn-search').click();
+   $('#status_word').text(switch_status);
+  });
+
+//   Student status
+  $(document).on('click', '#student_status', function(){
+     
+     let student_status = $(this).val();
+     
+     if(student_status == 'Active'){
+        $(this).val('Inactive');
+        student_status = 'Inactive';
+     }
+     else{
+        $(this).val('Active');
+        student_status = 'Active'
+     }
+     
+    });
+   
+  // Remove error message
+  function removeSelect2ErrorMessage(){
+    $('.newcourseDiv').removeClass('border border-danger');
+    $('.newcourseUl').addClass('d-none');
+    $('.select2HasError').val(0);
+  }
+   
+  function addSelect2ErrorMessage(){
+    $('.newcourseDiv').addClass('border border-danger');
+    $('.newcourseUl').removeClass('d-none');
+    $('.select2HasError').val(1);
+  }
+   
+  // Select2 validation
+  $(document).on('change', 'select[name=newcourse]', function(){
+    let newcourse = $(this).val();
+    console.log(newcourse)
+    if(newcourse != '')
+      removeSelect2ErrorMessage();
+    else
+      addSelect2ErrorMessage();
+  });
+   
+  $(document).on('click', '#createStudent', function(){
+
+    let newcourseAttr = $('.select2').attr('requiredSelect2');
+    let newcourse =  $('select[name=newcourse]').val()
+    // Check if the select2 has required attribute
+    if (typeof newcourseAttr !== typeof undefined && newcourseAttr !== false){
+
+      if(newcourse === '' || newcourse == null)
+        addSelect2ErrorMessage();
+      else
+        removeSelect2ErrorMessage();
+    }
+  });
+   
+     
+  $('#btn-search').on('click',function(){
+   let switch_status = $('#switch_status').val();
+
+    var formData = new FormData(document.getElementById('search_form'));
+    formData.append('csrf-token', Cookies.get('CSRF-TOKEN'));
+    formData.append('status', switch_status);
+    var url = '{{ url("Student@searchStudent") }}';
+    // var posting = $.post(schedulesUpdateView, { "scheduleid": scheduleid,"csrf-token": Cookies.get("CSRF-TOKEN") });
+    // posting.done(function (response) { console.log(response); });
+
+      $.ajax({
+         url : url,             
+         type : "POST",
+         cache: false,
+         contentType: false,
+         processData: false,
+         data: formData,
+         error : function(error) {
+            $('#loading-modal').hide();
+            var error_message = '<ul>';
+               $.each(error.responseJSON, function(field,message) {
+               error_message += '<li class="veltin-error">'+message+'</li>';
+               })
+               error_message += '</ul>';
+               $('#alert-message-modal').modal('show');
+            $('#alert-message-modal #alert-message').html(error_message);
+         },
+         success : function(data) {
+            console.log(data)
+            if(data.length > 0){
+                     var html = '';
+                     $('#total_status').text(data.length);
+                     $.each(data,function(i,val){
+                        if(val.licensetype == null){var license = ''}else{var license = val.licensetype};
+                        
+                        html+='<div class="col-md-4 col-lg-3"><div class="user-grid card p-0 shadow-sm"><div class="p-0 bg-grey p-3"><div class="user-grid-pic pt-5"></div>';
+                        html+='<div class="user-grid-info pb-2">';
+                        html+='<h5 class=" text-gray text-uppercase font-14">'+val.fullname+'</h5></div></div>';
+                        html+='<div class="p-3 px-4">';                       
+                        html+='<div class="row user-grid-buttons">';
+                        html+='<div class="col-12 px-0 ml-1 mr-2 mb-2">';
+                        html+='<span class="bg-dark p-2 text-white float-left w-25 rounded-left"><img src="{{url('')}}assets/images/icons/telephone.png"></span>';
+                        html+='<div class="pr-2 d-inline w-75 float-right">';
+                        html+='<div class="text-center p-2 bg-grey rounded-right letter_spacing_phone">'+val.phone+'</div>';
+                        html+='</div></div>';
+                        html+='<div class="col-md-6 p-5">';
+                        html+='<a class="btn btn-red btn-block" href="{{ url("Profile@get",["userid"=>"'+val.userid+'"])}}">';
+                        html+='<i class="fa fa-user mr-2"></i>{{sch_translate("profile")}}</a>';
+                        html+='</div>';
+                        html+='<div class="col-md-6 p-5">';
+                        //  html+='<a class="btn btn-default btn-block" href="{{url("Schedule@get")}}?filter=student&filterid='+val.user+'"><i class="fa fa-car mr-2 mt-1" aria-hidden="true" style="font-size: 16px;"></i>'+license+'</a>';
+                        html+='<button type="button" class="btn btn-default text-black btn-block" style="cursor: default"><i class="fa fa-car mr-2 mt-1" aria-hidden="true" style="font-size: 16px;"></i>'+license+'</button>';
+                        html+='</div></div></div></div></div>';
+                     });
+                     $('#default').hide();
+                     $('#search_result').html(html);
+            }else{
+               $('#total_status').text(0);
+               var html  = '<div class="col-md-12"><div class="empty"><i class="mdi mdi-alert-circle-outline"></i><h3>Keine Einträge verfügbar</h3></div></div>';
+               $('#default').hide();
+               $('#search_result').html(html);
+            }
+         }
+      });
+
+  });
+
+  $('#btn-reset').on('click', function() {
+      $('input[name=search]').val("");
+      $('select[name=fuehrerschein_class]').val("All");
+      $('select[name=istatus]').val("All");
+      $('select[name=location]').val("All");
+
+      // Trigger button click to display all results
+      // $('#btn-search').click();
+  });
+</script>

@@ -1,0 +1,22 @@
+
+                    <div class="modal-body">
+                        <form class="simcy-form" data-parsley-validate="" method="POST" action="{{ url('Profile@updatenote') }}">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12"> 
+                                        <label>{{sch_translate('write_note')}}</label>
+                                        <textarea class="form-control" placeholder="{{sch_translate('write_note')}}" rows="6" name="note" required="">{{ $note->note }}</textarea>
+                                        <input type="hidden" value="{{ csrf_token() }}" name="csrf-token">
+                                        <input type="hidden" value="{{ $note->id }}" name="noteid">
+                                    </div>
+                                </div>
+                            </div>                        
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button class="btn btn-primary btn-block">{{sch_translate('save_changes')}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>

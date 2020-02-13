@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('courses')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            @if ( $user->role != "student" )
+            <button type="button" class="btn btn-red btn-icon pull-right ml-5" data-toggle="modal" data-target="#create"><i class=" mdi mdi-plus-circle-outline"></i> {{sch_translate('add_course')}}</button>
+            @endif
+            <h3>{{sch_translate('courses')}}</h3>
+            <p>{{sch_translate('manage_courses_in_school')}}</p>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+            @if(!empty($courses))
+            @foreach($courses as $course)
+
+                <!-- branch -->
+                <div class="col-md-3">
+                    <div class="card p-0">
+                        <div class="school">
+                            <div class="school-heading bg-grey p-4 border-red mb-0 text-center">
+                                <div class="school-details pl-0">
+                                    <a role="menuitem" href="{{ url('Course@preview',['courseid'=>$course->id]) }}" class="pt-2">
+                                      <img src="{{url('')}}assets/images/icons/training.png" class="mb-1">
+                                      <b><h6>{{$course->name}}</h6></b>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="school-info border-bottom-0 mb-0 pt-2 px-4 pb-1">
+                                <p>
+                                    <span><img src="{{url('')}}assets/images/icons/relationship-sm.png"></span>
+                                     {{ $course->students }} {{sch_translate('active_students')}}
+                                </p>
+                                <p>
+                                    <span><img src="{{url('')}}assets/images/icons/teacher-sm.png"></span>
+                                    {{ count($course->instructors) .' '.sch_translate('instructors')}}
+                                </p>
+                                <p>
+                                    <span><i class="far fa-clock"></i></span>
+                                     {{$course->duration}} {{$course->period}}
+                                </p>
+                                <p>
+                                    <span><img src="{{url('')}}assets/images/icons/placeholder-sm.png"></span>
+                                     {{$course->branchname}}
+                                </p>
+                            </div>
+                            <div class="course-info-more px-3 pl-4 mb-2">
+                                <div class="dropdown pull-right">
+                                        <span class="dropdown-toggle" data-toggle="dropdown">
+                                            <i class="mdi mdi-dots-horizontal"></i> </span>
+                                        <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                          <li role="presentation"><a role="menuitem" href="{{ url('Course@preview',['courseid'=>$course->id]) }}"> <i class="mdi mdi-eye"></i> {{sch_translate('view_more')}}</a></li>
+                                          @if ( $user->role != "student" )
+                                          <li role="presentation"><a role="menuitem" href="{{url('Schedule@get')}}?filter=course&filterid={{ $course->id }}"> <i class="mdi mdi-calendar-text"></i> {{sch_translate('kalender')}}</a></li>
+                                          <li role="presentation"><a role="menuitem" class="fetch-display-click" data="courseid:{{ $course->id }}|csrf-token:{{ csrf_token() }}" url="<?=url('Course@updateview');?>" holder=".update-holder" modal="#update" href=""> <i class="mdi mdi-pencil"></i> {{sch_translate('edit')}}</a></li>
+                                          <li role="presentation"><a class="send-to-server-click" data="courseid:{{ $course->id }}|csrf-token:{{ csrf_token() }}" url="{{ url('Course@delete') }}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('course_warning_delete')}}" warning-button="{{sch_translate('yes_delete')}}" loader="true" data-cancel-button="{{sch_translate('cancel')}}"><i class="mdi mdi-delete"></i>{{sch_translate('delete')}}</a></li>
+                                          @endif
+                                        </ul>
+                                </div>
+                                <div class="course-instructors">
+                                    @if (!empty($course->instructors))
+                                    @foreach ($course->instructors as $instructor)
+                                    @if( !empty($instructor->avatar) )
+                                    <img src="{{ url('') }}uploads/avatar/{{ $instructor->avatar }}" data-toggle="tooltip" data-placement="top" title="Instructor {{ $instructor->fname }} {{ $instructor->lname }}" class="img-circle">
+                                    @else
+                                    <img src="{{ url('') }}assets/images/avatar.png" data-toggle="tooltip" data-placement="top" title="{{sch_translate('instructor')}} {{ $instructor->fname }} {{ $instructor->lname }}" class="user-avatar">
+                                    @endif
+                                    @endforeach
+                                    @endif
+                                    <div class="more-instructors" data-toggle="tooltip" data-placement="top" title="
+                                    {{ count($course->instructors) .' '.sch_translate('instructors')}}">{{ count($course->instructors) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <!-- course -->
+            @endforeach
+            @else
+                <div class="col-md-12">
+                    <div class="empty">
+                        <i class="mdi mdi-alert-circle-outline"></i>
+                        <h3>{{sch_translate('empty_here')}}</h3>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+
+
+  <!-- modals -->
+  <div class="modal right fade" id="create" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                  <h4 class="modal-title" id="myModalLabel2">{{sch_translate('add_course')}}</h4>
+              </div>
+
+              <div class="modal-body">
+                  <form class="simcy-form translateValidation" id="create-course" action="{{ url('Course@create') }}"  data-parsley-validate="" method="POST" loader="true">
+                      <p>{{sch_translate('create_new_course')}}</p>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                            <label>{{sch_translate('cover_image')}}</label>
+                            <input type="file" name="image" class="croppie" placeholder="{{sch_translate('course_cover_image')}}" crop-width="400" crop-height="190" accept="image/*" required="">
+                            <input type="hidden" name="csrf-token" value="{{csrf_token()}}">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('course_name')}}</label>
+                          <input type="text" name="name" class="form-control" placeholder="{{sch_translate('course_name')}}" required="">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('price')}} ({{ currency() }})</label>
+                          <input type="text" name="price" class="form-control" id="price" placeholder="0" required="" autocomplete="off">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-6">
+                            <label>{{sch_translate('duration')}}</label>
+                            <input type="text" name="duration" id="duration" class="form-control" placeholder="0" required="" autocomplete="off">
+                            <p class="duration-error" style="color:#ff1a1a;display: none;">Must be greater than 0</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label>{{sch_translate('period')}}</label>
+                            <select name="period" class="form-control" required="">
+                                <option value="Days">{{sch_translate('days')}}</option>
+                                <option value="Weeks">{{sch_translate('weeks')}}</option>
+                                <option value="Months">{{sch_translate('months')}}</option>
+                            </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('no_of_practical_classes')}}</label>
+                          <input type="text" name="practical_classes" id="practical_classes" class="form-control" placeholder="0" value="" autocomplete="off">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('no_of_thoery_classes')}}</label>
+                          <input type="text" name="theory_classes" id="theory_classes" class="form-control" placeholder="0" value="" autocomplete="off">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label for="email">{{sch_translate('instructors')}}</label>
+                          <select class="form-control select2" name="instructors[]" multiple="">
+                              @foreach($instructors as $instructor)
+                              <option value="{{$instructor->id}}">{{$instructor->fname}} {{$instructor->lname}}</option>
+                              @endforeach
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <label for="email">{{sch_translate('status')}}</label>
+                          <select class="form-control" name="status">
+                              <option value="Available">{{sch_translate('available')}}</option>
+                              <option value="Unavailable">{{sch_translate('unavailable')}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <button class="btn btn-red btn-block" type="submit">{{sch_translate('create_course')}}</button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+              </div>
+
+          </div><!-- modal-content -->
+      </div><!-- modal-dialog -->
+  </div><!-- modal -->
+
+    <!-- update -->
+    <div class="modal right fade" id="update" role="dialog" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title" id="myModalLabel2">{{sch_translate('edit_course')}}</h4>
+                </div>
+                <div class="update-holder"></div>
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div>
+    <!-- end update -->
+
+    <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+    <script src="{{ url('') }}assets/js/popper.min.js"></script>
+    <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="{{ url('') }}assets/js/simcify.js"></script> <!-- old .min -->
+    <script src="{{ url('') }}assets/js/app.js"></script>
+    @include("translate/validation")
+    @include("schleier/bottomscript")
+
+    <script>
+        $(document).ready(function() {
+            // $('input[name=price]').on('change, keyup', function() {
+            //     var currentInput = $(this).val();
+            //     var fixedInput = currentInput.replace(/[A-Za-z-.='"/><!?|{}@#$%^&*()]/g, '');
+            //     $(this).val(fixedInput);
+            // });
+
+            function setInputFilter(textbox, inputFilter) {
+              ["input", "keydown", "keypress", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+                textbox.addEventListener(event, function() {
+                  if (inputFilter(this.value)) {
+                    this.oldValue = this.value;
+                    this.oldSelectionStart = this.selectionStart;
+                    this.oldSelectionEnd = this.selectionEnd;
+                  } else if (this.hasOwnProperty("oldValue")) {
+                    this.value = this.oldValue;
+                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                  }
+                });
+              });
+            }
+
+            setInputFilter(document.getElementById("duration"), function(value) {
+                return /^-?\d*[]?\d*$/.test(value); 
+            });
+            setInputFilter(document.getElementById("price"), function(value) {
+                return /^\d*[.,]?\d*$/.test(value); 
+            });
+            setInputFilter(document.getElementById("practical_classes"), function(value) {
+                return /^\d*[.,]?\d*$/.test(value); 
+            });
+            setInputFilter(document.getElementById("theory_classes"), function(value) {
+                return /^\d*[.,]?\d*$/.test(value); 
+            });
+
+            $('input[name=duration]').on('change, keyup', function() {
+                $(this).css({'color': '#000','border':'none'});
+                $('.duration-error').css('display','none');
+            });
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<div class="modal-body">
+      <form class="simcy-form translateValidation" id="update-course" action="{{ url('Course@update') }}"  data-parsley-validate="" method="POST" loader="true">
+          <p>{{sch_translate('create_course')}}</p>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+                <label>{{sch_translate('course_cover_image')}}</label>
+                <input type="file" name="image" class="croppie" placeholder="{{sch_translate('course_cover_image')}}" crop-width="400" crop-height="190" accept="image/*" default="{{ url('') }}uploads/courses/{{ $course->image }}">
+
+                <input type="hidden" name="csrf-token" value="{{ csrf_token() }}">
+                <input type="hidden" name="courseid" value="{{ $course->id }}">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <label>{{sch_translate('course_name')}}</label>
+              <input type="text" name="name" class="form-control" value="{{ $course->name }}" placeholder="{{sch_translate('course_name')}}" required="">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <label>{{sch_translate('price')}} ({{ currency() }})</label>
+              <input type="number" name="price" id="price_update" class="form-control" value="{{ $course->price }}" placeholder="{{sch_translate('price')}}" required=""> 
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-6">
+                <label>{{sch_translate('duration')}}</label>
+                <input type="number" name="duration" id="duration_update" class="form-control" value="{{ $course->duration }}" placeholder="{{sch_translate('duration')}}" required="">
+                <p class="duration-error" style="color:#ff1a1a;display: none;">Must be greater than 0</p>
+            </div>
+
+            <div class="col-md-6">
+                <label>{{sch_translate('period')}}</label>
+                <select name="period" class="form-control" required="">
+                    <option value="Days" @if( !empty( $course->period == "Days" ) ) selected @endif>
+                    {{sch_translate('days')}}</option>
+                    <option value="Weeks" @if( !empty( $course->period == "Weeks" ) ) selected @endif>
+                    {{sch_translate('weeks')}}</option>
+                    <option value="Months" @if( !empty( $course->period == "Months" ) ) selected @endif >
+                    {{sch_translate('months')}}</option>
+                </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <label>{{sch_translate('no_of_practical_classes')}}</label>
+              <input type="text" name="practical_classes" id="practical_classes_update" value="{{ $course->practical_classes }}" min="0" class="form-control" placeholder="{{sch_translate('no_of_practical_classes')}}" required>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <label>{{sch_translate('no_of_thoery_classes')}}</label>
+              <input type="text" name="theory_classes" id="theory_classes_update" value="{{ $course->theory_classes }}" min="0" class="form-control" placeholder="{{sch_translate('no_of_thoery_classes')}}" required>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <label for="email">{{sch_translate('instructors')}}</label>
+              <select class="form-control select2-dynamic" name="instructors[]" multiple="">
+                  @foreach($instructors as $instructor)
+                  <option value="{{ $instructor->id }}" @if( in_array($instructor->id, $instructorsIds) ) selected @endif>
+                  {{$instructor->fname}} {{$instructor->lname}}</option>
+                  @endforeach
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <label for="email">{{sch_translate('status')}}</label>
+              <select class="form-control" name="status">
+                  <option value="Available" @if( !empty( $course->status == "Available" ) ) selected @endif >
+                  {{sch_translate('available')}}</option>
+                  <option value="Unavailable" @if( !empty( $course->status == "Unavailable" ) ) selected @endif >
+                  {{sch_translate('unavailable')}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <button class="btn btn-red btn-block" type="submit">{{sch_translate('save_changes')}}</button>
+            </div>
+          </div>
+        </div>
+      </form>
+  </div>
+  <script src="{{ url('') }}assets/js/simcify.js"></script>
+  @include("translate/validation")
+  <script type="text/javascript">
+    // croppify();
+    $(".select2-dynamic").select2();
+    // $('input[name=price]').on('change, keyup', function() {
+    //     var currentInput = $(this).val();
+    //     var fixedInput = currentInput.replace(/[A-Za-z-.='"/><!?|{}@#$%^&*()]/g, '');
+    //     $(this).val(fixedInput);
+    // });
+    $('input[name=duration]').on('change, keyup', function() {
+        $(this).css({'color': '#000','border':'none'});
+        $('.duration-error').css('display','none');
+    });
+    function setInputFilter(textbox, inputFilter) {
+      ["input", "keydown", "keypress", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+        textbox.addEventListener(event, function() {
+          if (inputFilter(this.value)) {
+            this.oldValue = this.value;
+            this.oldSelectionStart = this.selectionStart;
+            this.oldSelectionEnd = this.selectionEnd;
+          } else if (this.hasOwnProperty("oldValue")) {
+            this.value = this.oldValue;
+            this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+          }
+        });
+      });
+    }
+    setInputFilter(document.getElementById("duration_update"), function(value) {
+        return /^-?\d*[]?\d*$/.test(value); 
+    });
+    setInputFilter(document.getElementById("price_update"), function(value) {
+        return /^\d*[.,]?\d*$/.test(value) 
+    });
+    setInputFilter(document.getElementById("practical_classes_update"), function(value) {
+        return /^\d*[.,]?\d*$/.test(value) 
+    });
+    setInputFilter(document.getElementById("theory_classes_update"), function(value) {
+        return /^\d*[.,]?\d*$/.test(value) 
+    });
+  </script>

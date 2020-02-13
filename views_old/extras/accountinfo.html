@@ -1,0 +1,73 @@
+{{"";//<=important dont remove
+ $sch_is_schuler = $profile->role == "student"; 
+ //only students have rows in userinfo, so else create an empty object
+ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
+}}
+<table class="accountinfo-table">
+    @if($sch_is_schuler)
+    <tr>
+        <td class="profile-item-title">{{sch_translate('Karteikennung')}}</td>
+        <td class="profile-item-value">{{$user_info->cardnumber}}</td>
+    </tr>
+    <tr>
+        <td class="profile-item-title">{{sch_translate('fuehrerschein_class')}}</td>
+        <td class="profile-item-value">{{$user_info->licensetype}}</td>
+    </tr>
+    <tr>
+        <td class="profile-item-title">{{sch_translate('erteilungsart')}}</td>
+        <td class="profile-item-value">{{sch_translate($user_info->erteilungsart)}}</td>
+    </tr>
+    <tr>
+        <td class="profile-item-title">{{sch_translate('bf17')}}</td>
+        <td class="profile-item-value">{{sch_translate($user_info->bf17)}}</td>
+    </tr>
+    <tr>
+        <td class="profile-item-title">{{sch_translate('Anmeldedatum')}}</td>
+        <td class="profile-item-value">{{$user_info->register_date}}</td>
+    </tr>
+    <tr>
+        <td class="profile-item-title">{{sch_translate('anrede')}}</td>
+        <td class="profile-item-value">{{sch_translate($user_info->title)}}</td>
+    </tr>
+    @endif
+    <tr>
+        <td class="profile-item-title">{{sch_translate('email')}}</td>
+        <td class="profile-item-value">{{$profile->email;}}</td>
+    </tr>
+    <tr>
+      <td class="profile-item-title">{{sch_translate('gender')}}</td>
+      <td class="profile-item-value">{{sch_translate($profile->gender)}}</td>
+    </tr>
+    <tr>
+        <td class="profile-item-title">{{sch_translate('address')}}</td>
+        <td class="profile-item-value">{{$profile->address}}</td>
+    </tr>
+    <tr>
+        <td class="profile-item-title">{{sch_translate('date_of_birth')}}</td>
+        <td class="profile-item-value">
+          @if( $profile->date_of_birth != '0000-00-00' ) 
+          <span>{{ date('F j, Y', strtotime($profile->date_of_birth)) }}</span>
+          @else
+          <span class="text-muted">{{sch_translate('not_set')}}</span>
+          @endif
+      </td>
+  </tr>
+  @if($sch_is_schuler)
+  <tr>
+      <td class="profile-item-title">{{sch_translate('job')}}</td>
+      <td class="profile-item-value">{{$user_info->job}}</td>
+  </tr>
+  <tr>
+      <td class="profile-item-title">{{sch_translate('Staatsangehoerigkeit')}}</td>
+      <td class="profile-item-value">{{$user_info->nationality}}</td>
+  </tr>
+  <tr>
+      <td class="profile-item-title">{{sch_translate('Ausweis-Nr')}}</td>
+      <td class="profile-item-value">{{$user_info->id_number}}</td>
+  </tr>
+  <tr>
+      <td class="profile-item-title">{{sch_translate('language')}}</td>
+      <td class="profile-item-value">{{sch_translate($user_info->language)}}</td>
+  </tr>
+  @endif
+</table>

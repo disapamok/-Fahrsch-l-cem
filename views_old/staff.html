@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{sch_translate('app_desc')}}">
+    <meta name="author" content="{{sch_translate('app_author')}}">
+	@include("schleier/topscript")
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+    <title>{{sch_translate('staff')}} | {{sch_translate('app_name_long')}}</title>
+
+    <!-- Material design icons -->
+    <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Simcify CSS -->
+    <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+
+    <!-- Landa CSS -->
+    <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+
+    <!-- header -->
+    @include("includes/header")
+    <!-- main content -->
+    <div class="main-content">
+        <div class="page-header">
+            <button type="button" class="btn btn-primary btn-icon pull-right ml-5" data-toggle="modal" data-target="#create"><i class=" mdi mdi-account-plus-outline"></i> {{sch_translate('add_staff')}} </button>
+            <button type="button" class="btn btn-success btn-icon pull-right toggle-search"><i class=" mdi mdi-filter-outline"></i> {{sch_translate('filter_8nd_search')}} </button>
+            <h3>{{sch_translate('staff')}}</h3>
+        </div>
+
+
+        <!-- page content -->
+        <div class="row">
+
+            <!-- search & Filter -->
+            <div class="col-md-12 search-filter" style="display: none;">
+               <div class="card">
+                <form class="form" action="" method="GET">
+                    <div class="row">
+                        <div class="col-md-8">
+                              <div class="form-group">
+                                <label>{{sch_translate('search_name')}}</label>
+                                <input type="text" class="form-control" placeholder="{{sch_translate('search_name,_email_or_phone')}}">
+                              </div>
+                        </div>
+                        <div class="col-md-2">
+                              <div class="form-group">
+                                <label for="email">{{sch_translate('gender')}}</label>
+                                <select class="form-control" name="gender">
+                                    <option value="">{{sch_translate('select_gender')}}*</option>
+                                    <option value="">{{sch_translate('all')}}</option>
+                                    <option value="Male">{{sch_translate('male')}}</option>
+                                    <option value="Female">{{sch_translate('female')}}</option>
+                                </select>
+                              </div>
+                        </div>
+                        <div class="col-md-2">
+                              <button class="btn btn-primary btn-icon btn-block"><i class=" mdi mdi-filter-outline"></i> {{sch_translate('search')}}</button>
+                        </div>
+                    </div>
+                </form>
+              </div>
+            </div>
+            @if(!empty($staffs))
+             @foreach($staffs as $staff)
+                <!-- user grid -->
+                <div class="col-md-3">
+                    <div class="user-grid card">
+                        <div class="user-grid-pic">
+                            @if( !empty($staff->avatar) )
+                            <img src="{{ url('') }}uploads/avatar/{{ $staff->avatar }}">
+                            @else
+                            <img src="{{ url('') }}assets/images/avatar.png">
+                            @endif
+                        </div>
+                        <div class="user-grid-info">
+                            <h5>{{ $staff->fname}} {{$staff->lname }}</h5>
+                            <p>{{ $staff->branchname }}</p>
+                            <p>{{ $staff->position }}</p>
+                        </div>
+                        <div class="row user-grid-buttons">
+                            <div class="col-md-12">
+                                <a class="btn btn-primary btn-block" href="{{ url('Profile@get',['userid'=>$staff->id]) }}">{{sch_translate('profile')}}</a>
+                            </div>
+                        </div>
+                        <div class="user-grid-class-left">
+                            <p class="text-success"><i class="mdi mdi-account-edit"></i>
+                              @if( $staff->permissions == "read_write_delete")
+                              {{sch_translate('read_write_8nd_delete')}}
+                              @elseif( $staff->permissions == "read_write")
+                              {{sch_translate('read_8nd_write')}}
+                              @else
+                              {{sch_translate('read_only')}}
+                              @endif
+                            </p>
+                        </div>
+                    </div>
+                </div>
+              @endforeach
+            @else
+            <div class="col-md-12">
+                <div class="empty">
+                    <i class="mdi mdi-alert-circle-outline"></i>
+                    <h3>{{sch_translate('empty_here')}}</h3>
+                </div>
+            </div>
+             @endif
+        </div>
+    </div>
+
+    <!-- footer -->
+    @include("includes/footer")
+
+<!-- modals -->
+<div class="modal right fade" id="create" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+                    <h4 class="modal-title">{{sch_translate('add_staff')}}</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form class="simcy-form" data-parsley-validate="" action="{{ url('Staff@create') }}" method="POST" loader="true" >
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('first_name')}}</label>
+                            <input type="text" class="form-control" placeholder="{{sch_translate('first_name')}}" name="fname" required>
+                            <input type="hidden" value="{{ csrf_token() }}" name="csrf-token">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('last_name')}}</label>
+                            <input type="text" class="form-control" placeholder="{{sch_translate('last_name')}}" name="lname" required>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('email_address')}}</label>
+                            <input type="text" class="form-control" placeholder="{{sch_translate('email_address')}}" name="email" required>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('phone_number')}}</label>
+                            <input type="text" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" required>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="email">{{sch_translate('branch')}}</label>
+                            <select class="form-control" name="branch" required>
+                                <option value="">{{sch_translate('select_branch')}}*</option>
+                                @foreach($branches as $branch)
+                                <option value="{{$branch->id}}">{{$branch->name}}</option>
+                                @endforeach
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label>{{sch_translate('position_slash_role')}}</label>
+                            <input type="text" class="form-control" placeholder="{{sch_translate('position_slash_role')}}" name="position" required>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="email">{{sch_translate('permission')}}</label>
+                            <select class="form-control" name="permissions" required>
+                                <option value="read_write_delete">{{sch_translate('read_write_8nd_delete')}}</option>
+                                <option value="read_write">{{sch_translate('read_8nd_write')}}</option>
+                                <option value="read_only">{{sch_translate('read_only')}}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <button class="btn btn-primary btn-block">{{sch_translate('create_account')}}</button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                </div>
+
+            </div><!-- modal-content -->
+        </div><!-- modal-dialog -->
+    </div><!-- modal -->
+
+
+
+   <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+   <script src="{{ url('') }}assets/js/popper.min.js"></script>
+   <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+   <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+   <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+   <script src="{{ url('') }}assets/js/app.js"></script>
+   @include("schleier/bottomscript")
+</body>
+</html>

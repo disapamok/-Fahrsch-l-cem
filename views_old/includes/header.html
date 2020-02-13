@@ -1,0 +1,76 @@
+ <style>
+     header .bubble {
+         position: absolute;
+         margin-left: -10px !important;
+         margin-top: 0px !important;
+         background: red;
+         width: 20px;
+         height: 20px;
+         border-radius: 50%;
+         font-size: 12px;
+         color: #fff;
+         padding-top: 1px;
+         text-align: center;
+ </style>
+ <header>
+     <div class="header-left">
+         <ul class="nav header-links pull-right">
+             <li class="humbager">
+                 <a href="" class="btn btn-secondary just-icon"><i class="mdi mdi-menu"></i></a>
+             </li>
+             <li class="header-logo">
+                 <a href="{{ url('') }}" class="header-branding"><img
+                         src="{{ url('') }}uploads/app/{{ env('APP_LOGO'); }}" class="img-responsive"> </a>
+             </li>
+             <li class="scheduling-link">
+                 <!-- <a href="{{url('Schedule@get')}}" class="btn btn-red btn-icon"><i class="mdi mdi-calendar-text"></i> {{sch_translate('scheduling')}} </a> -->
+             </li>
+         </ul>
+     </div>
+     <div class="header-right">
+         <ul class="nav header-links pull-right">
+             <li class="notify mr-3">
+                 <div class="dropdown">
+                     <span class="dropdown-toggle" data-toggle="dropdown" id="notificationToggler">
+                         <span class="notifications"><img src="{{url('')}}assets/images/icons/notification.png"></span>
+                         <span
+                             class="label label-danger btn-round bubble">{{Simcify\Controllers\Notification::count()}}</span>
+                     </span>
+                     <ul class="dropdown-menu notification-container" role="menu" aria-labelledby="menu1">
+                            <div>
+                                <h4>Benachrichtigung</h4>
+                            </div>    
+
+                            <div class="notification-list"></div>
+                            
+                            <div class="view-notifications-link">
+                                <a href="{{ url('') }}notifications">View All Notifications</a>
+                            </div>
+                     </ul>
+                 </div>
+             </li>
+             <li class="profile pt-2 mx-1">
+                 <div class="dropdown">
+                     <span class="dropdown-toggle" data-toggle="dropdown">
+                         <span class="avatarq">
+                             @if( !empty($user->avatar) )
+                             <img src="<?=url('');?>uploads/avatar/{{ $user->avatar }}" class="user-avatar img-circle">
+                             @else
+                             <img src="<?=url('');?>assets/images/avatar.png" class="user-avatar">
+                             @endif
+                         </span>
+                         <span class="profile-name ml-2"> <span class="hidden-xs">{{ $user->fname }} {{ $user->lname }}
+                             </span> <i class="mdi mdi mdi-menu-down-outline"></i> </span>
+                     </span>
+                     <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                         <!-- <li><a href="{{ url('Settings@get') }}"> <i class="mdi mdi-account"></i> {{sch_translate('profile')}} </a></li> -->
+                         <li><a href="{{ url('Settings@get') }}"> <i class="mdi mdi-settings"></i>
+                                 {{sch_translate('settings')}} </a></li>
+                         <li><a href="{{ url('Auth@signout') }}"> <i class="mdi mdi-logout"></i>
+                                 {{sch_translate('logout')}}</a></li>
+                     </ul>
+                 </div>
+             </li>
+         </ul>
+     </div>
+ </header>

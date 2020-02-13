@@ -1,0 +1,79 @@
+
+$notification = 'SMS sent to all branches by <strong>' . $user->fname . ' ' . $user->lname . '</strong>.';
+$notification = 'SMS sent to everyone by <strong>' . $user->fname . ' ' . $user->lname . '</strong>.';
+$notification = 'Email sent to all ' . $recipient . 's by <strong>' . $user->fname . ' ' . $user->lname . '</strong>.';
+
+"sms_sent_to_all_schools_by" => "SMS sent to all schools by <strong>__1__ __2__</strong>.",
+"sms_sent_to_all_branches_by" => "SMS sent to all branches by <strong>__1__ __2__</strong>.",
+"sms_sent_to_everyone_by" => "SMS sent to everyone by <strong>__1__ __2__</strong>.",
+"sms_sent_to_recipient_by" => "Email sent to all __1__ by <strong>__2__ __3__</strong>.",
+
+"sms_sent_to_all_schools_by" => "SMS sent to all schools by <strong>__1__ __2__</strong>.",
+"sms_sent_to_all_branches_by" => "SMS sent to all branches by <strong>__1__ __2__</strong>.",
+"sms_sent_to_everyone_by" => "SMS sent to everyone by <strong>__1__ __2__</strong>.",
+"sms_sent_to_recipient_by" => "SMS sent to all __1__ by <strong>__2__ __3__</strong>.",
+
+
+sch_translate("sms_sent_to_recipient_by", [$recipient, $user->fname, $user->lname]);
+sch_translate("sms_sent_to_all_schools_by", [$user->fname, $user->lname]);
+sch_translate("sms_sent_to_all_branches_by", [$user->fname, $user->lname]);
+sch_translate("sms_sent_to_everyone_by", [$user->fname, $user->lname]);
+
+
+"email_sent_to_all_schools_by" => "Email sent to all schools by <strong>__1__ __2__</strong>.",
+"email_sent_to_all_branches_by" => "Email sent to all branches by <strong>__1__ __2__</strong>.",
+"email_sent_to_everyone_by" => "Email sent to everyone by <strong>__1__ __2__</strong>.",
+"email_sent_to_recipient_by" => "Email sent to all __1__ by <strong>__2__ __3__</strong>.",
+
+"email_sent_to_all_schools_by" => "Email sent to all schools by <strong>__1__ __2__</strong>.",
+"email_sent_to_all_branches_by" => "Email sent to all branches by <strong>__1__ __2__</strong>.",
+"email_sent_to_everyone_by" => "Email sent to everyone by <strong>__1__ __2__</strong>.",
+"email_sent_to_recipient_by" => "Email sent to all __1__ by <strong>__2__ __3__</strong>.",
+"sms_sent_to_all_schools_by" => "SMS sent to all schools by <strong>__1__ __2__</strong>.",
+"sms_sent_to_all_branches_by" => "SMS sent to all branches by <strong>__1__ __2__</strong>.",
+"sms_sent_to_everyone_by" => "SMS sent to everyone by <strong>__1__ __2__</strong>.",
+"sms_sent_to_recipient_by" => "SMS sent to all __1__ by <strong>__2__ __3__</strong>.",
+
+
+sch_translate("email_sent_to_recipient_by", [$recipient, $user->fname, $user->lname]);
+sch_translate("email_sent_to_all_schools_by", [$user->fname, $user->lname]);
+sch_translate("email_sent_to_all_branches_by", [$user->fname, $user->lname]);
+sch_translate("email_sent_to_everyone_by", [$user->fname, $user->lname]);
+
+
+
+
+
+'You made a payment of <strong>'.money(input('amount')).'</strong>.'
+
+
+'A payment of <strong>'.money(input('amount')).'</strong> has been received from <strong>'.$student->fname.' '.$student->lname.'</strong>.'
+'A payment record of <strong>'.money($payment->amount).'</strong> has been deleted from your account.'
+'A payment record of <strong>'.money($payment->amount).'</strong> has been deleted by <strong>'.$user->fname.' '.$user->lname.'</strong>.'
+'Invoice #'.$invoice->reference.' of <strong>'.money($invoice->amount).'</strong> has been deleted from your account.'
+'Invoice #'.$invoice->reference.' of <strong>'.money($invoice->amount).'</strong>  has been deleted by <strong>'.$user->fname.' '.$user->lname.'</strong>.'
+
+
+"you_made_a_payment_of" => "You made a payment of <strong>__1__</strong> "
+"a_payment_of_recieved_from" => "A payment of <strong>__1__</strong> has been received from <strong>__2__ __3__</strong>."
+"a_payment_of_deleted_from" => "A payment record of <strong>__1__</strong> has been deleted from your account."
+"a_payment_of_deleted_by" => "A payment record of <strong>__1__</strong> has been deleted by <strong>__2__ __3__</strong>."
+
+"invoice_of_deleted_from" =>"Invoice #__1__ of <strong>__2__</strong> has been deleted from your account."
+"invoice_of_deleted_by" =>"Invoice #__1__ of <strong>__2__</strong>  has been deleted by <strong>__3__ __4__</strong>."
+
+
+
+sch_translate("you_made_a_payment_of", [money(input('amount')));
+sch_translate("a_payment_of_recieved_from", [money(input('amount')), $student->fname, $student->lname]);
+
+sch_translate("a_payment_of_deleted_by", [money(input('amount')), $user->fname, $user->lname]);
+
+sch_translate("a_payment_of_deleted_from", [money(input('amount'))]);
+
+
+sch_translate("invoice_of_deleted_from", [$invoice->reference, money($invoice->amount)]);
+sch_translate("invoice_of_deleted_by", [$invoice->reference, money($invoice->amount), $user->fname, $user->lname]);
+
+
+"invoice_of_recieved_from" => 

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="{{sch_getLangHtmlShortCode()}}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{sch_translate('app_desc')}}">
+  <meta name="author" content="{{sch_translate('app_author')}}">
+  @include("schleier/topscript")
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url('') }}uploads/app/{{ env('APP_ICON'); }}">
+  <title>{{sch_translate('instructors')}} | {{sch_translate('app_name_long')}}</title>
+  <!-- Material design icons -->
+  <link href="{{ url('') }}assets/fonts/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link href="{{ url('') }}assets/libs/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Simcify CSS -->
+  <link href="{{ url('') }}assets/css/simcify.min.css" rel="stylesheet">
+  <!-- Landa CSS -->
+  <link href="{{ url('') }}assets/css/style.css" rel="stylesheet">
+</head>
+  <body>
+    <!-- sidebar -->
+    @include("includes/sidebar")
+    <!-- header -->
+    @include("includes/header")
+    <!-- Used for select2 indicator validation -->
+    <input type="hidden" name="select2HasError" class="select2HasError" value="0" />
+    <!-- main content -->
+    <div class="main-content">
+      <div class="page-header">
+        <button type="button" class="btn btn-red pull-right ml-5" data-toggle="modal" data-target="#create">{{sch_translate('add_instructor')}} </button>
+        <button type="button" class="btn btn-grey pull-right toggle-search d-block d-sm-block d-md-none">{{sch_translate('filter_8nd_search')}} </button>
+        <h3>{{sch_translate('instructors_gender')}}</h3>
+      </div>
+      <!-- page content -->
+      <div class="row">
+        <!-- search & Filter -->
+        <div class="col-md-12 search-filter d-none d-md-block">
+            <div class="card">
+              <form class="form" action="{{ url('Instructor@get') }}" id="search_form" method="POST">
+                  <input type="hidden" value="{{ csrf_token() }}" name="csrf-token">
+                  <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                          <label>{{sch_translate('search_name')}}</label>
+                          <input type="text" class="form-control" value="{{$search}}" placeholder="{{sch_translate('search_name')}}" name="search">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                          <label for="email">{{sch_translate('Gender')}}</label>
+                          <select class="form-control" name="gender">
+                          <option value="All" @if( $gender == "All" ) selected @endif>
+                          {{sch_translate('all')}}</option>
+                          <option value="Male" @if( $gender == "Male" ) selected @endif>
+                          {{sch_translate('male')}}</option>
+                          <option value="Female" @if( $gender == "Female" ) selected @endif>
+                          {{sch_translate('female')}}</option>
+                          </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" id="btn-search" class="btn btn-grey btn-block"><i class="fas fa-search mr-2"></i> {{sch_translate('search')}}</button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-grey btn-block" type="reset" id="btn-reset" ><i class="fas fa-undo mr-2"></i>{{sch_translate('Reset')}}</button>
+                    </div>
+                  </div>
+              </form>
+            </div>
+        </div>
+      </div>
+
+      <div class="row" id="search_result">
+        @if(!empty($instructors))
+            @foreach($instructors as $instructor)
+            <!-- user grid -->
+            <div class="col-md-4 col-lg-3">
+                <div class="w-100 bg-grey p-1 rounded-top"></div>
+                <div class="user-grid card p-0 shadow-sm">
+                  <div class="p-0 p-3">
+                      <div class="user-grid-pic">
+                        @if( !empty($instructor->avatar) )
+                          <img src="{{ url('') }}uploads/avatar/{{ $instructor->avatar }}" class="student-image mb-2">
+                        @else
+                          <img src="{{ url('') }}assets/images/avatar.png" class="student-image mb-2">
+                        @endif
+                      </div>
+                      <div class="user-grid-info">
+                        <h5 class="text-gray text-uppercase font-14 mb-0">{{ $instructor->fname }} {{ $instructor->lname }}</h5>
+                        <p>{{sch_translate('instructor_of_course', [$instructor->courses])}}</p>
+                      </div>
+                  </div>
+                  <div class="p-3 px-4">
+                      <div class="row user-grid-buttons">
+                        <div class="col-md-12 px-0 ml-1 mr-2 mb-2">
+                            <span class="bg-dark p-2 text-white float-left w-25 rounded-left"><img src="{{url('')}}assets/images/icons/telephone.png"></span>
+                            <div class="pr-2 d-inline w-75 float-right">
+                              <div class="text-center p-2 bg-grey rounded-right letter_spacing_phone">{{ $instructor->phone }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 p-5">
+                            <a class="btn btn-red btn-block" href="{{url('Profile@get',['userid'=>$instructor->id])}}">
+                            <i class="fa fa-user mr-2"></i>{{sch_translate('profile')}}</a>
+                        </div>
+                        <div class="col-md-6 p-5">
+                            <a class="btn btn-default btn-block" href="{{url('Schedule@get')}}?filter=instructor&filterid={{ $instructor->id }}"><img src="{{url('')}}assets/images/icons/calendar-alt-solid.png" class="img-icon mr-2">{{sch_translate('Kalender')}}</a>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+            </div>
+            @endforeach
+          @else
+          <div class="col-md-12">
+              <div class="empty">
+                <i class="mdi mdi-alert-circle-outline"></i>
+                <h3>{{sch_translate('empty_here')}}</h3>
+              </div>
+          </div>
+          @endif
+      </div>
+    </div>
+    <!-- footer -->
+    @include("includes/footer")
+
+    <?php
+      $fuehrerschein_class_1_array = ["", "A", "A1", "A2", "AM"];
+      $fuehrerschein_class_2_array = ["", "B", "B96", "BE", "C", "C1", "C1E", "CE"];
+      $fuehrerschein_class_3_array = ["", "D", "DE", "D1", "D1E", "L", "T"];
+
+      $fuehrerschein_class_all_array = ["", "A", "A1", "A2", "AM", "B", "B96", "BE", "C", "C1", "C1E", "CE", "D", "DE", "D1", "D1E", "L", "T"];
+      
+      $fahrpruefung_languages = ["Englisch", "Deutsch", "Franzoesisch", "Griechisch", "Italienisch", "Polnisch", "Portugiesisch", "Rumaenisch", "Russisch", "Kroatisch", "Spanisch", "Tuerkisch", "arabisch_hocharabisch"];
+    ?>
+
+    <!-- modals -->
+    <div class="modal right fade" id="create" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
+              <h4 class="modal-title">{{sch_translate('add_instructor')}}</h4>
+            </div>
+            <div class="modal-body">
+              <form class="simcy-form translateValidation" data-parsley-validate="" action="{{ url('Instructor@create') }}" method="POST" loader="true">
+
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <label>{{sch_translate('Anrede')}}</label>
+                      <select class="form-control" name="title" required="">
+                        <option value="Mr">{{sch_translate('mr')}}</option>
+                        <option value="Mrs">{{sch_translate('mrs')}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                  <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                    <label>{{sch_translate('first_name')}}</label>
+                    <input type="text" class="form-control" placeholder="{{sch_translate('first_name')}}" name="fname" required>
+                    <input type="hidden" value="{{csrf_token()}}" name="csrf-token">
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('last_name')}}</label>
+                          <input type="text" class="form-control" placeholder="{{sch_translate('last_name')}}" name="lname" required>
+                        </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label>{{sch_translate('Geburtsdatum')}}</label>
+                        <input type="text" class="form-control datepickerx" data-date-format="dd-mm-yyyy"  placeholder="{{sch_translate('Geburtsdatum')}}" data-date-format="dd-mm-yyyy" name="date_of_birth" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                          <label for="email">{{sch_translate('gender')}}</label>
+                          <select class="form-control" name="gender" required>
+                              <option value="Male">{{sch_translate('male')}}</option>
+                              <option value="Female">{{sch_translate('female')}}</option>
+                          </select>
+                        </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label>{{sch_translate('street_nr')}}</label>
+                        <input type="text" class="form-control" placeholder="{{sch_translate('street_nr')}}" name="street_nr" required="">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label>{{sch_translate('plz_ort')}}</label>
+                        <div class="row">
+                          <div class="col-5 pr-0">
+                            <input type="number" class="form-control" placeholder="{{sch_translate('plz')}}" name="plz" required="">
+                          </div>
+                          <div class="col-7">
+                            <input type="text" class="form-control" placeholder="{{sch_translate('ort')}}" name="ort" required="">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('email_address')}}</label>
+                          <input type="email" class="form-control" placeholder="{{sch_translate('email_address')}}" name="email" required>
+                        </div>
+                    </div>
+                  </div>
+                  <!-- <div class="form-group">
+                    <div class="row hide-parsley">
+                      <div class="col-12">
+                        <label>{{sch_translate('phone_number')}}</label>
+                      </div>
+                      <div class="col-md-12">
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1"><i class="fa fa-plus"></i></span>
+                          </div>
+                        <input type="number" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" required="">
+                        </div>
+                      </div>
+                    </div>
+                    </div> -->
+                  <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                          <label>{{sch_translate('phone_number')}}</label>
+                          <input type="number" class="form-control" placeholder="{{sch_translate('phone_number')}}" name="phone" required>
+                        </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label for="email">{{sch_translate('education_classes')}}</label>
+                        <div class="row">
+                          <div class="col-4">
+                            <select class="form-control" name="fuehrerschein_class_1">
+                              @foreach($fuehrerschein_class_all_array as $fuehrerschein_class_1)
+                                <option value="{{$fuehrerschein_class_1}}">{{$fuehrerschein_class_1}}</option>
+                              @endforeach
+                            </select>
+                          </div>
+                          <div class="col-4">
+                            <select class="form-control" name="fuehrerschein_class_2">
+                              @foreach($fuehrerschein_class_all_array as $fuehrerschein_class_2)
+                                <option value="{{$fuehrerschein_class_2}}">{{$fuehrerschein_class_2}}</option>
+                              @endforeach
+                            </select>
+                          </div>
+                          <div class="col-4">
+                            <select class="form-control" name="fuehrerschein_class_3">
+                              @foreach($fuehrerschein_class_all_array as $fuehrerschein_class_3)
+                                <option value="{{$fuehrerschein_class_3}}">{{$fuehrerschein_class_3}}</option>
+                              @endforeach
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label for="email">{{sch_translate('vehicle_registration_number')}}</label>
+                        <div class="row">
+                          <div class="col-4">
+                            <input type="text" class="form-control" placeholder="" name="vreg_1" required>
+                          </div>
+                          <div class="col-4">
+                            <input type="text" class="form-control" placeholder="" name="vreg_2" required>
+                          </div>
+                          <div class="col-4">
+                            <input type="text" class="form-control" placeholder="" name="vreg_3" required>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <label>{{sch_translate('students')}}</label>
+                        <div class="studentDiv">
+                            <select class="form-control select2" name="student[]" id="myStudent" requiredSelect2 multiple>
+                              <option value="" disabled>{{sch_translate('students')}}</option>
+                              @foreach($students as $student)
+                                <option value="{{$student->id}}">{{$student->fname}} {{$student->lname }}</option>
+                              @endforeach
+                            </select>
+                        </div>
+                        <ul class="parsley-errors-list filled studentUl d-none">
+                          <li class="parsley-required">{{sch_translate('this_value_is_required')}}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group mt-md-5">
+                    <div class="row">
+                        <div class="col-md-12">
+                          <button id="createInstructor" class="btn btn-red btn-block">{{sch_translate('create_account')}}</button>
+                        </div>
+                    </div>
+                  </div>
+              </form>
+            </div>
+        </div>
+        <!-- modal-content -->
+      </div>
+      <!-- modal-dialog -->
+    </div>
+    <!-- modal -->
+
+    <script src="{{ url('') }}assets/js/jquery-3.3.1.min.js"></script>
+    <script src="{{ url('') }}assets/js/popper.min.js"></script>
+    <script src="{{ url('') }}assets/libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{ url('') }}assets/libs/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="{{ url('') }}assets/js/simcify.min.js"></script>
+    <script src="{{ url('') }}assets/js/app.js"></script>
+
+    <script src="{{ url('') }}assets/js/parsley_de.js"></script>
+    <script src="{{ url('') }}assets/js/parsley.min.js"></script>
+
+    <script src="{{ url('') }}assets/libs/datepicker/js/bootstrap-datepicker.js"></script>
+    <script>
+        $('.datepicker').datepicker({ language: "{{ sch_translate('translate') }}"});
+
+        $(document).ready(function () {
+          $(".datepickerx").datepicker({ autoclose: true });
+        });
+
+      // Remove error message
+      function removeSelect2ErrorMessage(){
+        $('.studentDiv').removeClass('border border-danger');
+        $('.studentUl').addClass('d-none');
+        $('.select2HasError').val(0);
+      }
+      
+      function addSelect2ErrorMessage(){
+        $('.studentDiv').addClass('border border-danger');
+        $('.studentUl').removeClass('d-none');
+        $('.select2HasError').val(1);
+      }
+
+      // Select2 validation
+      $(document).on('change', 'select[name=student]', function(){
+        let student = $(this).val();
+        console.log(student)
+        if(student != '')
+          removeSelect2ErrorMessage();
+        else
+          addSelect2ErrorMessage();
+      });
+      
+      $(document).on('click', '#createInstructor', function(){
+
+        let studentAttr = $('.select2').attr('requiredSelect2');
+        let student =  $('#myStudent').val();
+        console.log(student);
+        // Check if the select2 has required attribute
+        if (typeof studentAttr !== typeof undefined && studentAttr !== false){
+
+          if(student == '' || student == null)
+            addSelect2ErrorMessage();
+          else
+            removeSelect2ErrorMessage();
+        }
+      });
+
+      $('#search_form').on('submit',function(e){
+        e.preventDefault();
+        var formData = new FormData(document.getElementById('search_form'));
+        formData.append('csrf-token', Cookies.get('CSRF-TOKEN'));
+        var url = '{{ url("Instructor@searchInstructor") }}';
+        
+        $.ajax({
+          url : url,             
+          type : "POST",
+          cache: false,
+          contentType: false,
+          processData: false,
+          data: formData,
+          error : function(error) {
+            $('#loading-modal').hide();
+            var error_message = '<ul>';
+            $.each(error.responseJSON, function(field,message) {
+              error_message += '<li class="veltin-error">'+message+'</li>';
+            })
+            error_message += '</ul>';
+            $('#alert-message-modal').modal('show');
+            $('#alert-message-modal #alert-message').html(error_message);
+          },
+          success : function(data) {
+
+            $('#search_result').empty();
+            $('#search_result').html(data);
+          }
+        });
+      });
+
+      $('#btn-reset').on('click', function() {
+        $('input[name=search]').val("");
+        $('select[name=gender]').val("All");
+
+        // Trigger button click to display all results
+        // $('#btn-search').click();
+    });
+    </script>
+
+    @include("translate/validation")
+    @include("schleier/bottomscript")
+  </body>
+</html>

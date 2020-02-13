@@ -1,0 +1,18 @@
+
+<div class="modal-body">
+    @if(!empty($payments))
+        @foreach($payments as $index => $payment)
+            <div class="payment-item">
+                <div class="amount">
+                    <p class="text-primary">{{ currency().$payment->amount }}</p>
+                    <span class="text-xs text-muted">{{ date('d F Y',strtotime($payment->created_at)) }}</span>
+                </div>
+                <div class="method">
+                    {{ $payment->method }}
+                </div>
+            </div>
+        @endforeach 
+    @else
+        <p class="text-center">{{sch_translate("empty_here")}}</p>
+    @endif  
+</div>
