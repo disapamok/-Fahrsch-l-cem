@@ -15,7 +15,6 @@ class API{
 	// }
 
 	function fetchUser(){
-		echo 'sahan';  exit();
 
 		$inputJSON = file_get_contents('php://input');
 		$input = json_decode($inputJSON);
@@ -27,11 +26,26 @@ class API{
             "status" => "Active"
         ));
 
-        if($signin['status'] == 'error'){
-        	echo "error ";
-        }
+        if($signin['status'] == 'success'){
+        	$userRow = Database::table('users')->where('email', $input->email)->orderBy('id', true)->first();
+        	
+        	$user = array(
+        		'fname' => $userRow->fname,
+        		'lname' => $userRow->lname,
+        		'username' => $userRow->username,
+        		'email' => $userRow->email,
+        		'gender' => $userRow->gender,
+        		'date_of_birth' => $userRow->date_of_birth,
+        		'phone' => $userRow->phone,
+        		'student_type' => $userRow->student_type,
+        		'avatar' => $userRow->avatar,
+        		'role' => $userRow->role,
+        		'created_at' => $userRow->created_at
 
-		var_dump($signin);
+        	);
+        	$signin['user'] = $user;
+        }
+        return json_encode($signin);
 	}
 
 	function test(){
