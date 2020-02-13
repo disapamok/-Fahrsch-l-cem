@@ -494,7 +494,19 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                                                 </span>
                                             </td>
                                             <td class="text-center">
-                                                <a href="" class="table-action-icon send-to-server-click" data="enrollmentid:{{ $enrollment->id }}|csrf-token:{{ csrf_token() }}" url="{{ url('Student@deleteenrollment') }}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('this_course_course_will_be_deleted_from_this_students_enrollments')}}" warning-button="{{sch_translate('delete')}}" data-toggle="tooltip" data-placement="top" title="{{sch_translate('delete')}}" data-original-title="{{sch_translate('delete')}}" class="delete" data-cancel-button="{{sch_translate('cancel')}}"><img src="{{ url('') }}assets/images/icons/trash-alt-solid.svg" class="profile-trash"></a>
+                                                <a href="" 
+                                                class="table-action-icon send-to-server-click" 
+                                                data="enrollmentid:{{ $enrollment->id }}|csrf-token:{{ csrf_token() }}" 
+                                                url="{{ url('Student@deleteenrollment') }}" 
+                                                warning-title="{{sch_translate('are_you_sure')}}" 
+                                                warning-message="{{sch_translate('this_course_course_will_be_deleted_from_this_students_enrollments')}}" warning-button="{{sch_translate('delete')}}" 
+                                                data-toggle="tooltip" 
+                                                data-placement="top" 
+                                                title="{{sch_translate('delete')}}" 
+                                                data-original-title="{{sch_translate('delete')}}" 
+                                                class="delete" 
+                                                data-cancel-button="{{sch_translate('cancel')}}">
+                                                <img src="{{ url('') }}assets/images/icons/trash-alt-solid.svg" class="profile-trash"></a>
                                             </td>
                                         </tr>
                                         @endforeach 
