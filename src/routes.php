@@ -18,18 +18,18 @@ use Simcify\Middleware\RedirectIfAuthenticated;
     /*
     * API Routes
     */
-    Router::group(['prefix' => '/api'], function() {
-        Router::post('/fetch-user', 'API@fetchUser');
-    });
+    
 /**
  * ,------,
  * | NOTE | CSRF Tokens are checked on all PUT, POST and GET requests. It
  * '------' should be passed in a hidden field named "csrf-token" or a header
  *          (in the case of AJAX without credentials) called "X-CSRF-TOKEN"
  *  */
-
 Router::group(array(
     //'prefix' => env("APP_ROUTE_DIRECTORY")
+
+
+
 ), function()
 {
     Router::group(array(
@@ -288,7 +288,7 @@ Router::group(array(
 
             // Details of assigned instructor to students
             Router::get('api-assigned-instructors', 'InstructorApi@getAllAssignedInstructor');
-            
+
         });
 
 
@@ -304,3 +304,7 @@ Router::group(array(
     // error pages
     Router::get('/404', 'Schleier@error404');
     Router::get('/405', 'Schleier@error405');
+
+    Router::group(['prefix' => '/api'], function() {
+        Router::post('/fetch-user', 'API@fetchUser');
+    });
