@@ -223,5 +223,13 @@ class Branch {
         ));
         return response()->json(responder("success", sch_translate("alright"), sch_translate("branch_switch_successfull"), "reload()"));
     }
+
+
+    /*
+    *   Show individual branch.
+    */
+    public function showBranch($branchid){
+        var_dump($branchid); exit();
+    }
     
 }

@@ -319,6 +319,24 @@
             </div>
           </div>
 
+          <!-- Instructor -->
+          <div class="form-group">
+            <div class="row">
+              <div class="col-md-12">
+                <label for="email">{{sch_translate('instructor')}}</label>
+                <select class="form-control"name="instructor" required="">
+                  <option disabled="">{{sch_translate('select_instructor')}}</option>
+                  @if(!empty($instructors))
+                    @foreach($instructors as $instructors)
+                        <option value="{{$instructors->id}}">{{$instructors->fname.' '.$instructors->lname}}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- end-instructor field -->
+
           <div class="form-group">
             <div class="row mt-md-5">
               <div class="col-md-12">

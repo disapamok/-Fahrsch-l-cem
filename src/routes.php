@@ -8,7 +8,8 @@ use Simcify\Middleware\RedirectIfAuthenticated;
 
 
     $exceptCSRF = array(
-        '/api/fetch-user'
+        '/api/fetch-user',
+        '/api/fetch-instructor-by-student'
     );
 
     if(!in_array($_SERVER["REQUEST_URI"], $exceptCSRF)){
@@ -41,9 +42,6 @@ Router::group(array(
             'middleware' => Simcify\Middleware\Authenticate::class
         ), function()
         {
-            // Router::get('/test', function(){
-            //     echo view("test");                
-            // });
             
             //Dashboard
             Router::get('/', 'Dashboard@get');
@@ -74,6 +72,10 @@ Router::group(array(
             Router::post('/schools/sendemail', 'School@sendemail');
             Router::post('/schools/sendsms', 'School@sendsms');
 
+
+            Router::get('/branch/{branchid}', 'Branch@showBranch', array(
+                'as' => 'branchid'
+            ));
             //Branches
             Router::get('/branches', 'Branch@get');
             Router::post('/branch/switch', 'Branch@switcher');
@@ -84,6 +86,7 @@ Router::group(array(
             Router::post('/branch/sendemail', 'Branch@sendemail');
             Router::post('/branch/sendsms', 'Branch@sendsms');
 
+            
             // settings
             Router::get('/settings', 'Settings@get');
             Router::post('/settings/update/profile', 'Settings@updateprofile');
@@ -306,5 +309,6 @@ Router::group(array(
     Router::get('/405', 'Schleier@error405');
 
     Router::group(['prefix' => '/api'], function() {
-        Router::post('/fetch-user', 'API@fetchUser');
+        Router::post('/fetch-user', 'API@fetchUser')->name('fetchUser');
+        Router::post('/fetch-instructor-by-student','API@getStudentInstructor')->name('getStudentInstructor');
     });

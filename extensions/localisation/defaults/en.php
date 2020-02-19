@@ -743,7 +743,13 @@ $sch_default_en_languages_strings =[
 	"file_successfully_uploaded" => "File successfully uploaded.", 
 	"translate" => "en",
 	"this_value_is_required" => "This value is required",
-	"greater_than_zero" => "Must be greater than 0"
+	"greater_than_zero" => "Must be greater than 0",
+
+	/*
+	* Instructor field
+	*/
+	"instructor" => "Instructor",
+	"select_instructor" => "Instructor",
 ];
 
 

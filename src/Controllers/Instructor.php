@@ -226,6 +226,8 @@ class Instructor {
      
         // Get all student id assigned
         $student_ids = Database::table('userinfo')->where('user', $instructor)->first();
+
+        //var_dump($student_ids); exit();
         
         $student = Database::table('user')->where('id', input('assignstudent'))->first();
         // Convert to array

@@ -735,5 +735,11 @@ $sch_default_de_languages_strings = [
 	"to_print" => "Drucken",
 	"this_value_is_required" => "Dieses Feld ist ein Pflichtfeld",
 	"greater_than_zero" => "Muss größer als 0 sein"
+
+	/*
+	* Instructor field
+	*/
+	"instructor" => "Fahrlehrer/in",
+	"select_instructor" => "Fahrlehrer/in",
 ];
 ?>

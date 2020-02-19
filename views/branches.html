@@ -49,7 +49,9 @@
                             <div class="school-heading bg-grey p-4 border-red mb-0">
                                 <div class="school-icon text-grey bg-grey"><i class="mdi mdi-map-marker-multiple"></i></div>
                                 <div class="school-details">
-                                    <h6>{{$branch->name}}</h6>
+                                    <a href="{{url('Branch@showBranch',['branchid'=>$branch->id])}}">
+                                        <h6>{{$branch->name}}</h6>
+                                    </a>
                                     <!-- <span>{{$branch->email}}</span> -->
                                     <span class="letter_spacing_phone text-black">
                                         @if ( !empty($branch->phone) ) {{ $branch->phone }} @else 

@@ -19,10 +19,8 @@ class API{
 		$inputJSON = file_get_contents('php://input');
 		$input = json_decode($inputJSON);
 
-
 		$signin = Authenticate::login($input->email, $input->password, array(
             "rememberme" => true,
-            "redirect" => url('Dashboard@get'),
             "status" => "Active"
         ));
 
@@ -48,7 +46,16 @@ class API{
         return json_encode($signin);
 	}
 
-	function test(){
-		echo 'test';
+	function getStudentInstructor(){
+		$inputJSON = file_get_contents('php://input');
+		$input = json_decode($inputJSON);
+
+		//$input->student_id
+
+		//Database::table('userinfo')->where('student','', $instructor)->first();
+		return json_encode(array(
+			'error' => true,
+			'message' => 'This API is still under development. Please contact Sahan.'
+		));
 	}
 }

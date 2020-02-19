@@ -47,8 +47,10 @@ class Student{
 
         $courses = Database::table('courses')->where('school',$user->school)->where('status',"Available")->get();
         $branches = Database::table('branches')->where('school', $user->school)->orderBy('id', true)->get();
+        $instructors = Database::table('users')->where('role','instructor')->where('status','active')->orderBy('id', true)->get();
+        $test = "Sahan";
 
-        return view('students', compact("user", "students", "courses", "branches"));
+        return view('students', compact("user", "students", "courses", "branches","instructors"));
     }
 
     public function searchStudent(){
@@ -179,6 +181,7 @@ class Student{
         $_street_nr = escape(input("street_nr"));
         $_plz = escape(input("plz"));
         $_branch = escape(input("branch"));
+        $_instructor = escape(input("instructor"));
         $_address = $_street_nr.", ".$_plz." ".$_ort;
 
         $user = Database::table("users")->where("email", input('email'))->first();
@@ -233,6 +236,22 @@ class Student{
             $_language = escape(input("language"));
             $_erteilungsart = escape(preg_replace('/\s+/', ' ', input("erteilungsart")));
             $_job = escape(preg_replace('/\s+/', ' ', input("job")));
+
+
+            $userInfo = Database::table('userinfo')->where('user',$_instructor)->first();
+            $students = $userInfo->student;
+
+            $newStudents = array();
+            if($students == ""){
+                array_push($newStudents,$signup["id"]);
+            }else{
+                $newStudents = explode(",", $students);
+                array_push($newStudents, $signup["id"]);
+            }
+            $newStudents = implode(",", $newStudents);
+
+            $upData = array('student' => $newStudents);
+            Database::table('userinfo')->where('user', $_instructor)->update($upData);
 
             $data = array(
                 'user'=>$signup["id"],
