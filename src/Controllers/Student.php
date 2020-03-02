@@ -48,7 +48,6 @@ class Student{
         $courses = Database::table('courses')->where('school',$user->school)->where('status',"Available")->get();
         $branches = Database::table('branches')->where('school', $user->school)->orderBy('id', true)->get();
         $instructors = Database::table('users')->where('role','instructor')->where('status','active')->orderBy('id', true)->get();
-        $test = "Sahan";
 
         return view('students', compact("user", "students", "courses", "branches","instructors"));
     }
@@ -238,20 +237,12 @@ class Student{
             $_job = escape(preg_replace('/\s+/', ' ', input("job")));
 
 
-            $userInfo = Database::table('userinfo')->where('user',$_instructor)->first();
-            $students = $userInfo->student;
+            $instructor_student = array(
+                'instructor_id' => $_instructor,
+                'student_id'    => $newStudents
+            );
 
-            $newStudents = array();
-            if($students == ""){
-                array_push($newStudents,$signup["id"]);
-            }else{
-                $newStudents = explode(",", $students);
-                array_push($newStudents, $signup["id"]);
-            }
-            $newStudents = implode(",", $newStudents);
-
-            $upData = array('student' => $newStudents);
-            Database::table('userinfo')->where('user', $_instructor)->update($upData);
+            $resp = Database::table('instructor_students')->insert($instructor_student);
 
             $data = array(
                 'user'=>$signup["id"],

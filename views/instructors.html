@@ -308,7 +308,8 @@
                       <div class="col-md-12">
                         <label>{{sch_translate('students')}}</label>
                         <div class="studentDiv">
-                            <select class="form-control select2" name="student[]" id="myStudent" requiredSelect2 multiple>
+                            <!-- requiredSelect2 -->
+                            <select class="form-control select2" name="student[]" id="myStudent" multiple>
                               <option value="" disabled>{{sch_translate('students')}}</option>
                               @foreach($students as $student)
                                 <option value="{{$student->id}}">{{$student->fname}} {{$student->lname }}</option>

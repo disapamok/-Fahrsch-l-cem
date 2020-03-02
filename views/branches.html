@@ -85,9 +85,13 @@
                                         <span class="dropdown-toggle" data-toggle="dropdown">
                                             <i class="mdi mdi-dots-horizontal"></i> </span>
                                         <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+
                                           <li role="presentation"><a role="menuitem" class="fetch-display-click" data="branchid:{{ $branch->id }}|csrf-token:{{ csrf_token() }}" url="<?=url('Branch@updateview');?>" holder=".update-holder" modal="#update" href=""> <i class="mdi mdi-pencil"></i> {{sch_translate('edit')}}</a></li>
+
                                           <li role="presentation"><a role="menuitem" href="" input="branchid" modal="#sendemail" class="pass-data" value="{{ $branch->id }}"> <i class="mdi mdi-email-outline"></i>{{sch_translate('send_email')}}</a></li>
+
                                           <li role="presentation"><a role="menuitem" href="" input="branchid" modal="#sendsms" class="pass-data" value="{{ $branch->id }}"> <i class="mdi mdi-message-text-outline"></i> {{sch_translate('send_sms')}} </a></li>
+
                                           @if($branch->name != 'Headquarters' && $user->branch != $branch->id)
                                           <li role="presentation"><a role="menuitem" href="" class="send-to-server-click" data="branchid:{{ $branch->id }}|csrf-token:{{ csrf_token() }}" url="{{ url('Branch@delete') }}"  warning-message="{{sch_translate('delete_branch_and_staff')}}" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('delete_and_inform_schedule')}}" data-cancel-button="{{sch_translate('cancel')}}" warning-button="{{sch_translate('yes_delete')}}" loader="true"> <i class="mdi mdi-delete"></i>{{sch_translate('delete')}}</a></li>
                                           @endif
@@ -133,6 +137,25 @@
                 <div class="modal-body">
                     <form class="simcy-form translateValidation" action="{{ url('Branch@create') }}" method="POST" loader="true" data-parsley-validate="">
                         <p>{{sch_translate('enter_info_to_branch')}}</p>
+
+                    <div  class="form-group">
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <p>
+                                 <span id="status_word">Status</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="switch float-right">
+                                     <input type="checkbox" name="active" id="switch_status" value="1" checked>
+                                     <span class="slider round"></span>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+
                       <div class="form-group">
                         <div class="row">
                             <div class="col-md-12">
@@ -275,6 +298,8 @@
    <script src="{{ url('') }}assets/js/simcify.min.js"></script>
    <script src="{{ url('') }}assets/js/app.js"></script>
    @include("translate/validation")
+
+
    <script>
     //Send Email
     $('.sendemail').on('click',function(){
@@ -310,6 +335,7 @@
         $('.branchcode').val('');
     });
    </script>
+
    @include("schleier/bottomscript")
 </body>
 </html>

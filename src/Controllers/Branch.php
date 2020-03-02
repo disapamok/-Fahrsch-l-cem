@@ -43,7 +43,8 @@ class Branch {
             "school" => $user->school,
             "phone" => escape(input('phone')),
             "email" => escape(input('email')),
-            "address" => escape(input('address'))
+            "address" => escape(input('address')),
+            "active" => (input('active') == 1 ? 1: 0)
         );
         Database::table("branches")->insert($branchData);
         return response()->json(responder("success", sch_translate('branch_created'), sch_translate('branch_successfully_created'), "reload()"));
@@ -229,7 +230,7 @@ class Branch {
     *   Show individual branch.
     */
     public function showBranch($branchid){
-        var_dump($branchid); exit();
+        //var_dump($branchid); exit();
     }
     
 }

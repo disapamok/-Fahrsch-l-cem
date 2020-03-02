@@ -75,8 +75,13 @@ class Profile{
         $userinfo = Database::table('userinfo')->where('user',$userid)->get();
 
         $all_students = Database::table('users')->where('role', 'student')->get();
+
+        $instructors = Database::table('users')->where('role','instructor')->where('status','active')->orderBy('id', true)->get();
+        $choosenInstructor = Database::table('instructor_students')->where('student_id',$userid)->first();
+
+        $choosenInstructor = ($choosenInstructor != null ? $choosenInstructor->instructor_id : null);
         
-        return view('profile', compact("driving_lessons","theory_lessons","profile2","all_students","assigned_students","user", "profile","branches","enrollments","courses","notes","attachments","invoices","payments","instructors","fleets","students","timeline", "user_branch", "userinfo"));
+        return view('profile', compact("driving_lessons","theory_lessons","profile2","all_students","assigned_students","user", "profile","branches","enrollments","courses","notes","attachments","invoices","payments","instructors","fleets","students","timeline", "user_branch", "userinfo","instructors","choosenInstructor"));
     }
 
     /**
@@ -146,6 +151,21 @@ class Profile{
             $_erteilungsart = escape(input("erteilungsart"));
             $_job = escape(input("job"));
             $_address = $_street_nr.", ".$_plz." ".$_ort;
+
+            $studentID = input("userid");
+
+            $instructor_student = array(
+                'instructor_id' => input("instructor"),
+                'student_id'    => input("userid")
+            );
+            $resp = Database::table('instructor_students')->where('student_id',$studentID)->first();
+            
+
+            if($resp == null){
+                Database::table('instructor_students')->insert($instructor_student);
+            }else{
+                Database::table('instructor_students')->where('student_id',$studentID)->update($instructor_student);
+            }
 
             $data = array(
                 'user'=>input("userid"),

@@ -6,19 +6,16 @@ use Simcify\Middleware\Authenticate;
 use Pecee\Http\Middleware\BaseCsrfVerifier;
 use Simcify\Middleware\RedirectIfAuthenticated;
 
-
-    $exceptCSRF = array(
-        '/api/fetch-user',
-        '/api/fetch-instructor-by-student'
-    );
-
-    if(!in_array($_SERVER["REQUEST_URI"], $exceptCSRF)){
-        Router::csrfVerifier(new BaseCsrfVerifier());
-    }
-
+    
+    //header('Access-Control-Allow-Origin: *');  
+    //header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
     /*
     * API Routes
     */
+    $shouldProtect = strpos($_SERVER["REQUEST_URI"], '/api/') === false;
+    if($shouldProtect){
+       Router::csrfVerifier(new BaseCsrfVerifier());
+    }
     
 /**
  * ,------,
@@ -304,11 +301,14 @@ Router::group(array(
     
 });
 
-    // error pages
+    // error pages.
     Router::get('/404', 'Schleier@error404');
     Router::get('/405', 'Schleier@error405');
 
     Router::group(['prefix' => '/api'], function() {
         Router::post('/fetch-user', 'API@fetchUser')->name('fetchUser');
+        Router::post('/get-user','API@getUser')->name('getUser');
+        Router::post('/update-user','API@updateUser')->name('updateUser');
+
         Router::post('/fetch-instructor-by-student','API@getStudentInstructor')->name('getStudentInstructor');
     });
