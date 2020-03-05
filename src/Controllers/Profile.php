@@ -44,18 +44,17 @@ class Profile{
         // New data
         $driving_lessons = $driving_lessons_arr;
 
-        $assigned_students_id = Database::table('userinfo')->where('user',$userid)->first()->student;
-        // convert to array
-
-        $assigned_students_id = ($assigned_students_id == '') ? null : explode(',', $assigned_students_id);
+        $assigned_students_id = array();
+        $students = Database::table('instructor_students')->where('instructor_id',$userid)->get();
+        foreach ($students as $student) {
+            array_push($assigned_students_id, $student->student_id);
+        }
 
         $assigned_students = array();
         // Get students base on instructor
         foreach($assigned_students_id as $id){
             $assigned_students[] = Database::table('users')->where('id', $id)->first();
         }
-        // var_dump($assigned_students);
-        // die;
         // fix for dropdown students, use of $profile not $user [task: other students are missing in dropdown] 
         $query = "select * from (select * from users where role = 'student') as `users` LEFT JOIN userinfo on userinfo.`user` = users.id WHERE userinfo.id IS NOT NULL ";
         $query.="AND users.school =".$profile->school." AND users.branch =".$profile->branch;

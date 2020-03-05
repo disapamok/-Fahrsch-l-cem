@@ -223,46 +223,35 @@ class Instructor {
     public function addAssingStudent(){
 
         $instructor = input('instructor');
-     
-        // Get all student id assigned
-        $student_ids = Database::table('userinfo')->where('user', $instructor)->first();
+        $assignedStudent = input('assignstudent');
 
-        //var_dump($student_ids); exit();
-        
+        $ids = array();
+        $students = Database::table('instructor_students')->where('instructor_id',$instructor)->get();
+        foreach ($students as $student) {
+            array_push($ids, $student->student_id);
+        }
+
         $student = Database::table('user')->where('id', input('assignstudent'))->first();
-        // Convert to array
-        $ids = explode(",", $student_ids->student);
-        
-        // Check if exist
-        $key = in_array(input('assignstudent'), $ids);
-        
+        $key = in_array($assignedStudent, $ids);
         if($key){
             return response()->json(array(
                 "status" => "error",
                 "title" => sch_translate("learner_already_exist"),
                 "message" => sch_translate("learner_already_exist")
             ));
+        }else{
+            $data = array(
+                'instructor_id' => $instructor,
+                'student_id'    => $assignedStudent,
+            );
+            Database::table('instructor_students')->insert($data);
         }
 
-        if(!$student_ids->student){
-            $comma = "";
-        }
-        else{
-            $comma = ",";
-        }
-        
-        $data = array(
-            'student' => $student_ids->student. $comma .input('assignstudent')
-        );
-        Database::table('userinfo')->where('user', $instructor)->update($data);
-
-        $assigned_students_id = Database::table('userinfo')->where('user', $instructor)->first()->student;
-        // convert to array
-        $assigned_students_id = explode(',', $assigned_students_id);
-
+        array_push($ids, $assignedStudent);
         $assigned_students = array();
         // Get students base on instructor
-        foreach($assigned_students_id as $id){
+
+        foreach($ids as $id){
             $assigned_students[] = Database::table('users')->where('id', $id)->first();
         }
 
@@ -289,27 +278,12 @@ class Instructor {
 
     public function removeAssignStudent(){
 
+        $instructor = input('instructor');
+        $student    = input('student');
+        $row = Database::table('instructor_students')->where('instructor_id',$instructor)->where('student_id',$student)->delete();
+
         $student_ids = Database::table('userinfo')->where('user', input('instructor'))->first();
         $students = $student_ids->student;
-        
-        // convert to array
-        $students = explode(",", $students);
-
-        $new_student_ids = "";
-
-        foreach($students as $id){
-   
-            if($id != input('student')){
-                $new_student_ids .= $id.",";
-            }
-        }
-        // Remove last string
-        $new_student_ids = substr_replace($new_student_ids ,"",-1);
-
-        $data = array(
-            'student' => $new_student_ids
-        );
-        Database::table('userinfo')->where('user', input('instructor'))->update($data);
 
         return response()->json(array( "status" => "success"));
     }
