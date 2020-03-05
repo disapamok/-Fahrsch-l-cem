@@ -162,11 +162,11 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                                                         <div class="activity-block">      
                                                             <div class="times-holder">      
                                                                 <span class="time-holder text-uppercase">
-                                                                    <time class="date" datetime="9-25">{{date('d F, Y',strtotime($activity->created_at))}}</time>
+                                                                    <time class="date" datetime="9-25">{{date('d F, Y',strtotime($activity['created_at']))}}</time>
                                                                 </span> 
                                                             </div>
                                                             <div class="activity-holder text-uppercase d-inline-block">
-                                                                {{ $activity->activity }}
+                                                                {{ $activity['activity'].' '.$activity['done_by']->fname.' '.$activity['done_by']->lname }}
                                                             </div>
                                                         </div>
                                                     </li>

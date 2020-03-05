@@ -5,6 +5,7 @@ use Simcify\Database;
 use Simcify\Landa;
 use Simcify\Auth;
 use Simcify\Mail;
+use Simcify\ActivityTimeline;
 
 class Student{
 
@@ -167,8 +168,8 @@ class Student{
      * @return Json
      */
     public function create() {
+        
         $amountpaid = floatval(str_replace(',','.',input('amountpaid')));
-
         //user info 
         $studentStatus = escape(preg_replace('/\s+/', ' ', input('student_status')));
 
@@ -267,7 +268,12 @@ class Student{
         if ($signup["status"] == "success") {
 
             $timeline = sch_translate_notification("new_student_acct_created_by", [$user->fname, $user->lname]);
-            Landa::timeline($signup["id"], $timeline);  
+            
+            //Landa::timeline(, $timeline);  
+
+            ActivityTimeline::logActivity($signup["id"],ActivityTimeline::$LOG_CREATE_PROFILE);
+            //sahan
+
             Landa::notify($timeline, $signup["id"], "newaccount", "personal");
             
             $notification = sch_translate_notification("new_student_acct_created_for", [input('fname'), input('lname')]);

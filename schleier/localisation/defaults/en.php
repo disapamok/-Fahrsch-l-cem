@@ -776,6 +776,10 @@ $sch_default_en_languages_strings =[
 	"start_time_must_be_smaller_then_end_time" => "Start-time must be smaller then End-time.",
 	"end_time_must_be_bigger_then_start_time" => "End-time must be bigger then Start-time.",
 
+	//Activity Log
+	'log_create_profile' => 'Account created by ',
+	'log_add_class' => 'Lesson was added by '
+
 ];
 
 

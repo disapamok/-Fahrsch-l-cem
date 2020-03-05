@@ -7,6 +7,7 @@ use Simcify\File;
 use Simcify\Sms;
 use Simcify\Mail;
 use Simcify\FS;
+use Simcify\ActivityTimeline;
 
 class Profile{
 
@@ -26,7 +27,9 @@ class Profile{
         $courses = Database::table('courses')->where('school',$profile->school)->where('status',"Available")->get(); //$user->school
         $instructors = Database::table('users')->where(['role'=>'instructor','branch'=>$profile->branch,'school'=>$profile->school])->get(); //$user->branch , $user->school
         $fleets = Database::table('fleet')->where('branch',$profile->branch)->get(); //$user->branch
-        $timeline = Database::table('timeline')->where('user',$userid)->get();
+        $timeline = ActivityTimeline::getLog($userid); //Database::table('timeline')->where('user',$userid)->get();
+
+        //var_dump($timeline); exit();
         // $students = Database::table('users')->where(['role'=>'student','branch'=>$user->branch,'school'=>$user->school])->get();
         $theory_lessons = Database::table('theorylessons')->where('user', $userid)->get();
 

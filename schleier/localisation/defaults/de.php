@@ -766,5 +766,9 @@ $sch_default_de_languages_strings = [
 	"vehicle_registration_number" => "Fahrzeug Kennzeichen",
 	"start_time_must_be_smaller_then_end_time" => "Die Startzeit muss kleiner als die Endzeit sein.",
 	"end_time_must_be_bigger_then_start_time" => "Die Endzeit muss größer als die Startzeit sein.",
+
+	//Activity Log
+	'log_create_profile' => 'Konto erstellt von ',
+	'log_add_class' => 'Lektion wurde hinzugefügt von '
 ];
 ?>

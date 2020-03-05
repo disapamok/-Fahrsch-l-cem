@@ -4,6 +4,7 @@ namespace Simcify\Controllers;
 use Simcify\Auth;
 use Simcify\Database;
 use Simcify\Mail;
+use Simcify\ActivityTimeline;
 
 class Instructor {
     /**
@@ -310,6 +311,7 @@ class Instructor {
         $theoryid = Database::table('theorylessons')->insertId();
         
         self::setScheduleToCalendar($theoryid, null, $date." ".$time, $date." ".$time, $user, null);
+        ActivityTimeline::logActivity($user,ActivityTimeline::$ADD_CLASS);
         
         return response()->json(responder("success", sch_translate("alright"), sch_translate("theory_lesson_successfully_added"), "reload()"));
     }
