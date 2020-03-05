@@ -19,3 +19,4 @@ Homestead.json
 .phpunit.result.cache
 src/routes.php
 /sftp-config.json
+/assets
