@@ -87,7 +87,7 @@
                         @endif
                       </div>
                       <div class="user-grid-info">
-                        <h5 class="text-gray text-uppercase font-14 mb-0">{{ $instructor->fname }} {{ $instructor->lname }}</h5>
+                        <h5 class="text-gray text-uppercase font-14 mb-0">{{ substr($instructor->fname.' '.$instructor->lname,0,25) }} </h5>
                         <p>{{sch_translate('instructor_of_course', [$instructor->courses])}}</p>
                       </div>
                   </div>
