@@ -245,12 +245,12 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                         <div class="card">
                             <div class="card-header border-0">
                                 @if( $user->role != 'student' && $user->role != 'instructor'  )
-                                    <button id="btn_theory" class="btn btn-red btn-icon pull-right"  data-toggle="modal" data-target="#addtheory_lesson"><i class=" mdi mdi-plus-circle-outline"></i>{{sch_translate('Theoriestunde')}}</button>
-                                    <button id="btn_theory_update" class="btn btn-red btn-icon pull-right d-none"  data-toggle="modal" data-target="#updatetheory_lesson"><i class=" mdi mdi-check"></i>{{sch_translate('Theoriestunde')}}</button>
-                                    <button id="btn_driving_update" class="btn btn-red btn-icon pull-right d-none"  data-toggle="modal" data-target="#updatedriving_lesson"><i class=" mdi mdi-check"></i>{{sch_translate('Theoriestunde')}}</button>
+                                    <button id="btn_theory" class="btn btn-red btn-icon pull-right"  data-toggle="modal" data-target="#addtheory_lesson"><i class=" mdi mdi-plus-circle-outline"></i>{{sch_translate('Theoriestunden')}}</button>
+                                    <button id="btn_theory_update" class="btn btn-red btn-icon pull-right d-none"  data-toggle="modal" data-target="#updatetheory_lesson"><i class=" mdi mdi-check"></i>{{sch_translate('Theoriestunden')}}</button>
+                                    <button id="btn_driving_update" class="btn btn-red btn-icon pull-right d-none"  data-toggle="modal" data-target="#updatedriving_lesson"><i class=" mdi mdi-check"></i>{{sch_translate('Theoriestunden')}}</button>
                                     <button id="btn_driving" class="btn btn-red btn-icon pull-right d-none"  data-toggle="modal" data-target="#adddriving_lesson"><i class=" mdi mdi-plus-circle-outline"></i>{{sch_translate('Fahrstunde')}}</button>
                                 @endif
-                                <span id="theory_lesson" class="h5 mr-1 h5-bottom-border">{{sch_translate('Theoriestunde')}}</span>
+                                <span id="theory_lesson" class="h5 mr-1 h5-bottom-border">{{sch_translate('Theoriestunden')}}</span>
                                 <span id="driving_lesson" class="h5 ml-1 text-gray" style="cursor: pointer;">{{sch_translate('Fahrstunde')}}</span>
                             </div>
                             <div class="card-body p-0">
@@ -897,7 +897,7 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
-                        <h4 class="modal-title" id="myModalLabel3">{{sch_translate('add') }} {{sch_translate('Theoriestunde')}}</h4>
+                        <h4 class="modal-title" id="myModalLabel3">{{sch_translate('add') }} {{sch_translate('Theoriestunden')}}</h4>
                     </div>
 
                     <div class="modal-body">
@@ -985,7 +985,7 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <button class="btn btn-red btn-block" type="submit" id="addtheorylesson">{{sch_translate('add') }} {{sch_translate('Theoriestunde')}}</button>
+                                        <button class="btn btn-red btn-block" type="submit" id="addtheorylesson">{{sch_translate('add') }} {{sch_translate('Theoriestunden')}}</button>
                                     </div>
                                 </div>
                             </div>
@@ -1004,7 +1004,7 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="mdi mdi-close-circle-outline"></i></span></button>
-                        <h4 class="modal-title" id="myModalLabel4">{{ sch_translate('update') }} {{sch_translate('Theoriestunde')}}</h4>
+                        <h4 class="modal-title" id="myModalLabel4">{{ sch_translate('update') }} {{sch_translate('Theoriestunden')}}</h4>
                     </div>
 
                     <div class="modal-body">
@@ -1093,7 +1093,7 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <button class="btn btn-red btn-block" type="submit" id="updatetheorylesson">{{ sch_translate('update') }} {{sch_translate('Theoriestunde')}}</button>
+                                        <button class="btn btn-red btn-block" type="submit" id="updatetheorylesson">{{ sch_translate('update') }} {{sch_translate('Theoriestunden')}}</button>
                                     </div>
                                 </div>
                             </div>

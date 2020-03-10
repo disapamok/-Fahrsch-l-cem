@@ -778,7 +778,8 @@ $sch_default_en_languages_strings =[
 
 	//Activity Log
 	'log_create_profile' => 'Account created by ',
-	'log_add_class' => 'Lesson was added by '
+	'log_thory_lesson' => 'A theory lesson was added by ',
+	'log_add_practical_lesson' => 'A practical lesson was added by '
 
 ];
 

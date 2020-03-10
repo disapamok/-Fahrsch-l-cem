@@ -115,7 +115,7 @@
                               @endif -->
                         </div>
                         <div class="user-grid-info pb-2">
-                           <h5 class=" text-gray text-uppercase font-14">{{ $student['fname'] }} {{ $student['lname'] }}</h5>
+                           <h5 class=" text-gray text-uppercase font-14">{{ substr($student['fname'].' '.$student['lname'],0,25) }}</h5>
                         </div>
                      </div>
                      <div class="p-3 px-4">

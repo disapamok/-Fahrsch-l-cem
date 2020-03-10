@@ -4,6 +4,39 @@
  $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
 }}
 <table class="accountinfo-table">
+
+  <!-- Common fields -->
+  <tr>
+      <td class="profile-item-title">{{sch_translate('name')}}</td>
+      <td class="profile-item-value">{{$userdata->title.'. '.$profile->fname.' '.$profile->lname}}</td>
+  </tr>
+  <tr>
+      <td class="profile-item-title">{{sch_translate('date_of_birth')}}</td>
+      <td class="profile-item-value">
+        @if($profile->date_of_birth != '0000-00-00' ) 
+        <span>{{ date('F j, Y', strtotime($profile->date_of_birth)) }}</span>
+        @else
+        <span class="text-muted">{{sch_translate('not_set')}}</span>
+        @endif
+    </td>
+  </tr>
+  <tr>
+        <td class="profile-item-title">{{sch_translate('gender')}}</td>
+        <td class="profile-item-value">{{$profile->gender}}</td>
+  </tr> 
+  <tr>
+      <td class="profile-item-title">{{sch_translate('address')}}</td>
+      <td class="profile-item-value">{{$profile->address}}</td>
+  </tr>
+  <tr>
+      <td class="profile-item-title">{{sch_translate('email')}}</td>
+      <td class="profile-item-value">{{$profile->email}}</td>
+  </tr>
+  <tr>
+      <td class="profile-item-title">{{sch_translate('phone_number')}}</td>
+      <td class="profile-item-value">{{$profile->phone}}</td>
+  </tr>
+  
     @if($sch_is_schuler)
     <!-- <tr>
         <td class="profile-item-title">{{sch_translate('Karteikennung')}}</td>
@@ -30,36 +63,19 @@
         <td class="profile-item-value">{{sch_translate($user_info->title)}}</td>
     </tr>
     @endif
-    <tr>
-        <td class="profile-item-title">{{sch_translate('gender')}}</td>
-        <td class="profile-item-value">{{$profile->gender}}</td>
-    </tr>
-    <tr>
-        <td class="profile-item-title">{{sch_translate('date_of_birth')}}</td>
-        <td class="profile-item-value">
-          @if( $profile->date_of_birth != '0000-00-00' ) 
-          <span>{{ date('F j, Y', strtotime($profile->date_of_birth)) }}</span>
-          @else
-          <span class="text-muted">{{sch_translate('not_set')}}</span>
-          @endif
-      </td>
-    </tr>
-    <tr>
-        <td class="profile-item-title">{{sch_translate('email')}}</td>
-        <td class="profile-item-value">{{$profile->email}}</td>
-    </tr>
-    <tr>
-        <td class="profile-item-title">{{sch_translate('phone_number')}}</td>
-        <td class="profile-item-value">{{$profile->phone}}</td>
-    </tr>
+
+
+
+    
+    
+    
     <tr>
       <td class="profile-item-title">{{sch_translate('gender')}}</td>
       <td class="profile-item-value">{{sch_translate($profile->gender)}}</td>
     </tr>
-    <tr>
-        <td class="profile-item-title">{{sch_translate('address')}}</td>
-        <td class="profile-item-value">{{$profile->address}}</td>
-    </tr>
+    
+
+
     @if(false)
     <tr>
         <td class="profile-item-title">{{sch_translate('vehicle_reg_no')}}</td>

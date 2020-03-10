@@ -27,6 +27,10 @@ class Profile{
         $courses = Database::table('courses')->where('school',$profile->school)->where('status',"Available")->get(); //$user->school
         $instructors = Database::table('users')->where(['role'=>'instructor','branch'=>$profile->branch,'school'=>$profile->school])->get(); //$user->branch , $user->school
         $fleets = Database::table('fleet')->where('branch',$profile->branch)->get(); //$user->branch
+
+        //error_reporting(-1);
+        //ini_set('display_errors', 'On');
+
         $timeline = ActivityTimeline::getLog($userid); //Database::table('timeline')->where('user',$userid)->get();
 
         //var_dump($timeline); exit();
@@ -75,6 +79,7 @@ class Profile{
         $attachments = Database::table('attachments')->leftJoin('users','attachments.uploaded_by','users.id')->where('attachment_for',$profile->id)->orderBy('attachments.id', false)->get("`users.fname`", "`users.lname`", "`users.avatar`", "`attachments.created_at`", "`attachments.name`", "`attachments.attachment`", "`attachments.id`", "`attachments.uploaded_by`");
 
         $userinfo = Database::table('userinfo')->where('user',$userid)->get();
+        $userdata = $userinfo[0];
 
         $all_students = Database::table('users')->where('role', 'student')->get();
 
@@ -83,7 +88,9 @@ class Profile{
 
         $choosenInstructor = ($choosenInstructor != null ? $choosenInstructor->instructor_id : null);
         
-        return view('profile', compact("driving_lessons","theory_lessons","profile2","all_students","assigned_students","user", "profile","branches","enrollments","courses","notes","attachments","invoices","payments","instructors","fleets","students","timeline", "user_branch", "userinfo","instructors","choosenInstructor"));
+        //var_dump($userdata->title); exit();
+
+        return view('profile', compact("driving_lessons","theory_lessons","profile2","all_students","assigned_students","user", "profile","branches","enrollments","courses","notes","attachments","invoices","payments","instructors","fleets","students","timeline", "user_branch", "userinfo","instructors","choosenInstructor", "userdata"));
     }
 
     /**

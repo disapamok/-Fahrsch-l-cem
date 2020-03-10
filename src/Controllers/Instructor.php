@@ -311,7 +311,7 @@ class Instructor {
         $theoryid = Database::table('theorylessons')->insertId();
         
         self::setScheduleToCalendar($theoryid, null, $date." ".$time, $date." ".$time, $user, null);
-        ActivityTimeline::logActivity($user,ActivityTimeline::$ADD_CLASS);
+        ActivityTimeline::logActivity($user,ActivityTimeline::$ADD_THEORY_LESSON);
         
         return response()->json(responder("success", sch_translate("alright"), sch_translate("theory_lesson_successfully_added"), "reload()"));
     }
@@ -374,6 +374,8 @@ class Instructor {
         Database::table('drivinglessons')->insert($data);
         $drivingid = Database::table('drivinglessons')->insertId();  
 
+        ActivityTimeline::logActivity($user,ActivityTimeline::$ADD_PRACTICAL_LESSON);
+       
         self::setScheduleToCalendar(null, $drivingid, $date." ".$from, $date." ".$to, $user, $instructor);
 
         return response()->json(responder("success", sch_translate("alright"), sch_translate("driving_lesson_successfully_added"), "reload()"));
