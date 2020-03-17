@@ -67,7 +67,10 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                                 </div>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
                                   <li role="presentation"><a role="menuitem" href="" data-toggle="modal" data-target="#update"> <i class="mdi mdi-account"></i>{{sch_translate('edit_profile')}}</a></li>
-                                  <li role="presentation"><a role="menuitem" href="" url="{{ url('Profile@delete') }}" data="userid:{{ $profile->id }}|csrf-token:{{csrf_token()}}" class="send-to-server-click" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('this_account_will_be_deleted_completely')}}" warning-button="{{sch_translate('proceed')}}" data-cancel-button="{{sch_translate('cancel')}}"> <i class="mdi mdi-delete"></i>{{sch_translate('delete')}}</a></li>
+
+                                    <li role="presentation">
+                                        <a role="menuitem" href="" url="{{ url('Profile@delete') }}" data="userid:{{ $profile->id }}|csrf-token:{{csrf_token()}}" class="send-to-server-click" warning-title="{{sch_translate('are_you_sure')}}" warning-message="{{sch_translate('this_account_will_be_deleted_completely')}}" warning-button="{{sch_translate('proceed')}}" data-cancel-button="{{sch_translate('cancel')}}"> <i class="mdi mdi-delete"></i>{{sch_translate('delete')}}</a>
+                                    </li>
                               </ul>
                             </div>
                         </div>
@@ -184,22 +187,24 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                                             <?php
                                                 $index = 0;
                                             ?>
-                                            <div id="student_list">
-                                                @if(!empty($assigned_students))
-                                                    @foreach($assigned_students as $student)
-                                                        @if($student->fname)
-                                                            <div id="std_{{$student->id}}" class="p-2 alert {{ ($index++ % 2 == 0) ? 'alert-primary' : 'alert-danger' }} " role="alert">
-                                                                <a href="{{ url('')}}profile/{{$student->id}}" class="alert-link">{{ $student->fname }} {{ $student->lname }}</a>
-                                                                <i id="{{$student->id}}" instructor="{{ $profile->id }}" class="fa fa-trash text-danger float-right mt-1 mr-1 delete_std" style="cursor: pointer;"></i>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
-                                                @else
-                                                    <div class="text-center">
-                                                        <span class="text">No students found</span>
-                                                    </div>
-                                                @endif
-                                            </div>
+            <div id="student_list">
+                @if(!empty($assigned_students))
+                    @foreach($assigned_students as $student)
+                        @if($student->fname)
+                            <div id="std_{{$student->id}}" class="p-2 alert {{ ($index++ % 2 == 0) ? 'alert-primary' : 'alert-danger' }} " role="alert">
+
+                                <a href="{{ url('')}}profile/{{$student->id}}" class="alert-link">{{ $student->fname }} {{ $student->lname }}</a>
+
+                                <i id="{{$student->id}}" instructor="{{ $profile->id }}" class="fa fa-trash text-danger float-right mt-1 mr-1 delete_std" style="cursor: pointer;"></i>
+                            </div>
+                        @endif
+                    @endforeach
+                @else
+                    <div class="text-center">
+                        <span class="text">No students found</span>
+                    </div>
+                @endif
+            </div>
                                             
                                             <form class="simcy-form translateValidation" data-parsley-validate=""  loader="true" id="assign_form">
                                                 <!-- <form class="simcy-form translateValidation" data-parsley-validate="" action="{{ url('Instructo@addAssignStudent') }}" method="POST" loader="true"> -->
@@ -2128,16 +2133,24 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
 
         $(document).on('click', '.delete_std', function(){
 
+
             let total_manage_student = parseInt($('#total_manage_student').text());
             // Student id
             let student = $(this).attr('id');
             let instructor = $(this).attr('instructor');
-            let click = confirm("Remove student?");
 
-            if(click == true){
-
+            swal({
+              title: "{{sch_translate('are_you_sure')}}",
+              type: "warning",
+              showCancelButton: true,
+              confirmButtonClass: "confirm",
+              confirmButtonText: "{{sch_translate('proceed')}}",
+              cancelButton: "{{sch_translate('cancel')}}",
+              closeOnConfirm: false
+            },
+            function(){
+              
                 var url = '{{ url("Instructor@removeAssignStudent") }}';
-
                 var formData = new FormData();
                 formData.append('csrf-token', Cookies.get('CSRF-TOKEN'));
                 formData.append('student', student);
@@ -2150,6 +2163,7 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                     processData: false,
                     data: formData,
                     success: function(res){
+                        swal("Deleted!", ".", "success");
                         if(res.status == 'success'){
                             $('#std_'+student).remove();
                             $('#total_manage_student').text(total_manage_student - 1);
@@ -2157,7 +2171,9 @@ $user_info = ($sch_is_schuler)? $userinfo[0] : (object)[];
                 }
                 });
 
-            }
+            });
+
+            
         });
         
         $(document).on('click', '#driving_lesson', function(){
