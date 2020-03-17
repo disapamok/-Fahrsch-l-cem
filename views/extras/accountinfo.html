@@ -21,10 +21,6 @@
     </td>
   </tr>
   <tr>
-        <td class="profile-item-title">{{sch_translate('gender')}}</td>
-        <td class="profile-item-value">{{$profile->gender}}</td>
-  </tr> 
-  <tr>
       <td class="profile-item-title">{{sch_translate('address')}}</td>
       <td class="profile-item-value">{{$profile->address}}</td>
   </tr>
@@ -62,18 +58,7 @@
         <td class="profile-item-title">{{sch_translate('anrede')}}</td>
         <td class="profile-item-value">{{sch_translate($user_info->title)}}</td>
     </tr>
-    @endif
-
-
-
-    
-    
-    
-    <tr>
-      <td class="profile-item-title">{{sch_translate('gender')}}</td>
-      <td class="profile-item-value">{{sch_translate($profile->gender)}}</td>
-    </tr>
-    
+    @endif   
 
 
     @if(false)
