@@ -168,7 +168,6 @@ class Student{
      * @return Json
      */
     public function create() {
-        
         $amountpaid = floatval(str_replace(',','.',input('amountpaid')));
         //user info 
         $studentStatus = escape(preg_replace('/\s+/', ' ', input('student_status')));
@@ -213,6 +212,8 @@ class Student{
             "uniqueEmail" => escape(preg_replace('/\s+/', ' ', input('email')))
         ));
 
+
+
         if ($signup["status"] == "success") {
             //user info              
             // $_karteikennung = escape(input("karteikennung"));
@@ -237,12 +238,11 @@ class Student{
             $_erteilungsart = escape(preg_replace('/\s+/', ' ', input("erteilungsart")));
             $_job = escape(preg_replace('/\s+/', ' ', input("job")));
 
-
+            $student = Database::table('users')->where('email',input('email'))->first();
             $instructor_student = array(
                 'instructor_id' => $_instructor,
-                'student_id'    => $newStudents
+                'student_id'    => $student->id
             );
-
             $resp = Database::table('instructor_students')->insert($instructor_student);
 
             $data = array(
