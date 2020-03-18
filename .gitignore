@@ -20,3 +20,4 @@ Homestead.json
 src/routes.php
 /sftp-config.json
 /assets
+/*.code-workspace
